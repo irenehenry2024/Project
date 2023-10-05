@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+
 # Create your models here.
 class CustomUser(AbstractUser):
     CUSTOMER = 1
@@ -21,8 +22,13 @@ class CustomUser(AbstractUser):
     is_Customer = models.BooleanField(default=False)
     is_Dietitian = models.BooleanField(default=False)
     is_Doctor = models.BooleanField(default=False)
-    
+
     REQUIRED_FIELDS = []
         
     # def _str_(self):
     #     return self.username
+
+
+
+   
+    

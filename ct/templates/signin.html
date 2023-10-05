@@ -152,8 +152,6 @@
             
             if (password.trim() === "") {
                 $passwordSpan.html("Password is required").css("color", "#FF0000"); // Red color for empty password
-            } else if (password.length < 8) {
-                $passwordSpan.html("Password must be at least 8 characters").css("color", "#FF0000"); // Red color for short password
             } else {
                 $passwordSpan.html(""); // Clear the error message
             }
