@@ -16,20 +16,20 @@ def index(request):
 
 def signup(request):
     if request.method == 'POST':
-        username = request.POST.get('uname')
+        c_uname = request.POST.get('c_uname')
         email = request.POST.get('email')
         password = request.POST.get('password')
         
 
         if (
-            CustomUser.objects.filter(email=email).exists()
+            CustomUser.objects.filter(username=c_uname).exists()
         ):
-            messages.error(request, "email already registered")
-            return render(request, "signin.html")
+            messages.error(request, "username already registered")
+            return render(request, "signup.html")
 
         else:
             user = CustomUser.objects.create_user(
-                username=username,
+                username=c_uname,
                 email=email,
                 password=password,
                 
@@ -39,7 +39,7 @@ def signup(request):
             user.save()
             return redirect("signin")
     else:
-        return render(request, "dsignup.html")
+        return render(request, "signup.html")
 
 def dsignup(request):
     if request.method == 'POST':
@@ -49,10 +49,10 @@ def dsignup(request):
         
 
         if (
-            CustomUser.objects.filter(email=email).exists()
+            CustomUser.objects.filter(username=username).exists()
         ):
-            messages.error(request, "email already registered")
-            return render(request, "signin.html")
+            messages.error(request, "username already registered")
+            return render(request, "dsignup.html")
 
         else:
             user = CustomUser.objects.create_user(
@@ -78,10 +78,10 @@ def drsignup(request):
         
 
         if (
-            CustomUser.objects.filter(email=email).exists()
+            CustomUser.objects.filter(username=username).exists()
         ):
-            messages.error(request, "email already registered")
-            return render(request, "signin.html")
+            messages.error(request, "username already registered")
+            return render(request, "drsignup.html")
 
         else:
             user = CustomUser.objects.create_user(
@@ -93,9 +93,42 @@ def drsignup(request):
 
             )
             user.save()
+            
             return redirect("signin")
     else:
         return render(request, "drsignup.html")
+def signin(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            auth_login(request,user)
+            if request.user.is_Customer:
+                return redirect('/')
+            elif request.user.is_Dietitian:
+                return redirect('d_index')
+            elif request.user.is_Doctor:
+                return redirect('dr_index')
+        else:
+            messages.success(request,("Invalid login credentials."))
+    return render(request, 'signin.html')
+
+def index1(request):
+    return render(request, 'index1.html')
+
+
+from django.contrib.auth import logout
+
+def loggout(request):
+    logout(request)
+    return redirect('index')  # Redirect to the home page after logout
+
+def d_index(request):
+    return render(request, "d_index.html")
+def dr_index(request):
+    return render(request, "dr_index.html")
+
 
 # def signin(request):
 #     if request.method == 'POST':
@@ -134,22 +167,7 @@ def drsignup(request):
 #     return render(request, 'signin.html')
 
 
-def signin(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            auth_login(request,user)
-            if request.user.is_Customer:
-                return redirect('index')
-            elif request.user.is_Dietitian:
-                return redirect('d_index')
-            elif request.user.is_Doctor:
-                return redirect('dr_index')
-        else:
-            messages.success(request,("Invalid login credentials."))
-    return render(request, 'signin.html')
+
 
     # if request.user.is_authenticated:
     #     if request.user.is_Customer:
@@ -222,16 +240,6 @@ def signin(request):
 # def signout(request):
 #     pass
 
-from django.contrib.auth import logout
-
-def loggout(request):
-    logout(request)
-    return redirect('index')  # Redirect to the home page after logout
-
-def d_index(request):
-    return render(request, "d_index.html")
-def dr_index(request):
-    return render(request, "dr_index.html")
 
 # def signup(request):
 #     if request.method == 'POST':

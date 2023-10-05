@@ -144,10 +144,11 @@ LOGOUT_REDIRECT_URL = 'index'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_PORT = 1025 # or the appropriate port
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587 # or the appropriate port
 EMAIL_USE_TLS = True  # or False depending on your SMTP server
 EMAIL_USE_SSL = False  # or True depending on your SMTP server
-EMAIL_HOST_USER = 'your-email@example.com'
-EMAIL_HOST_PASSWORD = 'your-email-password'
+EMAIL_HOST_USER = 'irenehenry2024a@mca.ajce.in'
+EMAIL_HOST_PASSWORD = '$Irene3698'
 
 EMAIL_DEBUG = True

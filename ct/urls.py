@@ -14,7 +14,9 @@ urlpatterns = [
    path('signin/', views.signin, name="signin"),
    path('dsignup/', views.dsignup, name="dsignup"),
    path('drsignup/', views.drsignup, name="drsignup"),
+   path('index1/', views.index1, name="index1"),
    path('loggout/', auth_views.LogoutView.as_view(), name="loggout"),
+  
 
 
 path('password_reset/',auth_views.PasswordResetView.as_view(),name='password_reset'),
