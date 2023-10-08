@@ -88,24 +88,21 @@
                         <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% static 'about.html' %}">About</a>
+                        <a class="nav-link" href="{% static 'about.html' %}">Notifications</a>
                     </li>
 
-                    {% comment %} <li class="nav-item dropdown">
+                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Diets
+                          About
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <a class="dropdown-item" href="{% static 'special-dishes.html' %}">Low-Carb</a>
-                          <a class="dropdown-item" href="{% static 'special-dishes.html' %}">Keto</a>
-                          <a class="dropdown-item" href="{% static 'special-dishes.html' %}">High Protein</a>
-                          <a class="dropdown-item" href="{% static 'special-dishes.html' %}">Low-Fat</a>
-                          <a class="dropdown-item" href="{% static 'special-dishes.html' %}">Mediterranean</a>
-                          <a class="dropdown-item" href="{% static 'special-dishes.html' %}">Vegetarian</a>
-                          <a class="dropdown-item" href="{% static 'special-dishes.html' %}">Vegen</a>
-
+                          <a class="dropdown-item" href="{% static 'special-dishes.html' %}">Client Information</a>
+                          <a class="dropdown-item" href="{% static 'special-dishes.html' %}">Training & Support</a>
+                          <a class="dropdown-item" href="{% static 'special-dishes.html' %}">Meal Planning</a>
+                          <a class="dropdown-item" href="{% static 'special-dishes.html' %}">Dietary Assessment</a>
+                          <a class="dropdown-item" href="{% static 'special-dishes.html' %}">Progress Tracking</a>
                         </div>
-                    </li> {% endcomment %}
+                    </li> 
                 </div>
             </ul>
             
@@ -122,7 +119,7 @@
                     <a class="nav-link" style="color: blue;"> Welcome, {{ user.username }}</a>
                   </li>
                   <li class="nav-item active">
-                    <a href="{% url 'loggout' %}" class="nav-link">Logout</a>
+                    <a href="{% url 'loggout' %}"  id="logout-link"class="nav-link">Logout</a>
                   </li>
                   {% else %}
                   <li class="nav-item active">
@@ -197,14 +194,14 @@
     <div class="container">
         <div class="section-content">
             <div class="row">
-                <div class="col-sm-5 img-bg d-flex shadow align-items-center justify-content-center justify-content-md-end img-2" style="background-image: url(img/hero-2.jpg);">
+                {% comment %} <div class="col-sm-5 img-bg d-flex shadow align-items-center justify-content-center justify-content-md-end img-2" style="background-image: url(img/hero-2.jpg);"> {% endcomment %}
                     
                 </div>
                 <div class="col-sm-7 py-5 pl-md-0 pl-4">
                     <div class="heading-section pl-lg-5 ml-md-5">
-                        <span class="subheading">
+                        {% comment %} <span class="subheading">
                             About
-                        </span>
+                        </span><br> {% endcomment %}
                         <h2>
                             Welcome to Calorie Tracker
                         </h2>
@@ -257,12 +254,12 @@
                    
                 </span>
                 <h2>
-                    Being Healthy Has Never Been Easier
+                    Your Path to Health, One Calorie at a Time!
                 </h2>
             </div>
             <div class="row mt-5">
                 <div class="col-lg-5 col-md-6 align-self-center py-5">
-                     <h2 class="special-number">1.</h2>
+                     {% comment %} <h2 class="special-number">1.</h2> {% endcomment %}
                      <div class="dishes-text">
                         <h3><span>Weight Loss Blog</h3></span>
                         
@@ -272,15 +269,15 @@
                     </div>
                 </div>
                 <div class="col-lg-5 offset-lg-2 col-md-6 align-self-center mt-4 mt-md-0">
-                    <img src="{% static 'img/fitness.jpg' %}" alt="" class="img-fluid shadow w-100">
+                    <img src="{% static 'img/basket.jpeg' %}" alt="" class="img-fluid shadow w-100">
                 </div>
             </div>
             <div class="row mt-5">
                 <div class="col-lg-5 col-md-6 align-self-center order-2 order-md-1 mt-4 mt-md-0">
-                    <img src="{% static 'img/off.jpg' %}" alt="" class="img-fluid shadow w-100">
+                    <img src="{% static 'img/celery.jpeg' %}" alt="" class="img-fluid shadow w-100">
                 </div>
                 <div class="col-lg-5 offset-lg-2 col-md-6 align-self-center order-1 order-md-2 py-5">
-                    <h2 class="special-number">2.</h2>
+                    {% comment %} <h2 class="special-number">2.</h2> {% endcomment %}
                     <div class="dishes-text">
                         <h3><span>Diet Library</h3></span> 
                         <p class="pt-3">Are recipies from meal delivery services healthy? Here's how to find the best meal delivery service to help you hit your weight loss goals.</p>
@@ -318,4 +315,5 @@
 	<script src="{% static 'js/app.min.js' %}"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </body>
+
 </html>

@@ -185,7 +185,7 @@
         
           
           
-          
+{% comment %}           
           function validateEmail() {
               const email = $("#email").val();
               const filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -196,8 +196,27 @@
               } else {
                   $("#emailspan").html("");
               }
-          }
-          
+          } {% endcomment %}
+
+          function validateEmail() {
+            const email = $("#email").val().trim();
+            const $emailSpan = $("#emailspan");
+        
+            if (email === "") {
+                $emailSpan.html("Enter an email address").css("color", "#FF0000");
+            } else {
+                // Check for common Gmail format errors
+                {% comment %} const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/; {% endcomment %}
+                const gmailRegex= /^[A-Za-z]/;
+        
+                if (!gmailRegex.test(email)) {
+                    $emailSpan.html("Enter a valid Gmail address").css("color", "#FF0000");
+                } else {
+                    $emailSpan.html(""); // Clear the error message
+                }
+            }
+        }
+        
           
           
           function validatePassword() {

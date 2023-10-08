@@ -10,6 +10,16 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes  
+from django.utils.encoding import force_str
+from django.contrib.auth import get_user_model
+from django.shortcuts import render
+
+from django.core.mail import send_mail
+from django.urls import reverse
+
 # Create your views here.
 
 def index(request):
@@ -39,9 +49,29 @@ def signup(request):
 
             )
             user.save()
+            # Generate a confirmation token for the user
+            token = default_token_generator.make_token(user)
+
+            # Encode the user's primary key for use in the URL
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+
+            confirmation_link = reverse('confirm_email', kwargs={'uidb64': uid, 'token': token})
+            confirmation_link = request.build_absolute_uri(confirmation_link)
+
+            # Send the confirmation email to the user
+            subject = 'Confirm your email'
+            message = 'Please click the link below to confirm your email:\n\n' + confirmation_link
+            from_email = 'irenehenry2024a@mca.ajce.in'  # Replace with your email
+            recipient_list = [user.email]
+            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+             # Display a success message
+            messages.success(request, "Registration successful. You can now log in.")
+            
             return redirect("signin")
     else:
         return render(request, "signup.html")
+
 
 def dsignup(request):
     if request.method == 'POST':
@@ -66,6 +96,24 @@ def dsignup(request):
 
             )
             user.save()
+            # Generate a confirmation token for the user
+            token = default_token_generator.make_token(user)
+
+            # Encode the user's primary key for use in the URL
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+
+            confirmation_link = reverse('confirm_email', kwargs={'uidb64': uid, 'token': token})
+            confirmation_link = request.build_absolute_uri(confirmation_link)
+
+            # Send the confirmation email to the user
+            subject = 'Confirm your email'
+            message = 'Please click the link below to confirm your email:\n\n' + confirmation_link
+            from_email = 'irenehenry2024a@mca.ajce.in'  # Replace with your email
+            recipient_list = [user.email]
+            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+               # Display a success message
+            messages.success(request, "Registration successful. You can now log in.")
             return redirect("signin")
     else:
         return render(request, "dsignup.html")
@@ -95,29 +143,71 @@ def drsignup(request):
 
             )
             user.save()
+            # Generate a confirmation token for the user
+            token = default_token_generator.make_token(user)
+
+            # Encode the user's primary key for use in the URL
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+
+            confirmation_link = reverse('confirm_email', kwargs={'uidb64': uid, 'token': token})
+            confirmation_link = request.build_absolute_uri(confirmation_link)
+
+            # Send the confirmation email to the user
+            subject = 'Confirm your email'
+            message = 'Please click the link below to confirm your email:\n\n' + confirmation_link
+            from_email = 'irenehenry2024a@mca.ajce.in'  # Replace with your email
+            recipient_list = [user.email]
+            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            # Display a success message
+            messages.success(request, "Registration successful. You can now log in.")
             
             return redirect("signin")
     else:
         return render(request, "drsignup.html")
+
+# ...
+
 def signin(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            auth_login(request,user)
-            if request.user.is_Customer:
-                return redirect('/')
-            elif request.user.is_Dietitian:
+            auth_login(request, user)
+            if user.is_Customer:  # Check if the user is a customer
+                return redirect('/')  # Redirect to the index page
+            elif user.is_Dietitian:
                 return redirect('d_index')
-            elif request.user.is_Doctor:
+            elif user.is_Doctor:
                 return redirect('dr_index')
-            elif request.user.is_superuser:
+            elif user.is_superuser:
                 return redirect('admindashboard')
         else:
-            messages.success(request,("Invalid login credentials."))
+            messages.error(request, "Invalid login credentials.")
     return render(request, 'signin.html')
 
+
+# def signin(request):
+#     if request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         user = authenticate(request, username=username, password=password)
+#         if user is not None:
+#             auth_login(request,user)
+#             if request.user.is_Customer:
+#                 return redirect('/')
+#             elif request.user.is_Dietitian:
+#                 return redirect('d_index')
+#             elif request.user.is_Doctor:
+#                 return redirect('dr_index')
+#             elif request.user.is_superuser:
+#                 return redirect('admindashboard')
+#         else:
+#             messages.success(request,("Invalid login credentials."))
+#     return render(request, 'signin.html')
+
+# @login_required(login_url='signin')
 def admindashboard(request):
       
     # Fetch data for the admin dashboard here (e.g., user information, orders, statistics)
@@ -148,10 +238,12 @@ from django.contrib.auth import logout
 
 def loggout(request):
     logout(request)
-    return redirect('index')  # Redirect to the home page after logout
+    return redirect('/')  # Redirect to the home page after logout
 
 def d_index(request):
     return render(request, "d_index.html")
+
+
 def dr_index(request):
     return render(request, "dr_index.html")
 
@@ -181,5 +273,16 @@ def toggle_user_status(request, user_id):
 
     return redirect('admindashboard')  # Redirect back to the admin dashboard or another appropriate URL
 
-
+def confirm_email(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = get_user_model().objects.get(pk=uid)
+        if default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            return render(request, 'confirmation_success.html')
+        else:
+            return render(request, 'confirmation_failure.html')
+    except Exception as e:
+        return render(request, 'confirmation_failure.html')
 
