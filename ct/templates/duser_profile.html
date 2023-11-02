@@ -1,0 +1,470 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>profile</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <style>
+            /* Style for the custom dropdown menu */
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border: 1px solid #ccc;
+        padding: 10px;
+        min-width: 160px;
+        z-index: 1;
+    }
+    
+    /* Show the dropdown on hover */
+    .nav-item.dropdown:hover .dropdown-menu {
+        display: block;
+    }
+    
+    /* Style for the dropdown items */
+    .dropdown-menu li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Style for the dropdown links */
+    .dropdown-menu a {
+        text-decoration: none;
+        color: #333;
+        display: block;
+        padding: 8px 0;
+        transition: background-color 0.3s;
+    }
+    
+    /* Highlight on hover */
+    .dropdown-menu a:hover {
+        background-color: #f0f0f0;
+    }
+         </style>
+    </head>
+    <body>
+        <div class="boxed-page">
+            <nav id="navbar-header" class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand navbar-brand-center d-flex align-items-center p-0 only-mobile" href="/">
+                <img src="img/logo.png" alt="">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="lnr lnr-menu"></span>
+            </button>
+    
+            <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
+                <ul class="navbar-nav d-flex justify-content-between">
+                    <li class="nav-item only-desktop">
+                        <a class="nav-link" id="side-nav-open" href="#">
+                            <span class="lnr lnr-menu"></span>
+                        </a>
+                    </li>
+                    <div class="d-flex flex-lg-row flex-column">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="/">Meal Plan</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% static 'about.html' %}">View Article</a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{% static 'menu.html' %}">Analytics</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="accountSettingsDropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                              Profile Settings
+                            </a>
+                        <ul class="dropdown-menu" aria-labelledby="accountSettingsDropdown">
+                         <li><a href="{% static 'special-dishes.html' %}">My Details</a></li>
+                         <li><a href="{% url "change_password" %}">Change Password</a></li>
+                        </ul>
+                       </li>
+                    </div>
+                </ul>
+                
+                
+                <a class="navbar-brand navbar-brand-center d-flex align-items-center only-desktop" href="#">
+                    <img src="img/logo.png" alt="">
+                </a>
+                <ul class="navbar-nav d-flex justify-content-between">
+                    <div class="d-flex flex-lg-row flex-column">
+                        
+                      {% if user.is_authenticated %}
+                      <li class="nav-item active">
+                        <a class="nav-link" style="color: blue;"> Welcome, {{ user.username }}</a>
+                      </li>
+                      {% comment %} <li class="nav-item active">
+                        <a href="{% url 'loggout' %}" class="nav-link">Logout</a>
+                      </li> {% endcomment %}
+                      {% comment %} <li class="nav-item active">
+                        <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+                      </li> {% endcomment %}
+                      {% comment %} {% else %} {% endcomment %}
+                      {% comment %} <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Register as
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                          <a class="dropdown-item" href="{% url 'signup' %}">Customer</a>
+                          <a class="dropdown-item" href="{% url 'dsignup' %}">Dietitian</a>
+                          <a class="dropdown-item" href="{% url 'drsignup' %}">Doctor</a>
+    
+                        </div>
+                      </li> {% endcomment %}
+                      {% comment %} <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'signin' %}">Login</a>
+                      </li> {% endcomment %}
+                      {% endif %}
+                      {% comment %} <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'admindashboard' %}">Admin</a>
+                        </li> {% endcomment %}
+                    </div>
+                    {% comment %} <li class="nav-item">
+                        <a id="side-search-open" class="nav-link" href="#">
+                            <span class="lnr lnr-magnifier"></span>
+                        </a>
+                    </li> {% endcomment %}
+                </ul>
+            </div>
+        </div>
+    </nav>		
+        <section style="background-color: #eee;">
+            <div class="container py-5">
+                <div class="row">
+                    <div class="col">
+                        <nav aria-label="breadcrumb"
+                            class="bg-light rounded-3 p-3 mb-4">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item">
+                                    {% if user.is_Customer %}
+                                    <a href="{% url "index" %}">Home</a></li>
+                                    {% elif user.is_Dietitian %}
+                                    <a href="{% url "d_index" %}">Home</a></li>
+                                    {% elif user.is_Doctor %}
+                                    <a href="{% url "dr_index" %}">Home</a></li>
+                                    {% endif %}
+                                {% comment %} <li class="breadcrumb-item"><a href="#">User</a></li> {% endcomment %}
+                                <li class="breadcrumb-item active"
+                                    aria-current="page">Dietitian Profile</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </nav>
+
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="card mb-4">
+                            <div class="card-body text-center">
+                                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
+                                     alt="avatar"
+                                     class="rounded-circle img-fluid"
+                                     style="width: 150px;">
+                                     <h5 class="my-3">{{ user.username }}</h5>
+                                     {% if user.is_Customer %}
+                                        <p class="text-muted mb-1">Customer</p>
+                                     {% elif user.is_Dietitian %}
+                                        <p class="text-muted mb-1">Dietitian</p>
+                                     {% elif user.is_Doctor %}
+                                        <p class="text-muted mb-1">Doctor</p>
+                                     {% endif %}
+                                     <p class="text-muted mb-1">{{ user.email }}</p>
+                                     <p class="text-muted mb-1">Phone Number: {{ duser_profile.phone_number }}</p>
+                                     <p class="text-muted mb-1">State: {{ duser_profile.state }}</p>
+                                     <p class="text-muted mb-1">District: {{ duser_profile.district }}</p>
+                                     <p class="text-muted mb-1">Gender: {{ duser_profile.gender }}</p>
+                                     <p class="text-muted mb-1">certification: {{ duser_profile.certifications }}</p>
+                                     <p class="text-muted mb-1">Specialization: {{ duser_profile.specialization }}</p>
+
+
+                                <!-- Add other user details here if needed -->
+                                <div class="d-flex justify-content-center mb-2">
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="card mb-4 mb-lg-0">
+
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="card mb-4">
+                            <section>
+                                <form method="POST" action="" id="form">
+                                    {% csrf_token %}
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <p class="mb-0" for="num">Phone Number</p>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <input type="text" id="num" class="form-control form-control-lg" name="num" value= "{{ duser_profile.phone_number }}" />
+                                                <span id="numspan" style="font-size: 12px;"></span>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <p class="mb-0" for="state">State</p>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <select id="state" class="form-control form-control-lg" name="state" onchange="populateDistricts()" >
+                                                    <option value="" disabled selected>Select State</option>
+                                                         <option value="Andhra Pradesh" {% if duser_profile.state == "Andhra Pradesh" %}selected{% endif %}>Andhra Pradesh</option>
+                                                         <option value="Arunachal Pradesh" {% if duser_profile.state == "Arunachal Pradesh" %}selected{% endif %}>Arunachal Pradesh</option>
+                                                         <option value="Assam" {% if duser_profile.state == "Assam" %}selected{% endif %}>Assam</option>
+                                                         <option value="Bihar" {% if duser_profile.state == "Bihar" %}selected{% endif %}>Bihar</option>
+                                                         <option value="Chhattisgarh" {% if duser_profile.state == "Chhattisgarh" %}selected{% endif %}>Chhattisgarh</option>
+                                                         <option value="Goa" {% if duser_profile.state == "Goa" %}selected{% endif %}>Goa</option>
+                                                         <option value="Gujarat" {% if duser_profile.state == "Gujarat" %}selected{% endif %}>Gujarat</option>
+                                                         <option value="Haryana" {% if duser_profile.state == "Haryana" %}selected{% endif %}>Haryana</option>
+                                                         <option value="Himachal Pradesh" {% if duser_profile.state == "Himachal Pradesh" %}selected{% endif %}>Himachal Pradesh</option>
+                                                         <option value="Jharkhand" {% if duser_profile.state == "Jharkhand" %}selected{% endif %}>Jharkhand</option>
+                                                         <option value="Karnataka" {% if duser_profile.state == "Karnataka" %}selected{% endif %}>Karnataka</option>
+                                                         <option value="Kerala" {% if duser_profile.state == "Kerala" %}selected{% endif %}>Kerala</option>
+                                                         <option value="Madhya Pradesh" {% if duser_profile.state == "Madhya Pradesh" %}selected{% endif %}>Madhya Pradesh</option>
+                                                         <option value="Maharashtra" {% if duser_profile.state == "Maharashtra" %}selected{% endif %}>Maharashtra</option>
+                                                         <option value="Manipur" {% if duser_profile.state == "Manipur" %}selected{% endif %}>Manipur</option>
+                                                         <option value="Meghalaya" {% if duser_profile.state == "Meghalaya" %}selected{% endif %}>Meghalaya</option>
+                                                         <option value="Mizoram" {% if duser_profile.state == "Mizoram" %}selected{% endif %}>Mizoram</option>
+                                                         <option value="Nagaland" {% if duser_profile.state == "Nagaland" %}selected{% endif %}>Nagaland</option>
+                                                         <option value="Odisha" {% if duser_profile.state == "Odisha" %}selected{% endif %}>Odisha</option>
+                                                         <option value="Punjab" {% if duser_profile.state == "Punjab" %}selected{% endif %}>Punjab</option>
+                                                         <option value="Rajasthan" {% if duser_profile.state == "Rajasthan" %}selected{% endif %}>Rajasthan</option>
+                                                         <option value="Sikkim" {% if duser_profile.state == "Sikkim" %}selected{% endif %}>Sikkim</option>
+                                                         <option value="Tamil Nadu" {% if duser_profile.state == "Tamil Nadu" %}selected{% endif %}>Tamil Nadu</option>
+                                                         <option value="Telangana" {% if duser_profile.state == "Telangana" %}selected{% endif %}>Telangana</option>
+                                                         <option value="Tripura" {% if duser_profile.state == "Tripura" %}selected{% endif %}>Tripura</option>
+                                                         <option value="Uttar Pradesh" {% if duser_profile.state == "Uttar Pradesh" %}selected{% endif %}>Uttar Pradesh</option>
+                                                         <option value="Uttarakhand" {% if duser_profile.state == "Uttarakhand" %}selected{% endif %}>Uttarakhand</option>
+                                                         <option value="West Bengal" {% if duser_profile.state == "West Bengal" %}selected{% endif %}>West Bengal</option>
+                                                     </select>                                                                                    
+                                                   <span id="stspan" style="font-size: 12px;"></span>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <p class="mb-0" for="district">District</p>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <select id="district" class="form-control form-control-lg" name="district">
+                                                    <option value="" disabled selected>Select District</option>
+                                                    <option value="{{ duser_profile.district }}" selected>{{ duser_profile.district }}</option>
+                                                </select>
+                                                <span id="districtspan" style="font-size: 12px;"></span>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <p class="mb-0">Gender</p>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <select id="gender" class="form-control form-control-lg" name="gender">
+                                                    <option value="male" {% if user_profile.gender == "male" %}selected{% endif %}>Male</option>
+                                                    <option value="female" {% if user_profile.gender == "female" %}selected{% endif %}>Female</option>
+                                                    <option value="others" {% if user_profile.gender == "others" %}selected{% endif %}>Others</option>
+                                                   
+                                                    {% comment %} <option value="male">Male</option>
+                                                    <option value="female">Female</option>
+                                                    <option value="others">Others</option> {% endcomment %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    <hr>
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <p class="mb-0" for="certifications">Certifications</p>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <input type="text" id="certifications" class="form-control form-control-lg" name="certifications" value="{{ duser_profile.certifications }}" />
+                                                <span id="certificationsspan" style="font-size: 12px;"></span>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <p class="mb-0" for="specialization">Specialization</p>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <input type="text" id="specialization" class="form-control form-control-lg" name="specialization" value="{{ duser_profile.specialization }}" />
+                                                <span id="specializationspan" style="font-size: 12px;"></span>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                    <center><button type="submit" id="savebtn" class="btn btn-warning btn-lg ms-2">Save</button></center>
+
+                                     <br><br><br>
+
+                                </form>
+                                
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        
+        
+        
+        <script>
+            function populateDistricts() {
+                const stateSelect = document.getElementById('state');
+                const districtSelect = document.getElementById('district');
+                
+            // Define an object that maps states to their corresponding districts
+            const stateToDistricts = {
+                'Kerala': ['Thiruvananthapuram', 'Kollam', 'Pathanamthitta', 'Alappuzha', 'Kottayam', 'Idukki', 'Ernakulam', 'Thrissur', 'Palakkad', 'Malappuram', 'Kozhikode', 'Wayanad', 'Kannur', 'Kasaragod'],
+                'Andhra Pradesh': ['Anantapur', 'Chittoor', 'East Godavari', 'Guntur', 'Krishna', 'Kurnool', 'Nellore', 'Prakasam', 'Srikakulam', 'Visakhapatnam', 'Vizianagaram', 'West Godavari', 'YSR Kadapa'],
+                'Arunachal Pradesh': ['Tawang', 'West Kameng', 'East Kameng', 'Papum Pare', 'Kurung Kumey', 'Kra Daadi', 'Lower Subansiri', 'Upper Subansiri', 'West Siang', 'East Siang', 'Siang', 'Upper Siang', 'Lower Siang', 'Lower Dibang Valley', 'Dibang Valley', 'Anjaw', 'Lohit', 'Namsai', 'Changlang', 'Tirap', 'Longding'],
+                'Assam': ['Baksa', 'Barpeta', 'Biswanath', 'Bongaigaon', 'Cachar', 'Charaideo', 'Chirang', 'Darrang', 'Dhemaji', 'Dhubri', 'Dibrugarh', 'Dima Hasao', 'Goalpara', 'Golaghat', 'Hailakandi', 'Hojai', 'Jorhat', 'Kamrup', 'Kamrup Metropolitan', 'Karbi Anglong', 'Karimganj', 'Kokrajhar', 'Lakhimpur', 'Majuli', 'Morigaon', 'Nagaon', 'Nalbari', 'Sivasagar', 'Sonitpur', 'South Salmara-Mankachar', 'Tinsukia', 'Udalguri', 'West Karbi Anglong'],
+                'Bihar': ['Araria', 'Arwal', 'Aurangabad', 'Banka', 'Begusarai', 'Bhagalpur', 'Bhojpur', 'Buxar', 'Darbhanga', 'East Champaran', 'Gaya', 'Gopalganj', 'Jamui', 'Jehanabad', 'Kaimur', 'Katihar', 'Khagaria', 'Kishanganj', 'Lakhisarai', 'Madhepura', 'Madhubani', 'Munger', 'Muzaffarpur', 'Nalanda', 'Nawada', 'Patna', 'Purnia', 'Rohtas', 'Saharsa', 'Samastipur', 'Saran', 'Sheikhpura', 'Sheohar', 'Sitamarhi', 'Siwan', 'Supaul', 'Vaishali', 'West Champaran'],
+                'Chhattisgarh': ['Balod', 'Baloda Bazar', 'Balrampur', 'Bastar', 'Bemetara', 'Bijapur', 'Bilaspur', 'Dantewada', 'Dhamtari', 'Durg', 'Gariaband', 'Janjgir-Champa', 'Jashpur', 'Kabirdham', 'Kanker', 'Kondagaon', 'Korba', 'Koriya', 'Mahasamund', 'Mungeli', 'Narayanpur', 'Raigarh', 'Raipur', 'Rajnandgaon', 'Sukma', 'Surajpur', 'Surguja'],
+                'Goa': ['North Goa', 'South Goa'],
+                'Gujarat': ['Ahmedabad', 'Amreli', 'Anand', 'Aravalli', 'Banaskantha', 'Bharuch', 'Bhavnagar', 'Botad', 'Chhota Udaipur', 'Dahod', 'Dang', 'Devbhoomi Dwarka', 'Gandhinagar', 'Gir Somnath', 'Jamnagar', 'Junagadh', 'Kheda', 'Kutch', 'Mahisagar', 'Mehsana', 'Morbi', 'Narmada', 'Navsari', 'Panchmahal', 'Patan', 'Porbandar', 'Rajkot', 'Sabarkantha', 'Surat', 'Surendranagar', 'Tapi', 'Vadodara', 'Valsad'],
+                'Haryana': ['Ambala', 'Bhiwani', 'Charkhi Dadri', 'Faridabad', 'Fatehabad', 'Gurugram', 'Hisar', 'Jhajjar', 'Jind', 'Kaithal', 'Karnal', 'Kurukshetra', 'Mahendragarh', 'Nuh', 'Palwal', 'Panchkula', 'Panipat', 'Rewari', 'Rohtak', 'Sirsa', 'Sonipat', 'Yamunanagar'],
+                'Himachal Pradesh': ['Bilaspur', 'Chamba', 'Hamirpur', 'Kangra', 'Kinnaur', 'Kullu', 'Lahaul and Spiti', 'Mandi', 'Shimla', 'Sirmaur', 'Solan', 'Una'],
+                'Jharkhand': ['Bokaro', 'Chatra', 'Deoghar', 'Dhanbad', 'Dumka', 'East Singhbhum', 'Garhwa', 'Giridih', 'Godda', 'Gumla', 'Hazaribagh', 'Jamtara', 'Khunti', 'Koderma', 'Latehar', 'Lohardaga', 'Pakur', 'Palamu', 'Ramgarh', 'Ranchi', 'Sahibganj', 'Seraikela Kharsawan', 'Simdega', 'West Singhbhum'],
+                'Karnataka': ['Bagalkot', 'Ballari (Bellary)', 'Belagavi (Belgaum)', 'Bengaluru Rural', 'Bengaluru Urban', 'Bidar', 'Chamarajanagar', 'Chikkaballapura', 'Chikkmagaluru (Chikmagalur)', 'Chitradurga', 'Dakshina Kannada', 'Davangere', 'Dharwad', 'Gadag', 'Hassan', 'Haveri', 'Kalaburagi (Gulbarga)', 'Kodagu', 'Kolar', 'Koppal', 'Mandya', 'Mysuru (Mysore)', 'Raichur', 'Ramanagara', 'Shivamogga (Shimoga)', 'Tumakuru (Tumkur)', 'Udupi', 'Uttara Kannada (Karwar)', 'Vijayapura (Bijapur)', 'Yadgir'],
+                'Madhya Pradesh': ['Agar Malwa', 'Alirajpur', 'Anuppur', 'Ashoknagar', 'Balaghat', 'Barwani', 'Betul', 'Bhind', 'Bhopal', 'Burhanpur', 'Chhatarpur', 'Chhindwara', 'Damoh', 'Datia', 'Dewas', 'Dhar', 'Dindori', 'Guna', 'Gwalior', 'Harda', 'Hoshangabad', 'Indore', 'Jabalpur', 'Jhabua', 'Katni', 'Khandwa', 'Khargone', 'Mandla', 'Mandsaur', 'Morena', 'Narsinghpur', 'Neemuch', 'Panna', 'Raisen', 'Rajgarh', 'Ratlam', 'Rewa', 'Sagar', 'Satna', 'Sehore', 'Seoni', 'Shahdol', 'Shajapur', 'Sheopur', 'Shivpuri', 'Sidhi', 'Singrauli', 'Tikamgarh', 'Ujjain', 'Umaria', 'Vidisha'],
+                'Maharashtra': ['Ahmednagar', 'Akola', 'Amravati', 'Aurangabad', 'Beed', 'Bhandara', 'Buldhana', 'Chandrapur', 'Dhule', 'Gadchiroli', 'Gondia', 'Hingoli', 'Jalgaon', 'Jalna', 'Kolhapur', 'Latur', 'Mumbai', 'Nagpur', 'Nanded', 'Nandurbar', 'Nashik', 'Osmanabad', 'Palghar', 'Parbhani', 'Pune', 'Raigad', 'Ratnagiri', 'Sangli', 'Satara', 'Sindhudurg', 'Solapur', 'Thane', 'Wardha', 'Washim', 'Yavatmal'],
+                'Manipur': ['Bishnupur', 'Chandel', 'Churachandpur', 'Imphal East', 'Imphal West', 'Jiribam', 'Kakching', 'Kamjong', 'Kangpokpi', 'Noney', 'Pherzawl', 'Senapati', 'Tamenglong', 'Tengnoupal', 'Thoubal', 'Ukhrul'],
+                'Meghalaya': ['East Garo Hills', 'East Jaintia Hills', 'East Khasi Hills', 'North Garo Hills', 'Ri-Bhoi', 'South Garo Hills', 'South West Garo Hills', 'South West Khasi Hills', 'West Garo Hills', 'West Jaintia Hills', 'West Khasi Hills'],
+                'Mizoram': ['Aizawl', 'Champhai', 'Kolasib', 'Lawngtlai', 'Lunglei', 'Mamit', 'Saiha', 'Serchhip'],
+                'Nagaland': ['Dimapur', 'Kiphire', 'Kohima', 'Longleng', 'Mokokchung', 'Mon', 'Peren', 'Phek', 'Tuensang', 'Wokha', 'Zunheboto'],
+                'Odisha': ['Angul', 'Balangir', 'Balasore', 'Bargarh', 'Bhadrak', 'Boudh', 'Cuttack', 'Deogarh', 'Dhenkanal', 'Gajapati', 'Ganjam', 'Jagatsinghpur', 'Jajpur', 'Jharsuguda', 'Kalahandi', 'Kandhamal', 'Kendrapara', 'Kendujhar', 'Khordha', 'Koraput', 'Malkangiri', 'Mayurbhanj', 'Nabarangpur', 'Nayagarh', 'Nuapada', 'Puri', 'Rayagada', 'Sambalpur', 'Subarnapur', 'Sundargarh'],
+                'Punjab': ['Amritsar', 'Barnala', 'Bathinda', 'Faridkot', 'Fatehgarh Sahib', 'Fazilka', 'Ferozepur', 'Gurdaspur', 'Hoshiarpur', 'Jalandhar', 'Kapurthala', 'Ludhiana', 'Mansa', 'Moga', 'Muktsar', 'Pathankot', 'Patiala', 'Rupnagar', 'Sahibzada Ajit Singh Nagar', 'Sangrur', 'Shahid Bhagat Singh Nagar', 'Sri Muktsar Sahib', 'Tarn Taran'],
+                'Rajasthan': ['Ajmer', 'Alwar', 'Banswara', 'Baran', 'Barmer', 'Bharatpur', 'Bhilwara', 'Bikaner', 'Bundi', 'Chittorgarh', 'Churu', 'Dausa', 'Dholpur', 'Dungarpur', 'Hanumangarh', 'Jaipur', 'Jaisalmer', 'Jalore', 'Jhalawar', 'Jhunjhunu', 'Jodhpur', 'Karauli', 'Kota', 'Nagaur', 'Pali', 'Pratapgarh', 'Rajsamand', 'Sawai Madhopur', 'Sikar', 'Sirohi', 'Sri Ganganagar', 'Tonk', 'Udaipur'],
+                'Sikkim': ['East Sikkim', 'North Sikkim', 'South Sikkim', 'West Sikkim'],
+                'Tamil Nadu': ['Ariyalur', 'Chengalpattu', 'Chennai', 'Coimbatore', 'Cuddalore', 'Dharmapuri', 'Dindigul', 'Erode', 'Kallakurichi', 'Kancheepuram', 'Kanyakumari', 'Karur', 'Krishnagiri', 'Madurai', 'Nagapattinam', 'Namakkal', 'Nilgiris', 'Perambalur', 'Pudukkottai', 'Ramanathapuram', 'Ranipet', 'Salem', 'Sivagangai', 'Tenkasi', 'Thanjavur', 'Theni', 'Thoothukudi', 'Tiruchirappalli', 'Tirunelveli', 'Tirupathur', 'Tiruppur', 'Tiruvallur', 'Tiruvannamalai', 'Tiruvarur', 'Vellore', 'Viluppuram', 'Virudhunagar'],
+                'Telangana': ['Adilabad', 'Bhadradri Kothagudem', 'Hyderabad', 'Jagtial', 'Jangaon', 'Jayashankar Bhupalpally', 'Jogulamba Gadwal', 'Kamareddy', 'Karimnagar', 'Khammam', 'Komaram Bheem Asifabad', 'Mahabubabad', 'Mahabubnagar', 'Mancherial', 'Medak', 'Medchal-Malkajgiri', 'Nagarkurnool', 'Nalgonda', 'Nirmal', 'Nizamabad', 'Peddapalli', 'Rajanna Sircilla', 'Rangareddy', 'Sangareddy', 'Siddipet', 'Suryapet', 'Vikarabad', 'Wanaparthy', 'Warangal Rural', 'Warangal Urban', 'Yadadri Bhuvanagiri'],
+                'Tripura': ['Dhalai', 'Gomati', 'Khowai', 'North Tripura', 'Sepahijala', 'South Tripura', 'Unakoti', 'West Tripura'],
+                'Tripura': ['Dhalai', 'Gomati', 'Khowai', 'North Tripura', 'Sepahijala', 'South Tripura', 'Unakoti', 'West Tripura'],
+                'Uttar Pradesh': ['Agra', 'Aligarh', 'Allahabad', 'Ambedkar Nagar', 'Amethi', 'Amroha', 'Auraiya', 'Azamgarh', 'Baghpat', 'Bahraich', 'Ballia', 'Balrampur', 'Banda', 'Barabanki', 'Bareilly', 'Basti', 'Bijnor', 'Budaun', 'Bulandshahr', 'Chandauli', 'Chitrakoot', 'Deoria', 'Etah', 'Etawah', 'Faizabad', 'Farrukhabad', 'Fatehpur', 'Firozabad', 'Gautam Buddha Nagar', 'Ghaziabad', 'Ghazipur', 'Gonda', 'Gorakhpur', 'Hamirpur', 'Hapur', 'Hardoi', 'Hathras', 'Jalaun', 'Jaunpur', 'Jhansi', 'Kannauj', 'Kanpur Dehat', 'Kanpur Nagar', 'Kasganj', 'Kaushambi', 'Kheri', 'Kushinagar', 'Lalitpur', 'Lucknow', 'Maharajganj', 'Mahoba', 'Mainpuri', 'Mathura', 'Mau', 'Meerut', 'Mirzapur', 'Moradabad', 'Muzaffarnagar', 'Pilibhit', 'Pratapgarh', 'Rae Bareli', 'Rampur', 'Saharanpur', 'Sambhal', 'Sant Kabir Nagar', 'Shahjahanpur', 'Shamli', 'Shravasti', 'Siddharthnagar', 'Sitapur', 'Sonbhadra', 'Sultanpur', 'Unnao', 'Varanasi'],
+                'Uttarakhand': ['Almora', 'Bageshwar', 'Chamoli', 'Champawat', 'Dehradun', 'Haridwar', 'Nainital', 'Pauri Garhwal', 'Pithoragarh', 'Rudraprayag', 'Tehri Garhwal', 'Udham Singh Nagar', 'Uttarkashi'],
+                'West Bengal': ['Alipurduar', 'Bankura', 'Birbhum', 'Cooch Behar', 'Dakshin Dinajpur', 'Darjeeling', 'Hooghly', 'Howrah', 'Jalpaiguri', 'Jhargram', 'Kalimpong', 'Kolkata', 'Malda', 'Murshidabad', 'Nadia', 'North 24 Parganas', 'Paschim Bardhaman', 'Paschim Medinipur', 'Purba Bardhaman', 'Purba Medinipur', 'Purulia', 'South 24 Parganas', 'Uttar Dinajpur'],
+        
+        
+        
+        
+            };
+            
+        
+            const selectedState = stateSelect.value;
+        
+            // Clear the current options in the district dropdown
+            districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
+        
+            // Populate the district dropdown with options based on the selected state
+            if (selectedState in stateToDistricts) {
+                const districts = stateToDistricts[selectedState];
+                districts.forEach(district => {
+                    const option = document.createElement('option');
+                    option.text = district;
+                    option.value = district;
+                    districtSelect.appendChild(option);
+                });
+            }
+        }
+        </script>
+
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+       
+    <script>
+        $(document).ready(function () {
+            const fields = [
+                { id: "#num", validate: validatePhoneNumber },
+                { id: "#age", validate: validateAge },
+                { id: "#certifications", validate: validateCertifications },
+                { id: "#specialization", validate: validateSpecialization },
+
+            ];
+
+            fields.forEach(field => {
+                $(field.id).keyup(function () {
+                    field.validate();
+                });
+
+                validateFieldOnBlur(field.id, field.validate);
+            });
+
+            function checkFormValidity() {
+                const isValid = fields.every(field => {
+                    const $field = $(field.id);
+                    const $errorSpan = $(`${field.id}span`);
+
+                    return $field.val().trim() !== "" && $errorSpan.html() === "";
+                });
+{% comment %} $("#savebtn").prop("disabled", !isValid); {% endcomment %}
+            }
+
+            function validateFieldOnBlur(fieldId, validationFunction) {
+                $(fieldId).blur(function () {
+                    validationFunction();
+                    checkFormValidity();
+                });
+            }
+
+            // Form submission
+            $("#form").submit(function (event) {
+                if (!$("#savebtn").prop("disabled")) {
+                    // Form is valid, allow submission
+                    return true;
+                } else {
+                    // Form is not valid, prevent submission
+                    event.preventDefault();
+                    return false;
+                }
+            });
+
+            // Initial check for form validity
+            checkFormValidity();
+
+         
+            function validatePhoneNumber() {
+                const phoneInput = document.getElementById('num');
+                const phoneSpan = document.getElementById('numspan');
+                const phoneNumber = phoneInput.value.trim();
+
+                // Use a regular expression to validate the phone number format
+                const phonePattern = /^[0-9]{10}$/;
+
+                 if (!phonePattern.test(phoneNumber)) {
+                    phoneSpan.textContent = 'Invalid phone number';
+                } else {
+                    phoneSpan.textContent = '';
+                }
+            }
+
+            function validateAge() {
+                const ageInput = document.getElementById('age');
+                const ageSpan = document.getElementById('agespan');
+                const age = parseInt(ageInput.value);
+
+                // Check if the age is a valid positive integer
+                if (isNaN(age) || age <= 0) {
+                    ageSpan.textContent = 'Invalid age';
+                } else {
+                    ageSpan.textContent = '';
+                }
+            }
+           
+        });
+    </script>
+        
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+
+    </body>
+</html>

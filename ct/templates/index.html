@@ -10,7 +10,7 @@
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Resto - Restaurant Bootstrap 4 Template by GetTemplates.co</title>
+    <title>Calorie Tracker</title>
     <meta name="description" content="Resto">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -124,10 +124,13 @@
                   <li class="nav-item active">
                     <a href="{% url 'loggout' %}" class="nav-link">Logout</a>
                   </li>
+                  <li class="nav-item active">
+                    <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+                  </li>
                   {% else %}
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Users
+                      Register as
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                       <a class="dropdown-item" href="{% url 'signup' %}">Customer</a>
@@ -152,7 +155,8 @@
             </ul>
         </div>
     </div>
-</nav>		<div class="hero">
+</nav>		
+<div class="hero">
   <div class="container">
 	<div class="row d-flex align-items-center">
 		<div class="col-lg-6 hero-left">

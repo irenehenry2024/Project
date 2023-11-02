@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Doctor Profile</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </head>
+  <style>
+    .user-table {
+        border-collapse: collapse;
+        width: 100%;
+        border: 2px solid #2f49d1; /* blue border color */
+    }
+
+    .user-table th, .user-table td {
+        border: 1px solid #2f49d1; /* blue border color */
+        padding: 8px;
+        text-align: left;
+    }
+
+    .blue-header {
+        background-color: #2f49d1; /* blue background color */
+        color: #fff; /* White text color */
+    }
+  </style>
+  <body>
+    <div class="main-content">
+        <h1>Doctor Profiles</h1>
+        <table class="user-table">
+            <thead>
+                <tr class="blue-header">
+                    <th>Username</th>
+                    <th>Profile Verification</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Loop through doctor profiles -->
+                {% for doctor in doctors %}
+                    <tr>
+                        <td>{{ doctor.user.username }}</td>
+                        <td>
+                            {% if doctor.verified %}
+                                Verified
+                            {% else %}
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#doctorProfileModal{{ doctor.id }}">
+                                    Verify
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <!-- Modal for Doctor Profile Details -->
+                    <div class="modal fade" id="doctorProfileModal{{ doctor.id }}" tabindex="-1" role="dialog" aria-labelledby="doctorProfileModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="doctorProfileModalLabel">Doctor Profile: {{ doctor.user.username }}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <!-- Display doctor profile details here -->
+                                    <p>Phone Number: {{ doctor.phone_number }}</p>
+                                    <p>Gender: {{ doctor.gender }}</p>
+                                    <p>State: {{ doctor.state }}</p>
+                                    <p>District: {{ doctor.district }}</p>
+                                    <p>Certification: {{ doctor.certifications }}</p>
+                                    <p>Specialization: {{ doctor.specialization }}</p>
+                                    <p>Available Timings: {{ doctor.available_timings }}</p>
+                                    <!-- Add other profile details here -->
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <a href="{% url 'verify_doctor' doctor.id %}" class="btn btn-primary">Verify</a>
+                                    <!-- You can also add a "Decline" button here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+  </body>
+</html>
+
+{% comment %} <html>
+  <head>
+    <title>Doctor Profile</title>
+</head>
+<style>
+    .user-table {
+        border-collapse: collapse;
+        width: 100%;
+        border: 2px solid #2f49d1; /* blue border color */
+    }
+
+    .user-table th, .user-table td {
+        border: 1px solid #2f49d1; /* blue border color */
+        padding: 8px;
+        text-align: left;
+    }
+
+    .blue-header {
+        background-color: #2f49d1; /* blue background color */
+        color: #fff; /* White text color */
+    }
+</style>
+<body>
+<div class="main-content">
+    <h1>Doctor Profiles</h1>
+    <table class="user-table">
+        <thead>
+            <tr class="blue-header">
+                <th>Username</th>
+                <th>Profile Verification</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Loop through doctor profiles -->
+            {% for doctor in doctors %}
+                <tr>
+                    <td>{{ doctor.user.username }}</td>
+                    <td>
+                        {% if doctor.verified %}
+                            Verified
+                        {% else %}
+                            <a href="{% url 'verify_doctor' doctor.id %}">Verify</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+  </div>
+</body>
+
+</html> {% endcomment %}

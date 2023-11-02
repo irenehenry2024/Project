@@ -10,7 +10,7 @@
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Resto - Restaurant Bootstrap 4 Template by GetTemplates.co</title>
+    <title>Calorie Tracker</title>
     <meta name="description" content="Resto">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -120,6 +120,9 @@
                   </li>
                   <li class="nav-item active">
                     <a href="{% url 'loggout' %}"  id="logout-link"class="nav-link">Logout</a>
+                  </li>
+                  <li class="nav-item active">
+                    <a href="{% url 'duser_profile' %}" class="nav-link">Profile</a>
                   </li>
                   {% else %}
                   <li class="nav-item active">

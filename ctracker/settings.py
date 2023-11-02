@@ -48,7 +48,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+ 
 ]
+
 
 ROOT_URLCONF = 'ctracker.urls'
 
@@ -121,6 +124,8 @@ AUTHENTICATION_BACKENDS = [
     # Add your custom backend if needed
 ]
 
+# Session timeout (in seconds)
+SESSION_COOKIE_AGE = 3600  # 1 hour
 
 
 # Default primary key field type
@@ -129,7 +134,8 @@ AUTHENTICATION_BACKENDS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS=[os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS=[os.path.join(BASE_DIR, 'static'),]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
