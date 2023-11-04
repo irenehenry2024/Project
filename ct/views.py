@@ -20,10 +20,45 @@ from django.core.mail import send_mail
 from django.urls import reverse
 from django.contrib.auth import login, authenticate
 from .models import UserProfile 
+
+# API Key: 02572699cea14f3c8aad5d8c26b32ae1
+
 # Create your views here.
+
+
 
 def index(request):
     return render(request, "index.html")
+
+def calorie_counting(request):
+    import requests
+    import json
+
+    if request.method == 'POST':
+        query=request.POST['query']
+        api_url='https://api.api-ninjas.com/v1/nutrition?query='
+        api_request = requests.get (api_url + query, headers={'X-Api-Key': 'kqQ9bfS938jO+qjX74KnWg==HFoOm2P07PDOalEP'})
+
+        try:
+            api = json.loads(api_request.content)
+            print(api_request.content)   
+        except Exception as e:
+            api = "oops there was an error"
+            print(e)
+        return render(request, 'calorie_counting.html',{'api':api})
+    else:
+        return render(request, 'calorie_counting.html',{'query':'Enter a valid query'})
+
+
+
+    # query = '1lb brisket and fries'
+    # api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(query)
+    # response = requests.get(api_url, headers={'X-Api-Key': 'kqQ9bfS938jO+qjX74KnWg==HFoOm2P07PDOalEP'})
+    # if response.status_code == requests.codes.ok:
+    #    print(response.text)
+    # else:
+    #    print("Error:", response.status_code, response.text)
+   
 
 
 def signup(request):
@@ -204,24 +239,7 @@ def login(request):
         username = request.POST['username']
         password = request.POST['password']
     return render(request, 'login.html')
-# def signin(request):
-#     if request.method == 'POST':
-#         username = request.POST['username']
-#         password = request.POST['password']
-#         user = authenticate(request, username=username, password=password)
-#         if user is not None:
-#             auth_login(request,user)
-#             if request.user.is_Customer:
-#                 return redirect('/')
-#             elif request.user.is_Dietitian:
-#                 return redirect('d_index')
-#             elif request.user.is_Doctor:
-#                 return redirect('dr_index')
-#             elif request.user.is_superuser:
-#                 return redirect('admindashboard')
-#         else:
-#             messages.success(request,("Invalid login credentials."))
-#     return render(request, 'signin.html')
+
 
 # @login_required(login_url='signin')
 def admindashboard(request):
@@ -308,18 +326,7 @@ def confirm_email(request, uidb64, token):
     except Exception as e:
         return render(request, 'confirmation_failure.html')
 
-# def set_session(request):
-#     # Set a value in the session
-#     request.session['user_id'] = 1
-#     return HttpResponse("Session data set successfully.")
 
-# def get_session(request):
-#     # Get a value from the session
-#     user_id = request.session.get('user_id', None)
-#     if user_id is not None:
-#         return HttpResponse(f"User ID from session: {user_id}")
-#     else:
-#         return HttpResponse("User ID not found in session.")
 
 def customer_list(request):
     users = CustomUser.objects.filter(is_Customer=True)
@@ -336,17 +343,6 @@ def doctor_list(request):
     return render(request, 'doctor_list.html', {'users': users})
     pass
 
-# from django.http import JsonResponse
-# from django.contrib.auth.models import User
-
-# def update_user_status(request, user_id, new_status):
-#     try:
-#         user = User.objects.get(id=user_id)
-#         user.is_active = new_status == "active"
-#         user.save()
-#         return JsonResponse({"newStatus": "active" if user.is_active else "inactive"})
-#     except User.DoesNotExist:
-#         return JsonResponse({"error": "User not found"}, status=404)
 
 
 
@@ -378,6 +374,13 @@ def user_profile(request):
 
         user_profile.save()
         messages.success(request, 'Profile updated successfully.')
+
+    # Calculate BMI
+    if user_profile.height and user_profile.weight:
+        height_in_meters = user_profile.height / 100  # Convert height to meters
+        bmi = user_profile.weight / (height_in_meters ** 2)
+        user_profile.bmi = bmi  # Save BMI in the user profile
+        user_profile.save()   
 
     context = {
         'user_profile': user_profile,
@@ -462,6 +465,291 @@ def druser_profile(request):
 
     return render(request, 'druser_profile.html', context)
 
+
+
+
+
+
+
+
+from .models import DoctorProfile
+from django.shortcuts import render, redirect
+
+from django.shortcuts import render, redirect
+
+from django.shortcuts import render, redirect
+from .models import DoctorProfile, Booking
+
+def doctors_list(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        doctor_id = request.POST.get('doctor_id')
+
+        # Create a Booking instance
+        booking = Booking.objects.create(user_id=user_id, doctor_id=doctor_id)
+
+        if booking:
+            return redirect('doctors_list')
+        else:
+            return redirect('doctors_list')
+
+    # Fetch a list of DoctorProfile objects
+    doctors = DoctorProfile.objects.all()
+
+    context = {
+        'doctors': doctors,
+    }
+
+    return render(request, 'doctors_list.html', context)
+   
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.admin.views.decorators import staff_member_required
+
+@staff_member_required
+def doctor_profile(request):
+    # Get a list of doctor profiles
+    doctors = DoctorProfile.objects.all()
+   
+    
+    context = {
+        'doctors': doctors,
+       
+    }
+    return render(request, 'doctor_profile.html', context)
+
+from django.contrib import messages
+@staff_member_required
+def verify_doctor(request, doctor_id):
+    # Get the doctor profile
+    doctor = get_object_or_404(DoctorProfile, pk=doctor_id)
+    
+    # Verify the doctor
+    doctor.verified = True
+    doctor.save()
+
+      # Send a success message to the doctor
+    messages.success(request, f'Doctor {doctor.user.username} has been successfully verified.')
+    
+    # Redirect back to the list of doctor profiles
+    return redirect('doctor_profile')
+
+
+
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import render
+
+def change_password(request):
+    if request.method == 'POST':
+        old_password = request.POST.get('old_password')  # Get the old password from the form
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        user = request.user  # Get the currently logged-in user
+
+        # Check if the entered old password matches the user's current password
+        if not user.check_password(old_password):
+            return JsonResponse({'error': 'Incorrect old password'}, status=400)
+
+        if new_password == confirm_password:
+            # Change the user's password and save it to the database
+            user.set_password(new_password)
+            user.save()
+
+            # Update the session to keep the user logged in
+            update_session_auth_hash(request, user)
+
+            return JsonResponse({'message': 'Password changed successfully'})
+        else:
+            return JsonResponse({'error': 'Passwords do not match'}, status=400)
+
+    return render(request, 'change_password.html')
+
+from django.http import JsonResponse
+from .models import DoctorProfile
+from .models import Booking  # Import the Booking model if you have one
+
+def book_doctor(request):
+    if request.method == 'POST':
+        doctor_id = request.POST.get('doctor_id')
+
+        try:
+            doctor = DoctorProfile.objects.get(id=doctor_id)
+            user = request.user
+
+            # Check if the user has already booked this doctor
+            if doctor.booked_by.filter(id=user.id).exists():
+                return JsonResponse({'success': False, 'message': 'You have already booked this doctor.'})
+
+            # Create a Booking instance and link it to the selected doctor and the logged-in user
+            booking = Booking(doctor=doctor, user=user)
+            booking.save()
+
+            return JsonResponse({'success': True, 'message': 'Booking successful.'})
+        except DoctorProfile.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Doctor not found.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': 'An error occurred: ' + str(e)})
+
+def delete_doctor(request):
+    if request.method == 'POST':
+        doctor_id = request.POST.get('doctor_id')
+
+        try:
+            doctor = DoctorProfile.objects.get(id=doctor_id)
+
+            # Check if the logged-in user is the owner of the doctor profile
+            if doctor.user == request.user:
+                # Delete the doctor profile
+                doctor.delete()
+                return JsonResponse({'success': True, 'message': 'Doctor profile deleted successfully.'})
+            else:
+                return JsonResponse({'success': False, 'message': 'You do not have permission to delete this doctor profile.'})
+        except DoctorProfile.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Doctor not found.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': 'An error occurred: ' + str(e)})
+
+
+from django.shortcuts import render, redirect
+from .models import UserProfile, FoodItem, FoodIntake
+from django.db.models import Sum
+from django.http import HttpResponse
+
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.db.models import Sum
+from .models import UserProfile, FoodItem, FoodIntake
+
+def food_intake(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        gender = request.POST.get('gender')
+        age = int(request.POST.get('age'))
+        height = float(request.POST.get('height'))
+        weight = float(request.POST.get('weight'))
+
+        # You can create or update the user's profile based on username
+        user, created = UserProfile.objects.get_or_create(
+            username=username,
+            defaults={'gender': gender, 'age': age, 'height': height, 'weight': weight}
+        )
+
+        food_item_id = request.POST.get('food_item')
+        meal_time = request.POST.get('meal_time')
+        quantity = float(request.POST.get('quantity'))
+        food_item = FoodItem.objects.get(pk=food_item_id)
+
+        # Create a FoodIntake record for the user
+        FoodIntake.objects.create(user=user, food_item=food_item, meal_time=meal_time, quantity=quantity)
+
+        return redirect('food_intake_list')
+
+    users = UserProfile.objects.all()
+    food_items = FoodItem.objects.all()
+    return render(request, 'food_intake.html', {'users': users, 'food_items': food_items})
+
+def food_intake_list(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user')
+        user = UserProfile.objects.get(pk=user_id)
+        food_intake = FoodIntake.objects.filter(user=user)
+        total_calories = food_intake.aggregate(Sum('consumed_calories'))['consumed_calories__sum']
+        return HttpResponse(f"Total consumed calories for {user.username}: {total_calories} calories")
+
+    users = UserProfile.objects.all()
+    return render(request, 'food_intake_list.html', {'users': users})
+
+
+# # views.py
+# from django.http import JsonResponse
+# from django.shortcuts import get_object_or_404
+# from ct.models import DoctorProfile
+
+# def book_doctor(request):
+#     if request.method == 'POST':
+#         doctor_id = request.POST.get('doctor_id')
+#         doctor = get_object_or_404(DoctorProfile, id=doctor_id)
+
+#         # Perform the booking logic here (e.g., add the user to the doctor's booked_by field)
+#         # For demonstration purposes, we'll use a try-except block to handle exceptions.
+#         try:
+#             # Assuming the user is the currently logged-in user
+#             user = request.user
+#             doctor.booked_by.add(user)
+#             return JsonResponse({'success': True})
+#         except Exception as e:
+#             return JsonResponse({'success': False, 'error': str(e)}, status=500)
+#     else:
+#         return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
+
+# def delete_doctor(request):
+#     if request.method == 'POST':
+#         doctor_id = request.POST.get('doctor_id')
+#         doctor = get_object_or_404(DoctorProfile, id=doctor_id)
+
+#         # Perform the deletion logic here
+#         # For demonstration purposes, we'll use a try-except block to handle exceptions.
+#         try:
+#             doctor.delete()
+#             return JsonResponse({'success': True})
+#         except Exception as e:
+#             return JsonResponse({'success': False, 'error': str(e)}, status=500)
+#     else:
+#         return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
+
+
+
+# from django.shortcuts import render, redirect
+# from django.contrib import messages
+# from django.contrib.auth import update_session_auth_hash
+# from django.contrib.auth.forms import PasswordChangeForm
+
+# def change_password(request):
+#     if request.method == 'POST':
+#         form = PasswordChangeForm(user=request.user, data=request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             # Update the session to prevent the user from being logged out
+#             update_session_auth_hash(request, user)
+#             messages.success(request, 'Your password was successfully updated!')
+#             return redirect('change_password')  # Redirect to the same page after successful password change
+#         else:
+#             messages.error(request, 'Please correct the error below.')
+#     else:
+#         form = PasswordChangeForm(user=request.user)
+#     return render(request, 'change_password.html', {
+#         'form': form
+#     })
+
+
+# views.py
+# from django.shortcuts import render, get_object_or_404
+# from .models import DoctorProfile, Booking
+
+# def booked_doctors_list(request):
+#     # Fetch a list of booked doctors
+#     booked_doctors = DoctorProfile.objects.filter(booking__isnull=False)
+
+#     context = {
+#         'booked_doctors': booked_doctors,
+#     }
+
+#     return render(request, 'booked_doctors_list.html', context)
+
+# def booked_doctor_details(request, doctor_id):
+#     doctor = get_object_or_404(DoctorProfile, id=doctor_id)
+#     bookings = Booking.objects.filter(doctor=doctor)
+
+#     context = {
+#         'doctor': doctor,
+#         'bookings': bookings,
+#     }
+
+#     return render(request, 'booked_doctor_details.html', context)
+
+
 # from django.shortcuts import render, redirect
 # from .models import DoctorProfile
 # from django.contrib.auth.decorators import login_required
@@ -500,6 +788,49 @@ def druser_profile(request):
 #     }
 
 #     return render(request, 'druser_profile.html', context)
+
+# from django.shortcuts import render, redirect
+# from django.contrib import messages
+# from django.core.exceptions import ObjectDoesNotExist
+# from .models import DoctorProfile  # Import your UserProfile model
+
+# @login_required
+# def druser_profile(request):
+#     druser_profile = DoctorProfile.objects.get(user=request.user)
+#     try:
+#        druser_profile = DoctorProfile.objects.get(user=request.user)
+
+#     except ObjectDoesNotExist:
+#         # If the profile doesn't exist, create one for the user
+#         druser_profile = DoctorProfile(user=request.user)
+#         druser_profile.save()
+
+#     if request.method == 'POST':
+#         # Update the user profile with the data from the request
+#         druser_profile.phone_number = request.POST.get('num')
+#         druser_profile.state = request.POST.get('state')
+#         druser_profile.district = request.POST.get('district')
+#         druser_profile.gender = request.POST.get('gender')
+#         druser_profile.certifications = request.POST.get('certifications')
+#         druser_profile.specialization = request.POST.get('specialization')
+        
+
+#         druser_profile.save()
+#         messages.success(request, 'Profile updated successfully.')
+
+#     context = {
+#         'druser_profile': druser_profile,
+#     }
+
+#     return render(request, 'druser_profile.html', context)
+
+
+# from django.shortcuts import render
+# from .models import DoctorProfile
+
+# def doctors_list(request):
+#     doctors = DoctorProfile.objects.all()
+#     return render(request, 'doctors_list.html', {'doctors': doctors})
 
 
 # from django.shortcuts import render, redirect
@@ -567,210 +898,52 @@ def druser_profile(request):
 #     }
 
 #     return render(request, 'duser_profile.html', context)
-    
-# from django.shortcuts import render, redirect
-# from django.contrib import messages
-# from django.core.exceptions import ObjectDoesNotExist
-# from .models import DoctorProfile  # Import your UserProfile model
 
-# @login_required
-# def druser_profile(request):
-#     druser_profile = DoctorProfile.objects.get(user=request.user)
+# from django.http import JsonResponse
+# from django.contrib.auth.models import User
+
+# def update_user_status(request, user_id, new_status):
 #     try:
-#        druser_profile = DoctorProfile.objects.get(user=request.user)
-
-#     except ObjectDoesNotExist:
-#         # If the profile doesn't exist, create one for the user
-#         druser_profile = DoctorProfile(user=request.user)
-#         druser_profile.save()
-
-#     if request.method == 'POST':
-#         # Update the user profile with the data from the request
-#         druser_profile.phone_number = request.POST.get('num')
-#         druser_profile.state = request.POST.get('state')
-#         druser_profile.district = request.POST.get('district')
-#         druser_profile.gender = request.POST.get('gender')
-#         druser_profile.certifications = request.POST.get('certifications')
-#         druser_profile.specialization = request.POST.get('specialization')
-        
-
-#         druser_profile.save()
-#         messages.success(request, 'Profile updated successfully.')
-
-#     context = {
-#         'druser_profile': druser_profile,
-#     }
-
-#     return render(request, 'druser_profile.html', context)
-
-# from django.shortcuts import render
-# from .models import DoctorProfile
-
-# def doctors_list(request):
-#     doctors = DoctorProfile.objects.all()
-#     return render(request, 'doctors_list.html', {'doctors': doctors})
-
-from .models import DoctorProfile
-from django.shortcuts import render
-
-def doctors_list(request):
-    # Fetch a list of DoctorProfile objects
-    doctors = DoctorProfile.objects.all()
-
-    context = {
-        'doctors': doctors,
-    }
-
-    return render(request, 'doctors_list.html', context)
-
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import DoctorProfile
-from django.contrib.admin.views.decorators import staff_member_required
-
-@staff_member_required
-def doctor_profile(request):
-    # Get a list of doctor profiles
-    doctors = DoctorProfile.objects.all()
-   
-    
-    context = {
-        'doctors': doctors,
-       
-    }
-    return render(request, 'doctor_profile.html', context)
-
-from django.contrib import messages
-@staff_member_required
-def verify_doctor(request, doctor_id):
-    # Get the doctor profile
-    doctor = get_object_or_404(DoctorProfile, pk=doctor_id)
-    
-    # Verify the doctor
-    doctor.verified = True
-    doctor.save()
-
-      # Send a success message to the doctor
-    messages.success(request, f'Doctor {doctor.user.username} has been successfully verified.')
-    
-    # Redirect back to the list of doctor profiles
-    return redirect('doctor_profile')
+#         user = User.objects.get(id=user_id)
+#         user.is_active = new_status == "active"
+#         user.save()
+#         return JsonResponse({"newStatus": "active" if user.is_active else "inactive"})
+#     except User.DoesNotExist:
+#         return JsonResponse({"error": "User not found"}, status=404)
 
 
-# from django.shortcuts import render, redirect
-# from django.contrib import messages
-# from django.contrib.auth import update_session_auth_hash
-# from django.contrib.auth.forms import PasswordChangeForm
 
-# def change_password(request):
-#     if request.method == 'POST':
-#         form = PasswordChangeForm(user=request.user, data=request.POST)
-#         if form.is_valid():
-#             user = form.save()
-#             # Update the session to prevent the user from being logged out
-#             update_session_auth_hash(request, user)
-#             messages.success(request, 'Your password was successfully updated!')
-#             return redirect('change_password')  # Redirect to the same page after successful password change
-#         else:
-#             messages.error(request, 'Please correct the error below.')
+# def set_session(request):
+#     # Set a value in the session
+#     request.session['user_id'] = 1
+#     return HttpResponse("Session data set successfully.")
+
+# def get_session(request):
+#     # Get a value from the session
+#     user_id = request.session.get('user_id', None)
+#     if user_id is not None:
+#         return HttpResponse(f"User ID from session: {user_id}")
 #     else:
-#         form = PasswordChangeForm(user=request.user)
-#     return render(request, 'change_password.html', {
-#         'form': form
-#     })
-
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.shortcuts import render
-
-def change_password(request):
-    if request.method == 'POST':
-        old_password = request.POST.get('old_password')  # Get the old password from the form
-        new_password = request.POST.get('new_password')
-        confirm_password = request.POST.get('confirm_password')
-
-        user = request.user  # Get the currently logged-in user
-
-        # Check if the entered old password matches the user's current password
-        if not user.check_password(old_password):
-            return JsonResponse({'error': 'Incorrect old password'}, status=400)
-
-        if new_password == confirm_password:
-            # Change the user's password and save it to the database
-            user.set_password(new_password)
-            user.save()
-
-            # Update the session to keep the user logged in
-            update_session_auth_hash(request, user)
-
-            return JsonResponse({'message': 'Password changed successfully'})
-        else:
-            return JsonResponse({'error': 'Passwords do not match'}, status=400)
-
-    return render(request, 'change_password.html')
-
-# views.py
-# from django.shortcuts import render, get_object_or_404
-# from .models import DoctorProfile, Booking
-
-# def booked_doctors_list(request):
-#     # Fetch a list of booked doctors
-#     booked_doctors = DoctorProfile.objects.filter(booking__isnull=False)
-
-#     context = {
-#         'booked_doctors': booked_doctors,
-#     }
-
-#     return render(request, 'booked_doctors_list.html', context)
-
-# def booked_doctor_details(request, doctor_id):
-#     doctor = get_object_or_404(DoctorProfile, id=doctor_id)
-#     bookings = Booking.objects.filter(doctor=doctor)
-
-#     context = {
-#         'doctor': doctor,
-#         'bookings': bookings,
-#     }
-
-#     return render(request, 'booked_doctor_details.html', context)
+#         return HttpResponse("User ID not found in session.")
 
 
-# views.py
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from ct.models import DoctorProfile
-
-def book_doctor(request):
-    if request.method == 'POST':
-        doctor_id = request.POST.get('doctor_id')
-        doctor = get_object_or_404(DoctorProfile, id=doctor_id)
-
-        # Perform the booking logic here (e.g., add the user to the doctor's booked_by field)
-        # For demonstration purposes, we'll use a try-except block to handle exceptions.
-        try:
-            # Assuming the user is the currently logged-in user
-            user = request.user
-            doctor.booked_by.add(user)
-            return JsonResponse({'success': True})
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)}, status=500)
-    else:
-        return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
-
-def delete_doctor(request):
-    if request.method == 'POST':
-        doctor_id = request.POST.get('doctor_id')
-        doctor = get_object_or_404(DoctorProfile, id=doctor_id)
-
-        # Perform the deletion logic here
-        # For demonstration purposes, we'll use a try-except block to handle exceptions.
-        try:
-            doctor.delete()
-            return JsonResponse({'success': True})
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)}, status=500)
-    else:
-        return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
-
-
+# def signin(request):
+#     if request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         user = authenticate(request, username=username, password=password)
+#         if user is not None:
+#             auth_login(request,user)
+#             if request.user.is_Customer:
+#                 return redirect('/')
+#             elif request.user.is_Dietitian:
+#                 return redirect('d_index')
+#             elif request.user.is_Doctor:
+#                 return redirect('dr_index')
+#             elif request.user.is_superuser:
+#                 return redirect('admindashboard')
+#         else:
+#             messages.success(request,("Invalid login credentials."))
+#     return render(request, 'signin.html')
+    
 

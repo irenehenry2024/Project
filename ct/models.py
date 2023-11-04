@@ -42,15 +42,18 @@ class UserProfile(models.Model):
     age = models.IntegerField(null=True, blank=True)  # Allow null values
     height = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)  # Allow null value
     weight = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    #age = models.IntegerField(null=False, blank=False)
-    #height = models.CharField(max_length=10, blank=True, null=True)  # Allow null values
-    
-     # height = models.IntegerField(blank=True, null=True)
-    # height = models.CharField(max_length=10, blank=True)
-    # weight = models.IntegerField(blank=True, null=True)
+     # Add a field to store BMI
+    bmi = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+   
     
     def __str__(self):
         return self.user.username
+    #age = models.IntegerField(null=False, blank=False)
+    #height = models.CharField(max_length=10, blank=True, null=True)  # Allow null values
+    
+    # height = models.IntegerField(blank=True, null=True)
+    # height = models.CharField(max_length=10, blank=True)
+    # weight = models.IntegerField(blank=True, null=True)
 
 
 from django.db import models
@@ -91,15 +94,58 @@ class DoctorProfile(models.Model):
     def __str__(self):
         return self.user.username
 
+from django.db import models
+from django.contrib.auth import get_user_model
+from .models import DoctorProfile  # Import the DoctorProfile model
 
+class Booking(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)  # The user who made the booking
+    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE)  # The doctor being booked
+    booking_date = models.DateTimeField(default=None,null=True)  # Define a default value or use default=timezone.now if you want to set the current time
+
+
+
+
+from django.db import models
+from django.contrib.auth.models import User
+
+# Model for food items
+class FoodItem(models.Model):
+    name = models.CharField(max_length=100)
+    protein = models.DecimalField(max_digits=5, decimal_places=2)
+    carbs = models.DecimalField(max_digits=5, decimal_places=2)
+    calories = models.DecimalField(max_digits=5, decimal_places=2)
+
+    def __str__(self):
+        return self.name
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
-class Booking(models.Model):
-    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    slot_datetime = models.DateTimeField()
-    # Add other booking-related fields
+from django.db import models
+
+class FoodIntake(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    food_item = models.ForeignKey(FoodItem, on_delete=models.CASCADE)
+    meal_time = models.CharField(max_length=10)  # 'breakfast', 'lunch', or 'dinner'
+    quantity = models.DecimalField(max_digits=5, decimal_places=2)
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.user.username} ate {self.quantity} {self.food_item.name}'
+
+    @property
+    def consumed_calories(self):
+        return self.quantity * self.food_item.calories
+
+
+
+
+# from django.conf import settings
+# from django.contrib.auth import get_user_model
+# class Booking(models.Model):
+#     doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE)
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+#     slot_datetime = models.DateTimeField()
+#     # Add other booking-related fields
 
 
 

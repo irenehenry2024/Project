@@ -28,15 +28,18 @@ urlpatterns = [
    path('druser_profile/', views.druser_profile, name='druser_profile'),
    path('admindashboard/', views.admindashboard, name='admindashboard'),
    path('doctors_list/', views.doctors_list, name='doctors_list'),
+   path('book-doctor/', views.book_doctor, name='book_doctor'),   
    path('verify_doctor/<int:doctor_id>/', views.verify_doctor, name='verify_doctor'),
    path('doctor_profile/', views.doctor_profile, name='doctor_profile'),
    path('change_password/', views.change_password, name='change_password'),
    path('change_password/', views.change_password, name='change_password'),
    # path('booked_doctors/', views.booked_doctors_list, name='booked_doctors_list'),
    # path('booked_doctor/<int:doctor_id>/', views.booked_doctor_details, name='booked_doctor_details'),
-   path('book-doctor/', views.book_doctor, name='book_doctor'),
+   
    path('delete-doctor/', views.delete_doctor, name='delete_doctor'),
-   # path('food_intake/', views.food_intake, name='food_intake'),
+   path('calorie_counting/', views.calorie_counting, name='calorie_counting'),
+
+   path('food_intake/', views.food_intake, name='food_intake'),
    
    # path('update_user_status/<int:user_id>/<str:new_status>/', views.update_user_status, name='update_user_status'),
    # path('loggout/', auth_views.LogoutView.as_view(), name="loggout"),
