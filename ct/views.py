@@ -21,6 +21,10 @@ from django.urls import reverse
 from django.contrib.auth import login, authenticate
 from .models import UserProfile 
 
+from .models import Feedback
+from .forms import FeedbackForm
+
+
 # API Key: 02572699cea14f3c8aad5d8c26b32ae1
 
 # Create your views here.
@@ -29,6 +33,9 @@ from .models import UserProfile
 
 def index(request):
     return render(request, "index.html")
+
+def recipe_catalog(request):
+    return render(request, "recipe_catalog.html")
 
 def calorie_counting(request):
     import requests
@@ -380,10 +387,11 @@ def user_profile(request):
         height_in_meters = user_profile.height / 100  # Convert height to meters
         bmi = user_profile.weight / (height_in_meters ** 2)
         user_profile.bmi = bmi  # Save BMI in the user profile
-        user_profile.save()   
+        user_profile.save() 
 
     context = {
         'user_profile': user_profile,
+        
     }
 
     return render(request, 'user_profile.html', context)
@@ -403,6 +411,15 @@ def duser_profile(request):
         duser_profile.save()
 
     if request.method == 'POST':
+        if 'verify_dietitian' in request.POST:
+            # Handle the doctor verification process here
+            duser_profile.is_verified = True
+            duser_profile.save()
+            messages.success(request, 'Dietitian profile verified successfully.')
+            # Redirect to a success page or back to the profile page
+            return redirect('dietitian_profile')  # Update to your URL name
+
+    if request.method == 'POST':
         # Update the user profile with the data from the request
         duser_profile.phone_number = request.POST.get('num')
         duser_profile.state = request.POST.get('state')
@@ -410,6 +427,7 @@ def duser_profile(request):
         duser_profile.gender = request.POST.get('gender')
         duser_profile.certifications = request.POST.get('certifications')
         duser_profile.specialization = request.POST.get('specialization')
+        duser_profile.available_timings = request.POST.get('available_timings')
 
         duser_profile.save()
         messages.success(request, 'Profile updated successfully.')
@@ -468,15 +486,7 @@ def druser_profile(request):
 
 
 
-
-
-
-
-from .models import DoctorProfile
 from django.shortcuts import render, redirect
-
-from django.shortcuts import render, redirect
-
 from django.shortcuts import render, redirect
 from .models import DoctorProfile, Booking
 
@@ -486,6 +496,7 @@ def doctors_list(request):
         doctor_id = request.POST.get('doctor_id')
 
         # Create a Booking instance
+        bookings = Booking.objects.filter(doctor=doctor)
         booking = Booking.objects.create(user_id=user_id, doctor_id=doctor_id)
 
         if booking:
@@ -498,22 +509,64 @@ def doctors_list(request):
 
     context = {
         'doctors': doctors,
+        'bookings': bookings,
     }
 
     return render(request, 'doctors_list.html', context)
+
+from django.shortcuts import render, redirect
+from .models import DietitianProfile, DietitianBooking
+
+def dietitians_list(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        dietitian_id = request.POST.get('dietitian_id')
+
+        # Check if dietitian_id and user_id are not None and are valid
+        if dietitian_id is not None and user_id is not None:
+            try:
+                dietitian_id = int(dietitian_id)  # Convert to an integer if it's a string
+                user_id = int(user_id)  # Convert to an integer if it's a string
+            except (TypeError, ValueError):
+                # Handle invalid values
+                return redirect('dietitians_list')  # Redirect to the same page or show an error message
+
+            # Create a Booking instance
+            booking = DietitianBooking.objects.create(user_id=user_id, dietitian_id=dietitian_id)
+
+            if booking:
+                return redirect('dietitians_list')  # Redirect to the page after successful booking
+            else:
+                return redirect('dietitians_list')  # Handle booking failure
+        else:
+            # Handle missing dietitian_id or user_id
+            return redirect('dietitians_list')  # Redirect to the same page or show an error message
+
+    # Fetch a list of DietitianProfile objects
+    dietitians = DietitianProfile.objects.all()
+
+    context = {
+        'dietitians': dietitians,
+    }
+
+    return render(request, 'dietitians_list.html', context)
+
+
+
    
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
+from .models import Booking
 
 @staff_member_required
-def doctor_profile(request):
+def doctor_profile(request, doctor_id):
     # Get a list of doctor profiles
     doctors = DoctorProfile.objects.all()
-   
     
     context = {
         'doctors': doctors,
-       
+        
     }
     return render(request, 'doctor_profile.html', context)
 
@@ -532,6 +585,38 @@ def verify_doctor(request, doctor_id):
     
     # Redirect back to the list of doctor profiles
     return redirect('doctor_profile')
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.admin.views.decorators import staff_member_required
+
+@staff_member_required
+def dietitian_profile(request):
+    # Get a list of dietitian profiles
+    dietitians = DietitianProfile.objects.all()
+   
+    
+    context = {
+        'dietitians': dietitians,
+       
+    }
+    return render(request, 'dietitian_profile.html', context)
+
+from django.contrib import messages
+@staff_member_required
+def verify_dietitian(request, dietitian_id):
+    # Get the dietitian profile
+    dietitian = get_object_or_404(DietitianProfile, pk=dietitian_id)
+    
+    # Verify the doctor
+    dietitian.verified = True
+    dietitian.save()
+
+      # Send a success message to the dietitian
+    messages.success(request, f'Dietitian {dietitian.user.username} has been successfully verified.')
+    
+    # Redirect back to the list of doctor profiles
+    return redirect('dietitian_profile')
 
 
 
@@ -612,6 +697,53 @@ def delete_doctor(request):
             return JsonResponse({'success': False, 'message': 'An error occurred: ' + str(e)})
 
 
+
+from django.http import JsonResponse
+from .models import DietitianProfile
+from .models import DietitianBooking  # Import the Booking model if you have one
+
+def book_dietitian(request):
+    if request.method == 'POST':
+        dietitian_id = request.POST.get('dietitian_id')
+
+        try:
+            dietitian = DietitianProfile.objects.get(id=dietitian_id)
+            user = request.user
+
+            # Check if the user has already booked this dietitian
+            if dietitian.booked_by.filter(id=user.id).exists():
+                return JsonResponse({'success': False, 'message': 'You have already booked this doctor.'})
+
+            # Create a Booking instance and link it to the selected dietitian and the logged-in user
+            booking = DietitianBooking(dietitian=dietitian, user=user)
+            booking.save()
+
+            return JsonResponse({'success': True, 'message': 'Booking successful.'})
+        except DietitianProfile.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Dietitian not found.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': 'An error occurred: ' + str(e)})
+
+def delete_dietitian(request):
+    if request.method == 'POST':
+        dietitian_id = request.POST.get('dietitian_id')
+
+        try:
+            dietitian = DietitianProfile.objects.get(id=dietitian_id)
+
+            # Check if the logged-in user is the owner of the dietitian profile
+            if dietitian.user == request.user:
+                # Delete the dietitian profile
+                dietitian.delete()
+                return JsonResponse({'success': True, 'message': 'Dietitian profile deleted successfully.'})
+            else:
+                return JsonResponse({'success': False, 'message': 'You do not have permission to delete this dietitian profile.'})
+        except DietitianProfile.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Dietitian not found.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': 'An error occurred: ' + str(e)})
+
+
 from django.shortcuts import render, redirect
 from .models import UserProfile, FoodItem, FoodIntake
 from django.db.models import Sum
@@ -621,6 +753,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.db.models import Sum
 from .models import UserProfile, FoodItem, FoodIntake
+
 
 def food_intake(request):
     if request.method == 'POST':
@@ -660,6 +793,163 @@ def food_intake_list(request):
 
     users = UserProfile.objects.all()
     return render(request, 'food_intake_list.html', {'users': users})
+
+from django.shortcuts import render
+from .models import UserProfile
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def bmi_estimation(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+
+    if user_profile.height and user_profile.weight:
+        height_in_meters = user_profile.height / 100  # Convert height to meters
+        bmi = user_profile.weight / (height_in_meters ** 2)
+        user_profile.bmi = bmi  # Save BMI in the user profile
+        user_profile.save()
+
+    context = {
+        'user_profile': user_profile,
+    }
+
+    return render(request, 'bmi_estimation.html', context)
+
+from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404  # Import get_object_or_404
+from .models import DoctorProfile, Booking
+
+def dr_bookings(request, doctor_id):
+    doctor = get_object_or_404(DoctorProfile, id=doctor_id)  # Use get_object_or_404 for graceful handling
+    bookings = Booking.objects.filter(doctor=doctor)
+    users_who_booked = [booking.user for booking in bookings]
+
+    context = {
+        'doctor': doctor,
+        'users_who_booked': users_who_booked,
+    }
+
+    return render(request, 'dr_bookings.html', context)
+
+
+from .models import DietitianProfile, DietitianBooking
+
+def d_bookings(request, dietitian_id):
+    dietitian = DietitianProfile.objects.get(id=dietitian_id)  # Use DietitianProfile here
+    bookings = DietitianBooking.objects.filter(dietitian=dietitian)
+    users_who_booked = [booking.user for booking in bookings]
+
+    context = {
+        'dietitian': dietitian,  # Change 'doctor' to 'dietitian' here
+        'users_who_booked': users_who_booked,
+    }
+
+    return render(request, 'd_bookings.html', context)  # Change the template name to 'd_bookings.html'
+
+
+from django.shortcuts import render, redirect
+from .models import UserProfile
+from django.contrib import messages
+
+def log_exercise(request):
+    if request.method == 'POST':
+        # Handle form submission here
+        exercise_name = request.POST.get('exercise_name')
+        duration = request.POST.get('duration')
+        date = request.POST.get('date')
+
+        # Perform any necessary processing or database operations here
+        # For example, you can save the exercise log to your database
+
+        messages.success(request, 'Exercise logged successfully.')
+        return redirect('log_exercise')  # Redirect to the same page after successful submission
+
+    return render(request, 'log_exercise.html')
+
+# views.py
+
+from .models import DietitianProfile, DoctorProfile, Feedback
+from .forms import FeedbackForm
+
+def submit_feedback(request, professional_type, professional_id):
+    if professional_type == 'dietitian':
+        professional = DietitianProfile.objects.get(id=professional_id)
+
+    elif professional_type == 'doctor':
+        professional = DoctorProfile.objects.get(id=professional_id)
+
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+
+        if form.is_valid():
+            feedback = form.save(commit=False)
+            feedback.user = request.user
+            feedback.professional = professional
+            feedback.save()
+            messages.success(request, 'Feedback submitted successfully.')
+            return redirect('professional_profile', professional_type, professional_id)
+
+    else:
+        form = FeedbackForm()
+
+    return render(request, 'submit_feedback.html', {'form': form, 'professional': professional, 'professional_type': professional_type, 'professional_id': professional_id})
+# views.py
+
+# views.py
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import FeedbackForm
+from .models import Feedback
+
+@login_required
+def feedback_form(request):
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            feedback = form.save(commit=False)
+            feedback.user = request.user  # Assign the logged-in user to the feedback
+            feedback.save()
+            messages.success(request, 'Feedback submitted successfully.')
+            return redirect('user_profile')  # Redirect to a success page after submission
+
+    else:
+        form = FeedbackForm()
+
+    return render(request, 'feedback_form.html', {'form': form})
+
+
+
+
+
+
+# from django.shortcuts import render, redirect
+# from .models import DietitianProfile, DietitianBooking
+
+# def dietitians_list(request):
+#     if request.method == 'POST':
+#         user_id = request.POST.get('user_id')
+#         dietitian_id = request.POST.get('dietitian_id')
+
+#          # Check if the dietitian_id is not None and user_id is valid (add appropriate validation)
+#         if dietitian_id is not None and user_id is not None:
+#             # Create a Booking instance
+#             booking = DietitianBooking.objects.create(user_id=user_id, dietitian_id=dietitian_id)
+
+#             if booking:
+#                 return redirect('dietitians_list')
+#             else:
+#                 return redirect('dietitians_list')
+
+#     # Fetch a list of DoctorProfile objects
+#     dietitians = DietitianProfile.objects.all()
+
+#     context = {
+#         'dietitians': dietitians,
+#     }
+
+#     return render(request, 'dietitians_list.html', context)
+
 
 
 # # views.py

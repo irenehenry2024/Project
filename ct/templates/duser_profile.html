@@ -47,6 +47,15 @@
          </style>
     </head>
     <body>
+        {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+       {% endif %}
         <div class="boxed-page">
             <nav id="navbar-header" class="navbar navbar-expand-lg">
         <div class="container">
@@ -65,15 +74,25 @@
                         </a>
                     </li>
                     <div class="d-flex flex-lg-row flex-column">
-                        <li class="nav-item active">
+                        <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                            <li><a href="{% static 'special-dishes.html' %}">Meal Plan</a></li>
+                            <li><a href="{% static "about" %}">Recipe Catalog</a></li>
+                            <li><a href="{% static 'special-dishes.html' %}">Analytics</a></li>
+                            <li><a href="{% url 'd_bookings' %}">Bookings</a></li>
+
+                           </ul>
+                          </li>
+                       </div>
+                   </ul>
+                        {% comment %} <li class="nav-item active">
                             <a class="nav-link" href="/">Meal Plan</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% static 'about.html' %}">View Article</a>
+                            <a class="nav-link" href="{% static 'about' %}">Recipe Catalog</a>
                         </li>
                         <li class="nav-item active">
                             <a class="nav-link" href="{% static 'menu.html' %}">Analytics</a>
-                        </li>
+                        </li> {% endcomment %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="accountSettingsDropdown" role="button" aria-haspopup="true" aria-expanded="false">
                               Profile Settings
@@ -179,6 +198,8 @@
                                      <p class="text-muted mb-1">Gender: {{ duser_profile.gender }}</p>
                                      <p class="text-muted mb-1">certification: {{ duser_profile.certifications }}</p>
                                      <p class="text-muted mb-1">Specialization: {{ duser_profile.specialization }}</p>
+                                     <p class="text-muted mb-1">Available Timings: {{ duser_profile.available_timings }}</p>
+
 
 
                                 <!-- Add other user details here if needed -->
@@ -295,6 +316,17 @@
                                             <div class="col-sm-9">
                                                 <input type="text" id="specialization" class="form-control form-control-lg" name="specialization" value="{{ duser_profile.specialization }}" />
                                                 <span id="specializationspan" style="font-size: 12px;"></span>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <p class="mb-0" for="available_timings">Available Timings</p>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <input type="text" id="available_timings" class="form-control form-control-lg" name="available_timings" placeholder="9:00 AM - 11:00 AM, 2:00 PM - 4:00 PM" value="{{ duser_profile.available_timings }}" />
+                                                <span id="availabletimingsspan" style="font-size: 12px;"></span>
                                             </div>
                                         </div>
                                         <hr>

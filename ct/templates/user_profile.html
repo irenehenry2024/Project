@@ -71,11 +71,11 @@
                     <div class="d-flex flex-lg-row flex-column">
                         <ul class="dropdown-menu" aria-labelledby="accountSettingsDropdown">
                             
-                            <li><a href="{% url 'food_intake' %}">Food Intake</a></li>
+                            <li><a href="{% url 'calorie_counting' %}">Food Intake</a></li>
                             <li><a href="{% static "change_password" %}">Diet Plan</a></li>
-                            <li><a href="{% static "change_password" %}">BMI Estimation</a></li>
-                            <li><a href="{% static 'about' %}">Recipe Catalog</a></li>
-                            <li><a href="{% static "change_password" %}">Excercise</a></li>
+                            <li><a href="{% url 'bmi_estimation' %}">BMI Estimation</a></li>
+                            <li><a href="{% url 'recipe_catalog' %}">Recipe Catalog</a></li>
+                            <li><a href="{% url 'log_exercise' %}">Excercise</a></li>
                            </ul>
                           </li>
 
@@ -89,9 +89,18 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% static 'about.html' %}">Recipe Catalog</a>
                         </li> {% endcomment %}
-                        <li class="nav-item active">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="bookAppointmentsDropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                              Book Appointments
+                            </a>
+                        <ul class="dropdown-menu" aria-labelledby="bookAppointmentsDropdown">
+                         <li><a href=" {% url 'doctors_list' %} ">Book Doctors</a></li>
+                         <li><a href="{% url 'dietitians_list' %}">Book Dietitian</a></li>
+                        </ul>
+                       </li>
+                        {% comment %} <li class="nav-item active">
                             <a class="nav-link" href="{% url 'doctors_list' %}">Book Appointments</a>
-                        </li>
+                        </li> {% endcomment %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="accountSettingsDropdown" role="button" aria-haspopup="true" aria-expanded="false">
                               Profile Settings
@@ -99,6 +108,7 @@
                         <ul class="dropdown-menu" aria-labelledby="accountSettingsDropdown">
                          <li><a href="{% static 'special-dishes.html' %}">My Details</a></li>
                          <li><a href="{% url "change_password" %}">Change Password</a></li>
+                         <li><a href="{% url 'feedback_form' %}">Feedback</a></li>
                         </ul>
                        </li>
 

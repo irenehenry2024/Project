@@ -68,6 +68,7 @@ class DietitianProfile(models.Model):
     gender = models.CharField(max_length=10, blank=True)
     certifications = models.TextField()
     specialization = models.CharField(max_length=100)
+    available_timings = models.CharField(max_length=255, blank=True, null=True)
     
     
     def __str__(self):
@@ -89,20 +90,49 @@ class DoctorProfile(models.Model):
     # booked_by = models.ManyToManyField(User, related_name='booked_doctors', blank=True)
     
     
-    
-    
     def __str__(self):
         return self.user.username
+
+
+from django.contrib.auth.models import User
+
+class DietitianProfile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    state = models.CharField(max_length=255, null=True, blank=True)
+    district = models.CharField(max_length=100, blank=True, null=True)
+    age = models.IntegerField(blank=True, null=True)
+    gender = models.CharField(max_length=10, blank=True)
+    certifications = models.TextField()
+    specialization = models.CharField(max_length=100)
+    available_timings = models.CharField(max_length=255, blank=True, null=True)
+    # booked_by = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='booked_dietitians', blank=True)
+
+    def __str__(self):
+        return self.user.username
+
+
 
 from django.db import models
 from django.contrib.auth import get_user_model
 from .models import DoctorProfile  # Import the DoctorProfile model
+from datetime import date
 
 class Booking(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)  # The user who made the booking
     doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE)  # The doctor being booked
-    booking_date = models.DateTimeField(default=None,null=True)  # Define a default value or use default=timezone.now if you want to set the current time
+    booking_date = models.DateField(default=date(2023, 1, 1))  # Replace with your desired default date
+    #booking_date =  models.DateField()  # Define a default value or use default=timezone.now if you want to set the current time
 
+from django.db import models
+from django.contrib.auth import get_user_model
+from .models import DietitianProfile  # Import the DoctorProfile model
+from datetime import date
+
+class DietitianBooking(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)  # The user who made the booking
+    dietitian = models.ForeignKey(DietitianProfile, on_delete=models.CASCADE)  # The doctor being booked
+    booking_date = models.DateField(default=date(2023, 1, 1))  # Replace with your desired default date
 
 
 
@@ -136,6 +166,39 @@ class FoodIntake(models.Model):
     def consumed_calories(self):
         return self.quantity * self.food_item.calories
 
+from django.db import models
+from django.conf import settings
+
+class ExerciseLog(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    exercise_name = models.CharField(max_length=255)
+    duration = models.PositiveIntegerField()  # Duration in minutes
+    date = models.DateField()
+
+    def __str__(self):
+        return f"{self.user.username} - {self.exercise_name} on {self.date}"
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class Feedback(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    professional_type = models.CharField(max_length=10)  # 'dietitian' or 'doctor'
+    feedback_message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    dietitian = models.ForeignKey(DietitianProfile, on_delete=models.SET_NULL, null=True, blank=True)
+    doctor = models.ForeignKey(DoctorProfile, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.user.username} Feedback'
+
+from django import forms
+from .models import Feedback
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        model = Feedback
+        fields = ['feedback_message', 'dietitian', 'doctor']
 
 
 

@@ -15,34 +15,34 @@
         <div class="col-10">
   
           <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-normal mb-0 text-black">Doctor's List</h3>
+            <h3 class="fw-normal mb-0 text-black">Dietitian's List</h3>
             <div>
               <p class="mb-0"><span class="text-muted">Sort by:</span> <a href="#!" class="text-body">latest <i
                     class="fas fa-angle-down mt-1"></i></a></p>
             </div>
           </div>
-     {% for doctor in doctors %}
+     {% for dietitian in dietitians %}
           <div class="card rounded-3 mb-4">
             <div class="card-body p-4">
               <div class="row d-flex justify-content-between align-items-center">
                 <div class="col-md-2 col-lg-2 col-xl-2">
                   <img
                     src="{% static 'img/avatar/avatar-face-02.png' %}"
-                    class="img-fluid rounded-3" alt="{{ doctor.user.username }}">
+                    class="img-fluid rounded-3" alt="{{ dietitian.user.username }}">
                     {% comment %} https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-shopping-carts/img1.webp {% endcomment %}
                 </div>
                 <div class="col-md-3 col-lg-3 col-xl-3">
                   <p class="lead fw-normal mb-2">Doctor</p>
-                  <p><span class="text-muted">Name: </span>{{ doctor.user.username }}</p>
-                  <p><span class="text-muted">Phone Number: </span>{{ doctor.phone_number }}</p>
-                  <p><span class="text-muted">Specialization: </span>{{ doctor.specialization }}</p>
-                  <p><span class="text-muted">Available Timings: </span>{{ doctor.available_timings }}</p>
+                  <p><span class="text-muted">Name: </span>{{ dietitian.user.username }}</p>
+                  <p><span class="text-muted">Phone Number: </span>{{dietitian.phone_number }}</p>
+                  <p><span class="text-muted">Specialization: </span>{{ dietitian.specialization }}</p>
+                  <p><span class="text-muted">Available Timings: </span>{{ dietitian.available_timings }}</p>
                 </div>
                 <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
                   <button type="button" id="bookbtn" class="btn btn-warning btn-lg ms-2" data-bs-toggle="modal" data-bs-target="#bookingModal">Book</button>
                 </div>
                 <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                  <button type="submit" id="deletebtn" class="btn btn-warning btn-lg ms-2" onclick="deleteProfile('{{ doctor.id }}')">Delete</button> 
+                  <button type="submit" id="deletebtn" class="btn btn-warning btn-lg ms-2" onclick="deleteProfile('{{ dietitian.id }}')">Delete</button> 
                 </div>
                <div class="col-md-1 col-lg-1 col-xl-1 text-end">
                   <a href="#!" class="text-danger"><i class="fas fa-trash fa-lg"></i></a>
@@ -61,19 +61,19 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-              Are you sure you want to book a slot with this doctor?
+              Are you sure you want to book a slot with this dietitian?
           </div>
           <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
               <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                <form method="post" action="{% url 'doctors_list' %}">
+                <form method="post" action="{% url 'dietitians_list' %}">
                     {% csrf_token %}
                     <input type="hidden" name="user_id" value="{{ request.user.id }}">
-                    <input type="hidden" name="doctor_id" value="{{ doctor.id }}">
+                    <input type="hidden" name="dietitian_id" value="{{ dietitian.id }}">
                     <button type="submit" class="btn btn-warning btn-lg ms-2" href="#bookingModal">Book</button>
                 </form>
-            </div>  
-                        </div>
+              </div>  
+          </div>
 
       </div>
   </div>
@@ -92,7 +92,7 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-              Are you sure you want to delete this doctor profile?
+              Are you sure you want to delete this dietitian profile?
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -127,20 +127,20 @@
 <script>
   document.querySelectorAll('[data-bs-target="#bookingModal"]').forEach(button => {
     button.addEventListener('click', function () {
-        const doctorId = button.getAttribute('data-doctor-id');
+        const dietitianId = button.getAttribute('data-dietitian-id');
         const userId = button.getAttribute('data-user-id');
-        document.querySelector('#bookbtn').setAttribute('data-doctor-id', doctorId);
+        document.querySelector('#bookbtn').setAttribute('data-dietitian-id', dietitianId);
         document.querySelector('#bookbtn').setAttribute('data-user-id', userId);
     });
 });
 
-function bookDoctor(doctorId, userId) {
+function bookDietitian(dietitianId, userId) {
   // Assuming you're using AJAX to send data to the Django view
   $.ajax({
       type: 'POST',
-      url: '/doctors_list/',  // Update this URL to match your Django view's URL
+      url: '/dietitians_list/',  // Update this URL to match your Django view's URL
       data: {
-          'doctor_id': doctorId,
+          'dietitian_id': dietitianId,
           'user_id': userId,
       },
       success: function (data) {
@@ -151,6 +151,7 @@ function bookDoctor(doctorId, userId) {
       }
   });
 }
+
 
 </script>
 </body>
