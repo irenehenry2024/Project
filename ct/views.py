@@ -350,21 +350,16 @@ def doctor_list(request):
     return render(request, 'doctor_list.html', {'users': users})
     pass
 
-
-
-
 from django.shortcuts import render, redirect
 from .models import UserProfile
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist
 
 @login_required
 def user_profile(request):
-    user_profile = UserProfile.objects.get(user=request.user)
     try:
         user_profile = UserProfile.objects.get(user=request.user)
-    except ObjectDoesNotExist:
+    except UserProfile.DoesNotExist:
         # If the profile doesn't exist, create one for the user
         user_profile = UserProfile(user=request.user)
         user_profile.save()
@@ -382,19 +377,72 @@ def user_profile(request):
         user_profile.save()
         messages.success(request, 'Profile updated successfully.')
 
-    # Calculate BMI
-    if user_profile.height and user_profile.weight:
-        height_in_meters = user_profile.height / 100  # Convert height to meters
-        bmi = user_profile.weight / (height_in_meters ** 2)
-        user_profile.bmi = bmi  # Save BMI in the user profile
-        user_profile.save() 
+        # Calculate BMI
+        if user_profile.height and user_profile.weight:
+           height_in_meters = float(user_profile.height) / 100  # Convert height to meters as a float
+           weight_in_kg = float(user_profile.weight)  # Convert weight to kilograms as a float
+           bmi = weight_in_kg / (height_in_meters ** 2)
+           user_profile.bmi = bmi  # Save BMI in the user profile
+           user_profile.save()
+
+
+        # # Calculate BMI
+        # if user_profile.height and user_profile.weight:
+        #     height_in_meters = user_profile.height / 100  # Convert height to meters
+        #     bmi = user_profile.weight / (height_in_meters ** 2)
+        #     user_profile.bmi = bmi  # Save BMI in the user profile
+        #     user_profile.save()
 
     context = {
         'user_profile': user_profile,
-        
     }
 
     return render(request, 'user_profile.html', context)
+
+
+
+# from django.shortcuts import render, redirect
+# from .models import UserProfile
+# from django.contrib.auth.decorators import login_required
+# from django.contrib import messages
+# from django.core.exceptions import ObjectDoesNotExist
+
+# @login_required
+# def user_profile(request):
+#     user_profile = UserProfile.objects.get(user=request.user)
+#     try:
+#         user_profile = UserProfile.objects.get(user=request.user)
+#     except ObjectDoesNotExist:
+#         # If the profile doesn't exist, create one for the user
+#         user_profile = UserProfile(user=request.user)
+#         user_profile.save()
+
+#     if request.method == 'POST':
+#         # Update the user profile with the data from the request
+#         user_profile.phone_number = request.POST.get('num')
+#         user_profile.state = request.POST.get('state')
+#         user_profile.district = request.POST.get('district')
+#         user_profile.gender = request.POST.get('gender')
+#         user_profile.age = request.POST.get('age')
+#         user_profile.height = request.POST.get('height')
+#         user_profile.weight = request.POST.get('weight')
+
+#         user_profile.save()
+#         messages.success(request, 'Profile updated successfully.')
+
+#     # Calculate BMI
+#     if user_profile.height and user_profile.weight:
+#         height_in_meters = user_profile.height / 100  # Convert height to meters
+#         bmi = user_profile.weight / (height_in_meters ** 2)
+#         user_profile.bmi = bmi  # Save BMI in the user profile
+#         user_profile.save() 
+
+#     context = {
+#         'user_profile': user_profile,
+        
+#     }
+
+#     return render(request, 'user_profile.html', context)
 
 from django.shortcuts import render, redirect
 from .models import DietitianProfile
@@ -482,33 +530,26 @@ def druser_profile(request):
 
 
 
-from django.shortcuts import render, redirect
-from django.shortcuts import render, redirect
-from .models import DoctorProfile, Booking
+from django.shortcuts import render
+from .models import DoctorProfile, Booking  # Import the Booking model
 
 def doctors_list(request):
-    if request.method == 'POST':
-        user_id = request.POST.get('user_id')
-        doctor_id = request.POST.get('doctor_id')
-
-        # Create a Booking instance
-        bookings = Booking.objects.filter(doctor=doctor)
-        booking = Booking.objects.create(user_id=user_id, doctor_id=doctor_id)
-
-        if booking:
-            return redirect('doctors_list')
-        else:
-            return redirect('doctors_list')
-
-    # Fetch a list of DoctorProfile objects
     doctors = DoctorProfile.objects.all()
+
+    if request.user.is_authenticated:
+        # If the user is logged in, fetch their bookings
+        bookings = Booking.objects.filter(user=request.user)
+
+    else:
+        bookings = None  # If the user is not logged in, set bookings to None
 
     context = {
         'doctors': doctors,
-        'bookings': bookings,
+        'bookings': bookings,  # Now, 'bookings' has a value
     }
 
     return render(request, 'doctors_list.html', context)
+
 
 from django.shortcuts import render, redirect
 from .models import DietitianProfile, DietitianBooking
@@ -552,11 +593,10 @@ def dietitians_list(request):
    
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import render
 from .models import Booking
 
 @staff_member_required
-def doctor_profile(request, doctor_id):
+def doctor_profile(request):
     # Get a list of doctor profiles
     doctors = DoctorProfile.objects.all()
     
@@ -581,6 +621,27 @@ def verify_doctor(request, doctor_id):
     
     # Redirect back to the list of doctor profiles
     return redirect('doctor_profile')
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from .models import DoctorProfile
+
+@staff_member_required
+def decline_doctor(request, doctor_id):
+    # Get the doctor profile
+    doctor = get_object_or_404(DoctorProfile, pk=doctor_id)
+    
+    # Decline the doctor
+    doctor.declined = True
+    doctor.save()
+
+    # Send a message to the doctor
+    messages.error(request, f'Doctor {doctor.user.username} has been declined.')
+
+    # Redirect back to the list of doctor profiles
+    return redirect('doctor_profile')
+
 
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -614,6 +675,25 @@ def verify_dietitian(request, dietitian_id):
     # Redirect back to the list of doctor profiles
     return redirect('dietitian_profile')
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from .models import DietitianProfile
+
+@staff_member_required
+def decline_dietitian(request, dietitian_id):
+    # Get the doctor profile
+    dietitian = get_object_or_404(DietitianrProfile, pk=dietitian_id)
+    
+    # Decline the doctor
+    dietitian.declined = True
+    dietitian.save()
+
+    # Send a message to the doctor
+    messages.error(request, f'Doctor {dietitian.user.username} has been declined.')
+
+    # Redirect back to the list of doctor profiles
+    return redirect('dietitian_profile')
 
 
 from django.contrib.auth import update_session_auth_hash
@@ -864,32 +944,70 @@ def log_exercise(request):
     return render(request, 'log_exercise.html')
 
 # views.py
-
 from .models import DietitianProfile, DoctorProfile, Feedback
 from .forms import FeedbackForm
 
 def submit_feedback(request, professional_type, professional_id):
     if professional_type == 'dietitian':
         professional = DietitianProfile.objects.get(id=professional_id)
-
+        feedback_template = 'd_feedback.html'  # Template for dietitians
     elif professional_type == 'doctor':
         professional = DoctorProfile.objects.get(id=professional_id)
+        feedback_template = 'dr_feedback.html'  # Template for doctors
 
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
-
         if form.is_valid():
             feedback = form.save(commit=False)
             feedback.user = request.user
             feedback.professional = professional
             feedback.save()
             messages.success(request, 'Feedback submitted successfully.')
-            return redirect('professional_profile', professional_type, professional_id)
+            return render(request, feedback_template, {'professional': professional, 'feedback': feedback})
+            # Redirecting to the feedback page with the feedback message
 
     else:
         form = FeedbackForm()
 
     return render(request, 'submit_feedback.html', {'form': form, 'professional': professional, 'professional_type': professional_type, 'professional_id': professional_id})
+
+def d_feedback(request, professional_id):
+    dietitian = DietitianProfile.objects.get(id=professional_id)
+    feedback_messages = Feedback.objects.filter(professional=dietitian)
+
+    return render(request, 'd_feedback.html', {'dietitian': dietitian, 'feedback_messages': feedback_messages})
+
+def dr_feedback(request, professional_id):
+    doctor = DoctorProfile.objects.get(id=professional_id)
+    feedback_messages = Feedback.objects.filter(professional=doctor)
+
+    return render(request, 'dr_feedback.html', {'doctor': doctor, 'feedback_messages': feedback_messages})
+
+# from .models import DietitianProfile, DoctorProfile, Feedback
+# from .forms import FeedbackForm
+
+# def submit_feedback(request, professional_type, professional_id):
+#     if professional_type == 'dietitian':
+#         professional = DietitianProfile.objects.get(id=professional_id)
+
+#     elif professional_type == 'doctor':
+#         professional = DoctorProfile.objects.get(id=professional_id)
+
+#     if request.method == 'POST':
+#         form = FeedbackForm(request.POST)
+
+#         if form.is_valid():
+#             feedback = form.save(commit=False)
+#             feedback.user = request.user
+#             feedback.professional = professional
+#             feedback.save()
+#             messages.success(request, 'Feedback submitted successfully.')
+#             return redirect('professional_profile', professional_type, professional_id)
+
+#     else:
+#         form = FeedbackForm()
+
+#     return render(request, 'submit_feedback.html', {'form': form, 'professional': professional, 'professional_type': professional_type, 'professional_id': professional_id})
 # views.py
 
 # views.py

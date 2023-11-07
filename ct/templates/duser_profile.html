@@ -81,7 +81,8 @@
                     <ul class="dropdown-menu" aria-labelledby="accountSettingsDropdown">
                      <li><a href="{% static 'special-dishes.html' %}">Meal Plan</a></li>
                      <li><a href="{% static 'special-dishes.html' %}">Recipe Catalog</a></li>
-                     <li><a href="{% static 'special-dishes.html' %}">Bookings</a></li>
+                     <li><a href="{% url 'd_bookings' dietitian.id %}">Bookings</a></li>
+                     {% comment %} <li><a href="{% url 'd_feedback' %}">Feedbacks</a></li> {% endcomment %}
                    
                     </ul>
                 </li>
@@ -172,10 +173,10 @@
                     <div class="col-lg-4">
                         <div class="card mb-4">
                             <div class="card-body text-center">
-                                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
+                                {% comment %} <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
                                      alt="avatar"
                                      class="rounded-circle img-fluid"
-                                     style="width: 150px;">
+                                     style="width: 150px;"> {% endcomment %}
                                      <h5 class="my-3">{{ user.username }}</h5>
                                      {% if user.is_Customer %}
                                         <p class="text-muted mb-1">Customer</p>

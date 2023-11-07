@@ -33,6 +33,7 @@ urlpatterns = [
    path('delete-doctor/', views.delete_doctor, name='delete_doctor'),   
    path('verify_doctor/<int:doctor_id>/', views.verify_doctor, name='verify_doctor'),
    path('doctor_profile/', views.doctor_profile, name='doctor_profile'),
+   # path('doctor_profile/<int:doctor_id>/', views.doctor_profile, name='doctor_profile'),
    path('change_password/', views.change_password, name='change_password'),
    path('change_password/', views.change_password, name='change_password'),
    path('bmi_estimation/', views.bmi_estimation, name='bmi_estimation'),
@@ -44,10 +45,12 @@ urlpatterns = [
    path('delete-dietitian/', views.delete_dietitian, name='delete_dietitian'),   
    path('verify_dietitian/<int:dietitian_id>/', views.verify_dietitian, name='verify_dietitian'),
    path('dietitian_profile/', views.dietitian_profile, name='dietitian_profile'),
+   path('decline_doctor/<int:doctor_id>/', views.decline_doctor, name='decline_doctor'),
+   path('decline_dietitian/<int:dietitian_id>/', views.decline_dietitian, name='decline_dietitian'), 
 
    
    path('dr_bookings/<int:doctor_id>/', views.dr_bookings, name='dr_bookings'),
-   # path('d_bookings/<int:dietitian_id>/', views.d_bookings, name='d_bookings'),
+   path('d_bookings/<int:dietitian_id>/', views.d_bookings, name='d_bookings'),
    
    path('feedback_form/', views.feedback_form, name='feedback_form'),
    path('submit_feedback/dietitian/', views.submit_feedback, {'professional_type': 'dietitian'}, name='submit_dietitian_feedback'),

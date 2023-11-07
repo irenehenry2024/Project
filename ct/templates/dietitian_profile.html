@@ -74,8 +74,9 @@
                                     <!-- Add other profile details here -->
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    {% comment %} <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> {% endcomment %}
                                     <a href="{% url 'verify_dietitian' dietitian.id %}" class="btn btn-primary">Verify</a>
+                                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#declineDietitianModal{{ dietitian.id }}">Decline</button>
                                     <!-- You can also add a "Decline" button here -->
                                 </div>
                             </div>
@@ -84,6 +85,29 @@
                 {% endfor %}
             </tbody>
         </table>
+        {% for doctor in doctors %}
+<div class="modal fade" id="declineDietitianModal{{ dietitian.id }}" tabindex="-1" role="dialog" aria-labelledby="declineDietitianModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="declineDietitianModalLabel">Decline Dietitian Profile: {{ dietitian.user.username }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Provide a message or form to confirm the decline -->
+                <p>Are you sure you want to decline this doctor profile?</p>
+                <!-- You can add additional information or a form here. -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <a href="{% url 'decline_dietitian' dietitian.id %}" class="btn btn-danger">Confirm Decline</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
     </div>
   </body>
 </html>
