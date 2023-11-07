@@ -404,36 +404,35 @@ from django.contrib import messages
 @login_required
 def duser_profile(request):
     try:
-        duser_profile = DietitianProfile.objects.get(user=request.user)
+        dietitian = DietitianProfile.objects.get(user=request.user)
     except DietitianProfile.DoesNotExist:
         # If the profile doesn't exist, create one for the user
-        duser_profile = DietitianProfile(user=request.user)
-        duser_profile.save()
+        dietitian = DietitianProfile(user=request.user)
+        dietitian.save()
 
     if request.method == 'POST':
         if 'verify_dietitian' in request.POST:
-            # Handle the doctor verification process here
-            duser_profile.is_verified = True
-            duser_profile.save()
+            # Handle the dietitian verification process here
+            dietitian.is_verified = True
+            dietitian.save()
             messages.success(request, 'Dietitian profile verified successfully.')
             # Redirect to a success page or back to the profile page
             return redirect('dietitian_profile')  # Update to your URL name
 
-    if request.method == 'POST':
         # Update the user profile with the data from the request
-        duser_profile.phone_number = request.POST.get('num')
-        duser_profile.state = request.POST.get('state')
-        duser_profile.district = request.POST.get('district')
-        duser_profile.gender = request.POST.get('gender')
-        duser_profile.certifications = request.POST.get('certifications')
-        duser_profile.specialization = request.POST.get('specialization')
-        duser_profile.available_timings = request.POST.get('available_timings')
+        dietitian.phone_number = request.POST.get('phone_number')
+        dietitian.state = request.POST.get('state')
+        dietitian.district = request.POST.get('district')
+        dietitian.gender = request.POST.get('gender')
+        dietitian.certifications = request.POST.get('certifications')
+        dietitian.specialization = request.POST.get('specialization')
+        dietitian.available_timings = request.POST.get('available_timings')
 
-        duser_profile.save()
+        dietitian.save()
         messages.success(request, 'Profile updated successfully.')
 
     context = {
-        'duser_profile': duser_profile,
+        'dietitian': dietitian,  # Pass the 'dietitian' object to the template
     }
 
     return render(request, 'duser_profile.html', context)
@@ -447,42 +446,39 @@ from .models import DoctorProfile
 
 @login_required
 def druser_profile(request):
-    # Get or create the doctor profile for the current user
     try:
-        druser_profile = DoctorProfile.objects.get(user=request.user)
+        doctor = DoctorProfile.objects.get(user=request.user)
     except DoctorProfile.DoesNotExist:
         # If the profile doesn't exist, create one for the user
-        druser_profile = DoctorProfile(user=request.user)
-        druser_profile.save()
+        doctor = DoctorProfile(user=request.user)
+        doctor.save()
 
     if request.method == 'POST':
         if 'verify_doctor' in request.POST:
             # Handle the doctor verification process here
-            druser_profile.is_verified = True
-            druser_profile.save()
+            doctor.is_verified = True
+            doctor.save()
             messages.success(request, 'Doctor profile verified successfully.')
             # Redirect to a success page or back to the profile page
             return redirect('doctor_profile')  # Update to your URL name
 
         # Update the user profile with the data from the request
-        druser_profile.phone_number = request.POST.get('phone_number')  # Make sure form field names match
-        druser_profile.state = request.POST.get('state')
-        druser_profile.district = request.POST.get('district')
-        druser_profile.gender = request.POST.get('gender')
-        druser_profile.certifications = request.POST.get('certifications')
-        druser_profile.specialization = request.POST.get('specialization')
-        druser_profile.available_timings = request.POST.get('available_timings')
+        doctor.phone_number = request.POST.get('phone_number')
+        doctor.state = request.POST.get('state')
+        doctor.district = request.POST.get('district')
+        doctor.gender = request.POST.get('gender')
+        doctor.certifications = request.POST.get('certifications')
+        doctor.specialization = request.POST.get('specialization')
+        doctor.available_timings = request.POST.get('available_timings')
 
-
-        druser_profile.save()
+        doctor.save()
         messages.success(request, 'Profile updated successfully.')
 
     context = {
-        'druser_profile': druser_profile,
+        'doctor': doctor,  # Pass the 'doctor' object to the template
     }
 
     return render(request, 'druser_profile.html', context)
-
 
 
 
@@ -822,6 +818,8 @@ def dr_bookings(request, doctor_id):
     doctor = get_object_or_404(DoctorProfile, id=doctor_id)  # Use get_object_or_404 for graceful handling
     bookings = Booking.objects.filter(doctor=doctor)
     users_who_booked = [booking.user for booking in bookings]
+    
+
 
     context = {
         'doctor': doctor,

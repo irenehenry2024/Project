@@ -83,7 +83,9 @@
                          <li><a href="{% static 'special-dishes.html' %}">Health Records</a></li>
                          <li><a href="{% static 'special-dishes.html' %}">Remedials</a></li>
                          <li><a href="{% static 'special-dishes.html' %}">Tests</a></li>
-                         <li><a href="{% url 'dr_bookings' %}">Bookings</a></li>
+                         <li><a href="{% url 'dr_bookings' doctor.id %}">Bookings</a></li>
+
+                         {% comment %} <li><a href="{% url 'dr_bookings' %}">Bookings</a></li> {% endcomment %}
 
 
                          <!-- Link to doctor bookings -->

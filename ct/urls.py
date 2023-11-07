@@ -45,8 +45,9 @@ urlpatterns = [
    path('verify_dietitian/<int:dietitian_id>/', views.verify_dietitian, name='verify_dietitian'),
    path('dietitian_profile/', views.dietitian_profile, name='dietitian_profile'),
 
+   
    path('dr_bookings/<int:doctor_id>/', views.dr_bookings, name='dr_bookings'),
-   path('d_bookings/<int:dietitian_id>/', views.d_bookings, name='d_bookings'),
+   # path('d_bookings/<int:dietitian_id>/', views.d_bookings, name='d_bookings'),
    
    path('feedback_form/', views.feedback_form, name='feedback_form'),
    path('submit_feedback/dietitian/', views.submit_feedback, {'professional_type': 'dietitian'}, name='submit_dietitian_feedback'),

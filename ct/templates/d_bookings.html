@@ -12,12 +12,17 @@
         <div class="container h-100 py-5">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-10">
-                    <h3 class="fw-normal mb-4 text-black">Bookings for {{ dietitian.user.username }}</h3>
-                    <ul>
-                        {% for user in users_who_booked %}
-                            <li>{{ user.username }}</li>
-                        {% endfor %}
-                    </ul>
+                    <h3 class="fw-normal mb-4 text-black">Bookings for {{ doctor.user.username }}</h3>
+                    {% for user in users_who_booked %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h3 class="card-title">{{ user.username }}</h3>
+                            <p class="card-text">Email: {{ user.email }}</p>
+                            <!-- Add more user details here as needed -->
+                            <!-- Example: <p class="card-text">User Email: {{ user.email }}</p> -->
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>

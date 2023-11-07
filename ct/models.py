@@ -87,6 +87,7 @@ class DoctorProfile(models.Model):
     specialization = models.CharField(max_length=100)
     available_timings = models.CharField(max_length=255, blank=True, null=True)
     booked_by = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='booked_doctors', blank=True)
+    image = models.ImageField(upload_to='doctor_images/', blank=True, null=True)  # Add this line for the image field
     # booked_by = models.ManyToManyField(User, related_name='booked_doctors', blank=True)
     
     
@@ -106,7 +107,8 @@ class DietitianProfile(models.Model):
     certifications = models.TextField()
     specialization = models.CharField(max_length=100)
     available_timings = models.CharField(max_length=255, blank=True, null=True)
-    # booked_by = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='booked_dietitians', blank=True)
+    image = models.ImageField(upload_to='dietitian_images/', blank=True, null=True)  # Add this line for the image field
+
 
     def __str__(self):
         return self.user.username
