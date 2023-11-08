@@ -509,6 +509,9 @@ def duser_profile(request):
         dietitian.specialization = request.POST.get('specialization')
         dietitian.available_timings = request.POST.get('available_timings')
 
+        if request.FILES.get('image'):
+            dietitian.image = request.FILES['image']
+
         dietitian.save()
         messages.success(request, 'Profile updated successfully.')
 
@@ -551,6 +554,9 @@ def druser_profile(request):
         doctor.certifications = request.POST.get('certifications')
         doctor.specialization = request.POST.get('specialization')
         doctor.available_timings = request.POST.get('available_timings')
+
+        if request.FILES.get('image'):
+            doctor.image = request.FILES['image']
 
         doctor.save()
         messages.success(request, 'Profile updated successfully.')
@@ -759,98 +765,119 @@ def change_password(request):
             return JsonResponse({'error': 'Passwords do not match'}, status=400)
 
     return render(request, 'change_password.html')
-
+    
 from django.http import JsonResponse
 from .models import DoctorProfile
-from .models import Booking  # Import the Booking model if you have one
+from .models import Booking
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 
+@login_required
 def book_doctor(request):
     if request.method == 'POST':
         doctor_id = request.POST.get('doctor_id')
+        print(f'doctor_id received: {doctor_id}')
 
         try:
-            doctor = DoctorProfile.objects.get(id=doctor_id)
+            doctor = get_object_or_404(DoctorProfile, id=doctor_id)
             user = request.user
 
-            # Check if the user has already booked this doctor
-            if doctor.booked_by.filter(id=user.id).exists():
+            if Booking.objects.filter(doctor=doctor, user=user).exists():
                 return JsonResponse({'success': False, 'message': 'You have already booked this doctor.'})
 
-            # Create a Booking instance and link it to the selected doctor and the logged-in user
             booking = Booking(doctor=doctor, user=user)
             booking.save()
 
             return JsonResponse({'success': True, 'message': 'Booking successful.'})
-        except DoctorProfile.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Doctor not found.'})
         except Exception as e:
             return JsonResponse({'success': False, 'message': 'An error occurred: ' + str(e)})
 
-def delete_doctor(request):
+
+def view_doctor_details(request):
     if request.method == 'POST':
         doctor_id = request.POST.get('doctor_id')
 
         try:
             doctor = DoctorProfile.objects.get(id=doctor_id)
 
-            # Check if the logged-in user is the owner of the doctor profile
-            if doctor.user == request.user:
-                # Delete the doctor profile
-                doctor.delete()
-                return JsonResponse({'success': True, 'message': 'Doctor profile deleted successfully.'})
-            else:
-                return JsonResponse({'success': False, 'message': 'You do not have permission to delete this doctor profile.'})
+            # You can do some additional processing here if needed
+
+            return JsonResponse({'success': True, 'message': 'Doctor details retrieved successfully.'})
         except DoctorProfile.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Doctor not found.'})
         except Exception as e:
             return JsonResponse({'success': False, 'message': 'An error occurred: ' + str(e)})
 
-
-
 from django.http import JsonResponse
 from .models import DietitianProfile
-from .models import DietitianBooking  # Import the Booking model if you have one
+from .models import DietitianBooking
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 
+@login_required
 def book_dietitian(request):
     if request.method == 'POST':
         dietitian_id = request.POST.get('dietitian_id')
+        print(f'dietitian_id received: {dietitian_id}')
 
         try:
-            dietitian = DietitianProfile.objects.get(id=dietitian_id)
-            user = request.user
+           dietitian = get_object_or_404(DietitianProfile, id=dietitian_id)
+           user = request.user
 
-            # Check if the user has already booked this dietitian
-            if dietitian.booked_by.filter(id=user.id).exists():
-                return JsonResponse({'success': False, 'message': 'You have already booked this doctor.'})
+           if DietitianBooking.objects.filter(dietitian=dietitian, user=user).exists():
+               return JsonResponse({'success': False, 'message': 'You have already booked this dietitian.'})
 
-            # Create a Booking instance and link it to the selected dietitian and the logged-in user
-            booking = DietitianBooking(dietitian=dietitian, user=user)
-            booking.save()
+           booking = DietitianBooking(dietitian=dietitian, user=user)
+           booking.save()
 
-            return JsonResponse({'success': True, 'message': 'Booking successful.'})
-        except DietitianProfile.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Dietitian not found.'})
+           return JsonResponse({'success': True, 'message': 'Booking successful.'})
         except Exception as e:
             return JsonResponse({'success': False, 'message': 'An error occurred: ' + str(e)})
 
-def delete_dietitian(request):
+
+def view_dietitian_details(request):
     if request.method == 'POST':
         dietitian_id = request.POST.get('dietitian_id')
 
         try:
             dietitian = DietitianProfile.objects.get(id=dietitian_id)
 
-            # Check if the logged-in user is the owner of the dietitian profile
-            if dietitian.user == request.user:
-                # Delete the dietitian profile
-                dietitian.delete()
-                return JsonResponse({'success': True, 'message': 'Dietitian profile deleted successfully.'})
-            else:
-                return JsonResponse({'success': False, 'message': 'You do not have permission to delete this dietitian profile.'})
+            # You can do some additional processing here if needed
+
+            return JsonResponse({'success': True, 'message': 'Dietitian details retrieved successfully.'})
         except DietitianProfile.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Dietitian not found.'})
         except Exception as e:
             return JsonResponse({'success': False, 'message': 'An error occurred: ' + str(e)})
+
+
+# from django.http import JsonResponse
+# from .models import DietitianProfile
+# from .models import DietitianBooking  # Import the Booking model if you have one
+
+# def book_dietitian(request):
+#     if request.method == 'POST':
+#         dietitian_id = request.POST.get('dietitian_id')
+
+#         try:
+#             dietitian = DietitianProfile.objects.get(id=dietitian_id)
+#             user = request.user
+
+#             # Check if the user has already booked this dietitian
+#             if dietitian.booked_by.filter(id=user.id).exists():
+#                 return JsonResponse({'success': False, 'message': 'You have already booked this doctor.'})
+
+#             # Create a Booking instance and link it to the selected dietitian and the logged-in user
+#             booking = DietitianBooking(dietitian=dietitian, user=user)
+#             booking.save()
+
+#             return JsonResponse({'success': True, 'message': 'Booking successful.'})
+#         except DietitianProfile.DoesNotExist:
+#             return JsonResponse({'success': False, 'message': 'Dietitian not found.'})
+#         except Exception as e:
+#             return JsonResponse({'success': False, 'message': 'An error occurred: ' + str(e)})
+
+
 
 
 from django.shortcuts import render, redirect
