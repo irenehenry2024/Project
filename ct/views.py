@@ -56,6 +56,39 @@ def calorie_counting(request):
     else:
         return render(request, 'calorie_counting.html',{'query':'Enter a valid query'})
 
+# recipes/views.py
+from django.shortcuts import render
+import requests
+
+def recipe_catalog(request):
+    api_key = 'kqQ9bfS938jO+qjX74KnWg==HFoOm2P07PDOalEP'  # Replace with your Recipe Ninjas API key
+    # app_id = 'YOUR_APP_ID'  # Replace with your Recipe Ninjas App ID
+
+    # Make a request to the Recipe Ninjas API
+    response = requests.get('https://api.api-ninjas.com/v1/recipe?query=', params={
+        'format': 'json',
+        'results': '10',  # You can adjust the number of results as needed
+        'fields': 'item_name,nf_calories,nf_serving_size_qty,nf_serving_size_unit',
+        # 'appId': app_id,
+        'appKey': api_key,
+    })
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        recipes = response.json().get('hits', [])
+    else:
+        recipes = []
+
+    return render(request, 'recipe_catalog.html', {'recipes': recipes})
+
+# import requests
+# query = 'italian wedding soup'
+# api_url = 'https://api.api-ninjas.com/v1/recipe?query={}'.format(query)
+# response = requests.get(api_url, headers={'X-Api-Key': 'YOUR_API_KEY'})
+# if response.status_code == requests.codes.ok:
+#     print(response.text)
+# else:
+#     print("Error:", response.status_code, response.text)
 
 
     # query = '1lb brisket and fries'
