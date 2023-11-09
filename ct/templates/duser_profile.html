@@ -186,14 +186,14 @@
                                         <p class="text-muted mb-1">Doctor</p>
                                      {% endif %}
                                      <p class="text-muted mb-1">{{ user.email }}</p>
-                                     <p class="text-muted mb-1">Phone Number: {{ duser_profile.phone_number }}</p>
+                                     <p class="text-muted mb-1">Phone Number: {{ dietitian.phone_number }}</p>
                                      {% comment %} <p class="text-muted mb-1">Upload Certificate: {{ duser_profile.image }}</p> {% endcomment %}
-                                     <p class="text-muted mb-1">State: {{ duser_profile.state }}</p>
-                                     <p class="text-muted mb-1">District: {{ duser_profile.district }}</p>
-                                     <p class="text-muted mb-1">Gender: {{ duser_profile.gender }}</p>
-                                     <p class="text-muted mb-1">certification: {{ duser_profile.certifications }}</p>
-                                     <p class="text-muted mb-1">Specialization: {{ duser_profile.specialization }}</p>
-                                     <p class="text-muted mb-1">Available Timings: {{ duser_profile.available_timings }}</p>
+                                     <p class="text-muted mb-1">State: {{ dietitian.state }}</p>
+                                     <p class="text-muted mb-1">District: {{ dietitian.district }}</p>
+                                     <p class="text-muted mb-1">Gender: {{ dietitian.gender }}</p>
+                                     <p class="text-muted mb-1">certification: {{ dietitian.certifications }}</p>
+                                     <p class="text-muted mb-1">Specialization: {{ dietitian.specialization }}</p>
+                                     <p class="text-muted mb-1">Available Timings: {{ dietitian.available_timings }}</p>
 
 
 
@@ -218,7 +218,7 @@
                                                 <p class="mb-0" for="num">Phone Number</p>
                                             </div>
                                             <div class="col-sm-9">
-                                                <input type="text" id="num" class="form-control form-control-lg" name="num" value= "{{ duser_profile.phone_number }}" />
+                                                <input type="text" id="num" class="form-control form-control-lg" name="num" value= "{{ dietitian.phone_number }}" />
                                                 <span id="numspan" style="font-size: 12px;"></span>
                                             </div>
                                         </div>
@@ -242,34 +242,34 @@
                                             <div class="col-sm-9">
                                                 <select id="state" class="form-control form-control-lg" name="state" onchange="populateDistricts()" >
                                                     <option value="" disabled selected>Select State</option>
-                                                         <option value="Andhra Pradesh" {% if duser_profile.state == "Andhra Pradesh" %}selected{% endif %}>Andhra Pradesh</option>
-                                                         <option value="Arunachal Pradesh" {% if duser_profile.state == "Arunachal Pradesh" %}selected{% endif %}>Arunachal Pradesh</option>
-                                                         <option value="Assam" {% if duser_profile.state == "Assam" %}selected{% endif %}>Assam</option>
-                                                         <option value="Bihar" {% if duser_profile.state == "Bihar" %}selected{% endif %}>Bihar</option>
-                                                         <option value="Chhattisgarh" {% if duser_profile.state == "Chhattisgarh" %}selected{% endif %}>Chhattisgarh</option>
-                                                         <option value="Goa" {% if duser_profile.state == "Goa" %}selected{% endif %}>Goa</option>
-                                                         <option value="Gujarat" {% if duser_profile.state == "Gujarat" %}selected{% endif %}>Gujarat</option>
-                                                         <option value="Haryana" {% if duser_profile.state == "Haryana" %}selected{% endif %}>Haryana</option>
-                                                         <option value="Himachal Pradesh" {% if duser_profile.state == "Himachal Pradesh" %}selected{% endif %}>Himachal Pradesh</option>
-                                                         <option value="Jharkhand" {% if duser_profile.state == "Jharkhand" %}selected{% endif %}>Jharkhand</option>
-                                                         <option value="Karnataka" {% if duser_profile.state == "Karnataka" %}selected{% endif %}>Karnataka</option>
-                                                         <option value="Kerala" {% if duser_profile.state == "Kerala" %}selected{% endif %}>Kerala</option>
-                                                         <option value="Madhya Pradesh" {% if duser_profile.state == "Madhya Pradesh" %}selected{% endif %}>Madhya Pradesh</option>
-                                                         <option value="Maharashtra" {% if duser_profile.state == "Maharashtra" %}selected{% endif %}>Maharashtra</option>
-                                                         <option value="Manipur" {% if duser_profile.state == "Manipur" %}selected{% endif %}>Manipur</option>
-                                                         <option value="Meghalaya" {% if duser_profile.state == "Meghalaya" %}selected{% endif %}>Meghalaya</option>
-                                                         <option value="Mizoram" {% if duser_profile.state == "Mizoram" %}selected{% endif %}>Mizoram</option>
-                                                         <option value="Nagaland" {% if duser_profile.state == "Nagaland" %}selected{% endif %}>Nagaland</option>
-                                                         <option value="Odisha" {% if duser_profile.state == "Odisha" %}selected{% endif %}>Odisha</option>
-                                                         <option value="Punjab" {% if duser_profile.state == "Punjab" %}selected{% endif %}>Punjab</option>
-                                                         <option value="Rajasthan" {% if duser_profile.state == "Rajasthan" %}selected{% endif %}>Rajasthan</option>
-                                                         <option value="Sikkim" {% if duser_profile.state == "Sikkim" %}selected{% endif %}>Sikkim</option>
-                                                         <option value="Tamil Nadu" {% if duser_profile.state == "Tamil Nadu" %}selected{% endif %}>Tamil Nadu</option>
-                                                         <option value="Telangana" {% if duser_profile.state == "Telangana" %}selected{% endif %}>Telangana</option>
-                                                         <option value="Tripura" {% if duser_profile.state == "Tripura" %}selected{% endif %}>Tripura</option>
-                                                         <option value="Uttar Pradesh" {% if duser_profile.state == "Uttar Pradesh" %}selected{% endif %}>Uttar Pradesh</option>
-                                                         <option value="Uttarakhand" {% if duser_profile.state == "Uttarakhand" %}selected{% endif %}>Uttarakhand</option>
-                                                         <option value="West Bengal" {% if duser_profile.state == "West Bengal" %}selected{% endif %}>West Bengal</option>
+                                                         <option value="Andhra Pradesh" {% if dietitian.state == "Andhra Pradesh" %}selected{% endif %}>Andhra Pradesh</option>
+                                                         <option value="Arunachal Pradesh" {% if dietitian.state == "Arunachal Pradesh" %}selected{% endif %}>Arunachal Pradesh</option>
+                                                         <option value="Assam" {% if dietitian.state == "Assam" %}selected{% endif %}>Assam</option>
+                                                         <option value="Bihar" {% if dietitian.state == "Bihar" %}selected{% endif %}>Bihar</option>
+                                                         <option value="Chhattisgarh" {% if dietitian.state == "Chhattisgarh" %}selected{% endif %}>Chhattisgarh</option>
+                                                         <option value="Goa" {% if dietitian.state == "Goa" %}selected{% endif %}>Goa</option>
+                                                         <option value="Gujarat" {% if dietitian.state == "Gujarat" %}selected{% endif %}>Gujarat</option>
+                                                         <option value="Haryana" {% if dietitian.state == "Haryana" %}selected{% endif %}>Haryana</option>
+                                                         <option value="Himachal Pradesh" {% if dietitian.state == "Himachal Pradesh" %}selected{% endif %}>Himachal Pradesh</option>
+                                                         <option value="Jharkhand" {% if dietitian.state == "Jharkhand" %}selected{% endif %}>Jharkhand</option>
+                                                         <option value="Karnataka" {% if dietitian.state == "Karnataka" %}selected{% endif %}>Karnataka</option>
+                                                         <option value="Kerala" {% if dietitian.state == "Kerala" %}selected{% endif %}>Kerala</option>
+                                                         <option value="Madhya Pradesh" {% if dietitian.state == "Madhya Pradesh" %}selected{% endif %}>Madhya Pradesh</option>
+                                                         <option value="Maharashtra" {% if dietitian.state == "Maharashtra" %}selected{% endif %}>Maharashtra</option>
+                                                         <option value="Manipur" {% if dietitian.state == "Manipur" %}selected{% endif %}>Manipur</option>
+                                                         <option value="Meghalaya" {% if dietitian.state == "Meghalaya" %}selected{% endif %}>Meghalaya</option>
+                                                         <option value="Mizoram" {% if dietitian.state == "Mizoram" %}selected{% endif %}>Mizoram</option>
+                                                         <option value="Nagaland" {% if dietitian.state == "Nagaland" %}selected{% endif %}>Nagaland</option>
+                                                         <option value="Odisha" {% if dietitian.state == "Odisha" %}selected{% endif %}>Odisha</option>
+                                                         <option value="Punjab" {% if dietitian.state == "Punjab" %}selected{% endif %}>Punjab</option>
+                                                         <option value="Rajasthan" {% if dietitian.state == "Rajasthan" %}selected{% endif %}>Rajasthan</option>
+                                                         <option value="Sikkim" {% if dietitian.state == "Sikkim" %}selected{% endif %}>Sikkim</option>
+                                                         <option value="Tamil Nadu" {% if dietitian.state == "Tamil Nadu" %}selected{% endif %}>Tamil Nadu</option>
+                                                         <option value="Telangana" {% if dietitian.state == "Telangana" %}selected{% endif %}>Telangana</option>
+                                                         <option value="Tripura" {% if dietitian.state == "Tripura" %}selected{% endif %}>Tripura</option>
+                                                         <option value="Uttar Pradesh" {% if dietitian.state == "Uttar Pradesh" %}selected{% endif %}>Uttar Pradesh</option>
+                                                         <option value="Uttarakhand" {% if dietitian.state == "Uttarakhand" %}selected{% endif %}>Uttarakhand</option>
+                                                         <option value="West Bengal" {% if dietitian.state == "West Bengal" %}selected{% endif %}>West Bengal</option>
                                                      </select>                                                                                    
                                                    <span id="stspan" style="font-size: 12px;"></span>
                                             </div>
@@ -282,7 +282,7 @@
                                             <div class="col-sm-9">
                                                 <select id="district" class="form-control form-control-lg" name="district">
                                                     <option value="" disabled selected>Select District</option>
-                                                    <option value="{{ duser_profile.district }}" selected>{{ duser_profile.district }}</option>
+                                                    <option value="{{ dietitian.district }}" selected>{{ dietitian.district }}</option>
                                                 </select>
                                                 <span id="districtspan" style="font-size: 12px;"></span>
                                             </div>
@@ -294,9 +294,9 @@
                                             </div>
                                             <div class="col-sm-9">
                                                 <select id="gender" class="form-control form-control-lg" name="gender">
-                                                    <option value="male" {% if user_profile.gender == "male" %}selected{% endif %}>Male</option>
-                                                    <option value="female" {% if user_profile.gender == "female" %}selected{% endif %}>Female</option>
-                                                    <option value="others" {% if user_profile.gender == "others" %}selected{% endif %}>Others</option>
+                                                    <option value="male" {% if dietitian.gender == "male" %}selected{% endif %}>Male</option>
+                                                    <option value="female" {% if dietitian.gender == "female" %}selected{% endif %}>Female</option>
+                                                    <option value="others" {% if dietitian.gender == "others" %}selected{% endif %}>Others</option>
                                                    
                                                     {% comment %} <option value="male">Male</option>
                                                     <option value="female">Female</option>
@@ -310,7 +310,7 @@
                                                 <p class="mb-0" for="certifications">Certifications</p>
                                             </div>
                                             <div class="col-sm-9">
-                                                <input type="text" id="certifications" class="form-control form-control-lg" name="certifications" value="{{ duser_profile.certifications }}" />
+                                                <input type="text" id="certifications" class="form-control form-control-lg" name="certifications" value="{{ dietitian.certifications }}" />
                                                 <span id="certificationsspan" style="font-size: 12px;"></span>
                                             </div>
                                         </div>
@@ -321,7 +321,7 @@
                                                 <p class="mb-0" for="specialization">Specialization</p>
                                             </div>
                                             <div class="col-sm-9">
-                                                <input type="text" id="specialization" class="form-control form-control-lg" name="specialization" value="{{ duser_profile.specialization }}" />
+                                                <input type="text" id="specialization" class="form-control form-control-lg" name="specialization" value="{{ dietitian.specialization }}" />
                                                 <span id="specializationspan" style="font-size: 12px;"></span>
                                             </div>
                                         </div>
@@ -332,7 +332,7 @@
                                                 <p class="mb-0" for="available_timings">Available Timings</p>
                                             </div>
                                             <div class="col-sm-9">
-                                                <input type="text" id="available_timings" class="form-control form-control-lg" name="available_timings" placeholder="9:00 AM - 11:00 AM, 2:00 PM - 4:00 PM" value="{{ duser_profile.available_timings }}" />
+                                                <input type="text" id="available_timings" class="form-control form-control-lg" name="available_timings" placeholder="9:00 AM - 11:00 AM, 2:00 PM - 4:00 PM" value="{{ dietitian.available_timings }}" />
                                                 <span id="availabletimingsspan" style="font-size: 12px;"></span>
                                             </div>
                                         </div>

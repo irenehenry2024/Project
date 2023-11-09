@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ shop.shop_name }} Daily Slots</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+        }
+        h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+        h2 {
+            font-size: 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #e5e5e5;
+            border-radius: 5px;
+        }
+        a {
+            text-decoration: none;
+            color: #0077b6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ shop.shop_name }} Daily Slots</h1>
+
+        <h2>Available Slots for the Upcoming Week</h2>
+        <ul>
+            {% for daily_slot in daily_slots_with_capacity %}
+                <li>
+                    <strong>Date:</strong> {{ daily_slot.date }}<br>
+                    <strong>Amount of Spice (kg):</strong> {{ daily_slot.slots_available }} kg<br>
+                    <a href="{% url 'book_slots' shop.id %}?date={{ daily_slot.date }}">Book This Slot</a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <a href="{% url 'shop_detail' shop.id %}">Back to Shop</a>
+    </div>
+</body>
+</html>

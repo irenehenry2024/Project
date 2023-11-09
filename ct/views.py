@@ -288,6 +288,9 @@ def admindashboard(request):
     # You can use Django's ORM to query the database for this data
     # Example:
     users = CustomUser.objects.all()
+    customers= CustomUser.objects.filter(is_Customer=True)
+    dietitians= CustomUser.objects.filter(is_Dietitian=True)
+    doctors= CustomUser.objects.filter(is_Doctor=True)
     #  username = Order.objects.all()
     
     context = {
@@ -554,9 +557,9 @@ def druser_profile(request):
         doctor.certifications = request.POST.get('certifications')
         doctor.specialization = request.POST.get('specialization')
         doctor.available_timings = request.POST.get('available_timings')
+        doctor.image = request.FILES.get("image")
 
-        if request.FILES.get('image'):
-            doctor.image = request.FILES['image']
+        
 
         doctor.save()
         messages.success(request, 'Profile updated successfully.')
