@@ -2,114 +2,193 @@
 <html>
   <head>
     <title>Customers</title>
-    <head>
-      <meta charset="UTF-8">
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Admin Dashboard | Dashboard</title>
-      <!-- Favicon -->
-      <link rel="shortcut icon" href="./img/svg/logo.svg" type="image/x-icon">
-      <!-- Custom styles -->
-      <link rel="stylesheet" href="{% static './css/style.min2.css' %}">
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-      
-        <style>
-            .user-table {
-                border-collapse: collapse;
-                width: 100%;
-                border: 2px solid #2f49d1; /* blue border color */
-            }
-    
-            .user-table th, .user-table td {
-                border: 1px solid #2f49d1; /* blue border color */
-                padding: 8px;
-                text-align: left;
-            }
-    
-            .blue-header {
-                background-color: #2f49d1; /* blue background color */
-                color: #fff; /* White text color */
-            }
-        </style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Dashboard</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{% static './img/svg/logo.svg' %}" type="image/x-icon">
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="{% static './css/style.min2.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <style>
       .user-table {
-          border-collapse: collapse;
-          width: 100%;
-          border: 2px solid #2f49d1; /* blue border color */
+        border-collapse: collapse;
+        width: 100%;
+      }
+      
+      .user-table th, .user-table td {
+        padding: 8px;
+        text-align: left;
+      }
+      
+      .blue-header {
+        background-color: #2f49d1;
+        color: #fff;
+      }
+      
+      .user-table th {
+        background-color: #f2f2f2; /* Grey background color for table header */
+        color: #333; /* Text color for table header */
+      }
+      
+      .user-table td {
+        background-color: #ffffff; /* Grey background color for table cells */
+        color: #333; /* Text color for table cells */
+      }
+      
+      .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+      
+      .pagination ul {
+        list-style: none;
+        display: flex;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .pagination li {
+        margin: 0 5px;
+      }
+      
+      .pagination a {
+        text-decoration: none;
+        color: #2f49d1;
+        background-color: #fff;
+        padding: 8px 12px;
+        border: 1px solid #2f49d1;
+        border-radius: 4px;
+      }
+      
+      .pagination .active a {
+        color: #fff;
+        background-color: #2f49d1;
+      }
+      
+      {% comment %} .user-table {
+        border-collapse: collapse;
+        width: 100%;
+        border: 2px solid #2f49d1; /* blue border color */
       }
 
       .user-table th, .user-table td {
-          border: 1px solid #2f49d1; /* blue border color */
-          padding: 8px;
-          text-align: left;
+       
+        padding: 8px;
+        text-align: left;
       }
 
       .blue-header {
-          background-color: #2f49d1; /* blue background color */
-          color: #fff; /* White text color */
+        background-color: #2f49d1; /* blue background color */
+        color: #fff; /* White text color */
       }
-  </style>
-</head>
-<body>
-  <div class="layer"></div>
-<!-- ! Body -->
-<a class="skip-link sr-only" href="#skip-target">Skip to content</a>
-<div class="page-flex">
-  <!-- ! Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-start">
-        <div class="sidebar-head">
-            <a href="/" class="logo-wrapper" title="Home">
-                <span class="sr-only">Home</span>
-                <span class="icon logo" aria-hidden="true"></span>
-                <div class="logo-text">
-                    <span class="logo-title">Admin</span>
-                    <span class="logo-subtitle">Dashboard</span>
-                </div>
 
-            </a>
-            <button class="sidebar-toggle transparent-btn" title="Menu" type="button">
-                <span class="sr-only">Toggle menu</span>
-                <span class="icon menu-toggle" aria-hidden="true"></span>
-            </button>
-        </div>
-        <div class="sidebar-body">
-            <ul class="sidebar-body-menu">
-                <li>
-                    <a class="active" href="/"><span class="icon home" aria-hidden="true"></span>Dashboard</a>
-                </li>
-                <li>
-                  <a class="show-cat-btn" href="##">
-                      <span class="icon user-3" aria-hidden="true"></span>Users
-                      <span class="category__btn transparent-btn" title="Open list">
-                          <span class="sr-only">Open list</span>
-                          <span class="icon arrow-down" aria-hidden="true"></span>
-                      </span>
-                  </a>
-                
-                 <ul class="cat-sub-menu">
+      .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .pagination ul {
+        list-style: none;
+        display: flex;
+        padding: 0;
+        margin: 0;
+      }
+
+      .pagination li {
+        margin: 0 5px;
+      }
+
+      .pagination a {
+        text-decoration: none;
+        color: #2f49d1;
+        background-color: #fff;
+        padding: 8px 12px;
+        border: 1px solid #2f49d1;
+        border-radius: 4px;
+      }
+
+      .pagination .active a {
+        color: #fff;
+        background-color: #2f49d1;
+      } {% endcomment %}
+    </style>
+  </head>
+  <body>
+    <div class="layer"></div>
+    <!-- ! Body -->
+    <a class="skip-link sr-only" href="#skip-target">Skip to content</a>
+    <div class="page-flex">
+      <!-- ! Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-start">
+          <div class="sidebar-head">
+              <a href="{% url 'admindashboard' %}" class="logo-wrapper" title="Home">
+                  <span class="sr-only">Home</span>
+                  <span class="icon logo" aria-hidden="true"></span>
+                  <div class="logo-text">
+                      <span class="logo-title">Admin</span>
+                      <span class="logo-subtitle">Dashboard</span>
+                  </div>
+  
+              </a>
+              <button class="sidebar-toggle transparent-btn" title="Menu" type="button">
+                  <span class="sr-only">Toggle menu</span>
+                  <span class="icon menu-toggle" aria-hidden="true"></span>
+              </button>
+          </div>
+          <div class="sidebar-body">
+              <ul class="sidebar-body-menu">
                   <li>
-                    <a href="{% url 'customer_list' %}">Customer</a>
+                      <a class="active" href="{% url 'admindashboard' %}"><span class="icon home" aria-hidden="true"></span>Dashboard</a>
+                  </li>
+                  <li>
+                    <a class="show-cat-btn" href="##">
+                        <span class="icon user-3" aria-hidden="true"></span>Users
+                        <span class="category__btn transparent-btn" title="Open list">
+                            <span class="sr-only">Open list</span>
+                            <span class="icon arrow-down" aria-hidden="true"></span>
+                        </span>
+                    </a>
+                  
+                    <ul class="cat-sub-menu">
+                      <li>
+                          <a href="{% url 'customer_list' %}">Customer</a>
+                      </li>
+                      <li>
+                          <a href="{% url 'dietitian_list' %}">Dietitian</a>
+                      </li>
+                      <li>
+                        <a href="{% url 'doctor_list' %}">Doctor</a>
+                    </li>
+                    <li>
+                      <a href="{% url 'doctor_profile' %}">Doctor Profiles</a>
+                  </li>
+                  <li>
+                    <a href="{% url 'dietitian_profile' %}">Dietitian Profiles</a>
                 </li>
-                      </ul>
-                      
-                </div>
-            </div>
-            <div class="sidebar-footer">
-                <a href="##" class="sidebar-user">
-                    <span class="sidebar-user-img">
-                        <picture><source srcset="{% static './img/avatar/avatar-illustrated-01.webp' %}" type="image/webp"><img src="{% static './img/avatar/avatar-illustrated-01.png' %}" alt="User name"></picture>
-                    </span>
-                    <div class="sidebar-user-info">
-                        <span class="sidebar-user__title">Admin</span>
-                        <span class="sidebar-user__subtitle">Admin Dasboard</span>
-                    </div>
-                </a>
-            </div>
-        </aside>
-          <div class="main-wrapper">
-            <!-- ! Main nav -->
-            <nav class="main-nav--bg">
+                  </ul>
+                        
+                  </div>
+              </div>
+              <div class="sidebar-footer">
+                  <a href="##" class="sidebar-user">
+                      <span class="sidebar-user-img">
+                          <picture><source srcset="{% static './img/avatar/avatar-illustrated-01.webp' %}" type="image/webp"><img src="{% static './img/avatar/avatar-illustrated-01.png' %}" alt="User name"></picture>
+                      </span>
+                      <div class="sidebar-user-info">
+                          <span class="sidebar-user__title">Admin</span>
+                          <span class="sidebar-user__subtitle">Admin Dasboard</span>
+                      </div>
+                  </a>
+              </div>
+      </aside>
+      <div class="main-wrapper">
+        <!-- ! Main nav -->
+        <nav class="main-nav--bg">
           <div class="container main-nav">
             <div class="main-nav-start">
               <div class="search-wrapper">
@@ -131,8 +210,7 @@
                       </div>
                       <div class="notification-dropdown-text">
                         <span class="notification-dropdown__title">System just updated</span>
-                        <span class="notification-dropdown__subtitle">The system has been successfully upgraded. Read more
-                          here.</span>
+                        <span class="notification-dropdown__subtitle">The system has been successfully upgraded. Read more here.</span>
                       </div>
                     </a>
                   </li>
@@ -164,30 +242,9 @@
                   </li>
                 </ul>
               </div>
-              <div class="nav-user-wrapper">
-                <button href="##" class="nav-user-btn dropdown-btn" title="My profile" type="button">
-                  <span class="sr-only">My profile</span>
-                  <span class="nav-user-img">
-                    <picture><source srcset="{% static './img/avatar/avatar-illustrated-02.webp' %}" type="image/webp"><img src="{% static './img/avatar/avatar-illustrated-02.png' %}" alt="User name"></picture>
-                  </span>
-                </button>
-                <ul class="users-item-dropdown nav-user-dropdown dropdown">
-                  <li><a href="##">
-                      <i data-feather="user" aria-hidden="true"></i>
-                      <span>Profile</span>
-                    </a></li>
-                  <li><a href="##">
-                      <i data-feather="settings" aria-hidden="true"></i>
-                      <span>Account settings</span>
-                    </a></li>
-                  <li><a class="danger" id="logout-link" href="{% url 'loggout' %}">
-                    <i data-feather="log-out" aria-hidden="true"></i>
-                    <span>Log out</span></a></li>
-                </ul>
-                
-              </div>
             </div>
           </div>
+          <!-- ... (your existing navigation code) ... -->
         </nav>
         <script src="{% static './plugins/chart.min.js' %}"></script>
         <!-- Icons library -->
@@ -195,68 +252,62 @@
         <!-- Custom scripts -->
         <script src="{% static 'js/script.js' %}"></script>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">        
-  <h3>Registered Customers</h3><br>
-<table class="user-table">
-  <thead>
+        <h3>Registered Customers</h3><br>
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th class="blue-header">Username</th>
+              <th class="blue-header">Email</th>
+              <th class="blue-header">User</th>
+              <th class="blue-header">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                {% if user.is_Customer %}
+                  Customer
+                {% elif user.is_Dietitian %}
+                  Dietitian
+                {% elif user.is_Doctor %}
+                  Doctor
+                {% endif %}
+              </td>
+              <td>
+                {% if user.is_active %}
+                  <button class="toggle-status" data-user-id="{{ user.id }}" data-status="{{ user.is_active }}">Active</button>
+                {% else %}
+                  <button class="toggle-status" data-user-id="{{ user.id }}" data-status="inactive">Inactive</button>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
 
-      <tr>
-        <th class="blue-header">Username</th>
-        <th class="blue-header">Email</th>
-        <th class="blue-header">User</th>
-        <th class="blue-header">Action</th>
-        {% comment %} <th class="blue-header">Status</th> {% endcomment %}
-          
-      </tr>
-  </thead>
-  <tbody>
-    {% for user in users %}
-    <tr>
-      <td>{{ user.username }}</td>
-      <td>{{ user.email }}</td>
-     <td>
-        {% if user.is_Customer %}
-          Customer
-        {% elif user.is_Dietitian %}
-          Dietitian
-        {% elif user.is_Doctor %}
-          Doctor
-        {% endif %}
-      </td>
-      {% comment %} <td>
-        <form method="POST" action="{% url 'delete_user' user.id %}">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-        </form>
-      </td> {% endcomment %}
-      <td>
-        {% if user.is_active %}
-<!-- Example button for toggling user status -->
-        <button class="toggle-status" data-user-id="{{ user.id }}" data-status="{{ user.is_active }}">Active</button>
-        {% else %}
-          <button class="toggle-status" data-user-id="{{ user.id }}" data-status="inactive">Inactive</button>
-        {% endif %}
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-</body>
-
-</html>
-
-
-
-{% comment %} {% for user in users %}
-<tr>
-  <td>{{ user.username }}</td>
-  <td>{{ user.email }}</td>
-  <td>
-    {% if user.is_active %}
-    <!-- Example button for toggling user status -->
-    <button class="toggle-status" data-user-id="{{ user.id }}" data-status="active">Active</button>
-    {% else %}
-    <button class="toggle-status" data-user-id="{{ user.id }}" data-status="inactive">Inactive</button>
+      <!-- Pagination -->
+<div class="pagination">
+  <ul class="pagination">
+    {% if users.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ users.previous_page_number }}">Previous</a>
+      </li>
     {% endif %}
-  </td>
-</tr>
-{% endfor %} {% endcomment %}
+    {% for num in users.paginator.page_range %}
+      <li class="page-item {% if num == users.number %}active{% endif %}">
+        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+      </li>
+    {% endfor %}
+    {% if users.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ users.next_page_number }}">Next</a>
+      </li>
+    {% endif %}
+  </ul>
+</div>
+
+  </body>
+</html>

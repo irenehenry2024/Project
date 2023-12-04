@@ -64,14 +64,24 @@
                     {% csrf_token %}
 
                     <!-- Professional Type -->
-                    <div class="mb-3">
+                   
+<div class="mb-3">
+    <label for="professional_type" class="form-label">Professional Type</label>
+    <select class="form-select" id="professional_type" name="professional_type" required>
+        <option value="" selected disabled>Select Professional Type</option>
+        <option value="Doctor">Doctor</option>
+        <option value="Dietitian">Dietitian</option>
+    </select>
+</div>
+
+                    {% comment %} <div class="mb-3">
                         <label for="professional_type" class="form-label">Professional Type</label>
                         <select class="form-select" id="professional_type" name="professional_type" required>
                             <option value="" selected disabled>Select Professional Type</option>
                             <option value="Doctor">Doctor</option>
                             <option value="Dietitian">Dietitian</option>
                         </select>
-                    </div>
+                    </div> {% endcomment %}
 
                     <!-- Feedback Message -->
                     <div class="mb-3">

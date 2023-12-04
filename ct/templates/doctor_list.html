@@ -14,40 +14,62 @@
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
       
         <style>
-            .user-table {
-                border-collapse: collapse;
-                width: 100%;
-                border: 2px solid #2f49d1; /* blue border color */
-            }
-    
-            .user-table th, .user-table td {
-                border: 1px solid #2f49d1; /* blue border color */
-                padding: 8px;
-                text-align: left;
-            }
-    
-            .blue-header {
-                background-color: #2f49d1; /* blue background color */
-                color: #fff; /* White text color */
-            }
-        </style>
-    <style>
-      .user-table {
-          border-collapse: collapse;
-          width: 100%;
-          border: 2px solid #2f49d1; /* blue border color */
-      }
-
-      .user-table th, .user-table td {
-          border: 1px solid #2f49d1; /* blue border color */
-          padding: 8px;
-          text-align: left;
-      }
-
-      .blue-header {
-          background-color: #2f49d1; /* blue background color */
-          color: #fff; /* White text color */
-      }
+          .user-table {
+            border-collapse: collapse;
+            width: 100%;
+          }
+          
+          .user-table th, .user-table td {
+            padding: 8px;
+            text-align: left;
+          }
+          
+          .blue-header {
+            background-color: #2f49d1;
+            color: #fff;
+          }
+          
+          .user-table th {
+            background-color: #f2f2f2; /* Grey background color for table header */
+            color: #333; /* Text color for table header */
+          }
+          
+          .user-table td {
+            background-color: #ffffff; /* White background color for table cells */
+            color: #333; /* Text color for table cells */
+          }
+          
+          .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+          }
+          
+          .pagination ul {
+            list-style: none;
+            display: flex;
+            padding: 0;
+            margin: 0;
+          }
+          
+          .pagination li {
+            margin: 0 5px;
+          }
+          
+          .pagination a {
+            text-decoration: none;
+            color: #2f49d1;
+            background-color: #fff;
+            padding: 8px 12px;
+            border: 1px solid #2f49d1;
+            border-radius: 4px;
+          }
+          
+          .pagination .active a {
+            color: #fff;
+            background-color: #2f49d1;
+          }
+          
   </style>
 </head>
 <body>
@@ -59,7 +81,7 @@
   <aside class="sidebar">
     <div class="sidebar-start">
         <div class="sidebar-head">
-            <a href="/" class="logo-wrapper" title="Home">
+            <a href="{% url 'admindashboard' %}" class="logo-wrapper" title="Home">
                 <span class="sr-only">Home</span>
                 <span class="icon logo" aria-hidden="true"></span>
                 <div class="logo-text">
@@ -76,7 +98,7 @@
         <div class="sidebar-body">
             <ul class="sidebar-body-menu">
                 <li>
-                    <a class="active" href="/"><span class="icon home" aria-hidden="true"></span>Dashboard</a>
+                    <a class="active" href="{% url 'admindashboard' %}"><span class="icon home" aria-hidden="true"></span>Dashboard</a>
                 </li>
                 <li>
                   <a class="show-cat-btn" href="##">
@@ -87,6 +109,23 @@
                       </span>
                   </a>
                 
+                  <ul class="cat-sub-menu">
+                    <li>
+                        <a href="{% url 'customer_list' %}">Customer</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dietitian_list' %}">Dietitian</a>
+                    </li>
+                    <li>
+                      <a href="{% url 'doctor_list' %}">Doctor</a>
+                  </li>
+                  <li>
+                    <a href="{% url 'doctor_profile' %}">Doctor Profiles</a>
+                </li>
+                <li>
+                  <a href="{% url 'dietitian_profile' %}">Dietitian Profiles</a>
+              </li>
+                </ul>
                  <ul class="cat-sub-menu">
                   <li>
                     <a href="{% url 'doctor_profile' %}">Doctor Profiles</a>
@@ -165,28 +204,6 @@
                   </li>
                 </ul>
               </div>
-              <div class="nav-user-wrapper">
-                <button href="##" class="nav-user-btn dropdown-btn" title="My profile" type="button">
-                  <span class="sr-only">My profile</span>
-                  <span class="nav-user-img">
-                    <picture><source srcset="{% static './img/avatar/avatar-illustrated-02.webp' %}" type="image/webp"><img src="{% static './img/avatar/avatar-illustrated-02.png' %}" alt="User name"></picture>
-                  </span>
-                </button>
-                <ul class="users-item-dropdown nav-user-dropdown dropdown">
-                  <li><a href="##">
-                      <i data-feather="user" aria-hidden="true"></i>
-                      <span>Profile</span>
-                    </a></li>
-                  <li><a href="##">
-                      <i data-feather="settings" aria-hidden="true"></i>
-                      <span>Account settings</span>
-                    </a></li>
-                  <li><a class="danger" id="logout-link" href="{% url 'loggout' %}">
-                    <i data-feather="log-out" aria-hidden="true"></i>
-                    <span>Log out</span></a></li>
-                </ul>
-                
-              </div>
             </div>
           </div>
         </nav>
@@ -240,10 +257,28 @@
     </tr>
     {% endfor %}
   </tbody>
-  
 </table>
+ <!-- Pagination -->
+ <div class="pagination">
+  <ul class="pagination">
+    {% if users.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ users.previous_page_number }}">Previous</a>
+      </li>
+    {% endif %}
+    {% for num in users.paginator.page_range %}
+      <li class="page-item {% if num == users.number %}active{% endif %}">
+        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+      </li>
+    {% endfor %}
+    {% if users.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ users.next_page_number }}">Next</a>
+      </li>
+    {% endif %}
+  </ul>
+</div>
 </body>
-
 </html>
 
 

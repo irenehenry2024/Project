@@ -48,26 +48,39 @@ urlpatterns = [
    path('dietitian_profile/', views.dietitian_profile, name='dietitian_profile'),
    path('decline_doctor/<int:doctor_id>/', views.decline_doctor, name='decline_doctor'),
    path('decline_dietitian/<int:dietitian_id>/', views.decline_dietitian, name='decline_dietitian'),
-   path('view_dietitian_details/', views. view_dietitian_details, name=' view_dietitian_details'), 
+   path('view_dietitian_details/', views. view_dietitian_details, name=' view_dietitian_details'),
+   path('logout_view/', views.logout_view, name='logout_view'),
+
+   path('ratings/', views.ratings, name='ratings'),
+   path('dietitian_ratings/<int:dietitian_id>/', views.dietitian_ratings, name='dietitian_ratings'),
+   path('dietitian_ratings_page/<int:dietitian_id>/', views.dietitian_ratings_page, name='dietitian_ratings_page'),
+
+   path('dietitian/<int:dietitian_id>/timeslots/', views.dietitian_timeslots, name='dietitian_timeslots'),
+   path('dietitian_payment/<int:booking_id>/', views.dietitian_payment, name='dietitian_payment'),
+   path('pay/<int:booking_id>/', views.paymenthandler, name='pay'),
+
+   path('doctor/<int:doctor_id>/timeslots/', views.doctor_timeslots, name='doctor_timeslots'),
+   path('doctor_payment/<int:booking_id>/', views.doctor_payment, name='doctor_payment'),
+   path('pay/<int:booking_id>/', views.payment, name='pay'),
+
+   path('dratings/', views.dratings, name='dratings'),
+   path('doctor_ratings/<int:doctor_id>/', views.doctor_ratings, name='doctor_ratings'),
+   path('doctor_ratings_page/<int:doctor_id>/', views.doctor_ratings_page, name='doctor_ratings_page'),
+
 
    
    path('dr_bookings/<int:doctor_id>/', views.dr_bookings, name='dr_bookings'),
    path('d_bookings/<int:dietitian_id>/', views.d_bookings, name='d_bookings'),
+
+   path('log_meals/', views.log_meals, name='log_meals'),
+  
    
    path('feedback_form/', views.feedback_form, name='feedback_form'),
+   path('add_slot/', views.add_slot, name='add_slot'),
+   path('dr_addslot/', views.dr_addslot, name='dr_addslot'),
    path('submit_feedback/dietitian/', views.submit_feedback, {'professional_type': 'dietitian'}, name='submit_dietitian_feedback'),
    path('submit_feedback/doctor/', views.submit_feedback, {'professional_type': 'doctor'}, name='submit_doctor_feedback'),
 
-
-
-
-
-
-   # path('booked_doctors/', views.booked_doctors_list, name='booked_doctors_list'),
-   # path('booked_doctor/<int:doctor_id>/', views.booked_doctor_details, name='booked_doctor_details'),
-   
-   # path('update_user_status/<int:user_id>/<str:new_status>/', views.update_user_status, name='update_user_status'),
-   # path('loggout/', auth_views.LogoutView.as_view(), name="loggout"),
   
 
 path('toggle_user_status/<int:user_id>/', views.toggle_user_status, name='toggle_user_status'),
@@ -78,3 +91,19 @@ path('reset/done/',auth_views.PasswordResetCompleteView.as_view(),name='password
 
 
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+ # path('doctor/feedback/', doctor_feedback, name='doctor_feedback'),
+   # path('dietitian/feedback/', dietitian_feedback, name='dietitian_feedback'),
+ # path('select_availability/', views.select_availability, name='select_availability'),
+   # path('select_availability/<int:dietitian_id>/', views.select_availability, name='select_availability'),
+
+   #  path('submit_feedback/<str:professional_type>/<int:professional_id>/', views.submit_feedback, name='submit_feedback'),
+   #  path('d_feedback/<int:professional_id>/', views.d_feedback, name='d_feedback'),
+   #  path('dr_feedback/<int:professional_id>/', views.dr_feedback, name='dr_feedback'),
+   # path('dietitian-ratings//', views.dietitian_ratings_page, name='dietitian_ratings_page'),
+
+   # path('booked_doctors/', views.booked_doctors_list, name='booked_doctors_list'),
+   # path('booked_doctor/<int:doctor_id>/', views.booked_doctor_details, name='booked_doctor_details'),
+   
+   # path('update_user_status/<int:user_id>/<str:new_status>/', views.update_user_status, name='update_user_status'),
+   # path('loggout/', auth_views.LogoutView.as_view(), name="loggout"),
+  

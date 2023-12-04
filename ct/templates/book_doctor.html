@@ -1,0 +1,204 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Booking</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <!-- Custom CSS -->
+    <style>
+   
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 2rem;
+        }
+
+        .card {
+            border: 1px solid #0B2339;
+            border-radius: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .form-check {
+            margin-bottom: 1.5rem;
+        }
+
+        h4 {
+            color: #0B2339;
+        }
+
+        button.btn-primary {
+            background-color: #ffc107;
+            border-color: #ffc107;
+        }
+
+        button.btn-primary:hover {
+            background-color: #e0a800;
+            border-color: #e0a800;
+        }
+
+        footer {
+            background: linear-gradient(90deg, #0B2339, #4E5C68);
+            color: #fff;
+            padding: 1.5rem 0;
+            text-align: center;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 1.0em;
+        }
+        header {
+            text-align: left;
+            background-color: #0B2339;
+            color: #fff;
+            padding: 0.25rem 0;
+        }
+    
+        footer {
+            background-color: #0B2339;
+            color: #fff;
+            padding: 1rem 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    
+        header {
+            background: linear-gradient(90deg, #0B2339, #4E5C68); /* Multicolor gradient background */
+            color: #fff;
+            padding: 0.01rem 0; /* Increased padding for a more prominent header */
+            {% comment %} text-align: center; /* Center align text */ {% endcomment %}
+        }
+    
+        .custom-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    
+        .custom-heading h6 {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.60em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-left: 40px; /* Adjust the value as needed */
+            margin-right: 10px; /* Adjust the value as needed */
+        }
+    
+    
+    
+        footer {
+            background: linear-gradient(90deg, #0B2339, #4E5C68); /* Multicolor gradient background */
+            color: #fff;
+            padding: 0.5rem 0; /* Increased padding for a more prominent footer */
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center; /* Center align text */
+        }
+    
+        footer p {
+            margin: 0; /* Remove default margin for a cleaner look */
+            font-size: 1.0em; /* Increase font size for better visibility */
+        }
+       /* Add the following style for vertical centering */
+        .custom-heading div {
+            display: flex;
+            align-items: center;
+        } 
+    </style>
+</head>
+<body>
+    <header class="custom-heading">
+        <div class="container py-3">
+            <div class="row">
+                <div class="col">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item">
+                                {% if user.is_Customer %}
+                                    <a href="{% url "index" %}">Home</a>
+                                {% elif user.is_Dietitian %}
+                                    <a href="{% url "d_index" %}">Home</a>
+                                {% elif user.is_Doctor %}
+                                    <a href="{% url "dr_index" %}">Home</a>
+                                {% endif %}
+                            </li>
+                            <li class="breadcrumb-item">
+                                {% if user.is_Customer %}
+                                    <a href="{% url 'user_profile' %}">User Profile</a>
+                                {% elif user.is_Dietitian %}
+                                    <a href="{% url 'duser_profile' %}">Dietitian Profile</a>
+                                {% elif user.is_Doctor %}
+                                    <a href="{% url 'druser_profile' %}">Doctor Profile</a>
+                                {% endif %}
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Book Doctor</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <h6>Calorie Tracker</h6>
+    </header>
+    <div class="container">
+        <!-- Display dietitian details -->
+        <div class="card">
+            <div class="card-body">
+                <form method="post" >
+                    {% csrf_token %}
+                    <input type="hidden" name="doctor_id" value="{{ doctor.id }}">   
+                    <h4>Choose Date:</h4>
+            <div class="form-group">
+                <input type="date" name="session_date" class="form-control" style="width: 200px;" required>
+            </div>          
+                    <h4>Choose Time Slot:</h4>
+                    {% for time_slot in timeslots %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="time_slot" id="time_{{ forloop.counter }}" value="{{ time_slot.id }}">
+                            <label class="form-check-label" for="time_{{ forloop.counter }}">
+                                {{ time_slot.session }} - {{ time_slot.time }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                    <h4>Amount:</h4> 
+                    <p>500</p>
+                    <button type="submit" class="btn btn-primary">Proceed to Payment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2023 Calorie Tracker</p>
+    </footer>
+   
+</script>
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <!-- Custom JavaScript for form validation -->
+    <script>
+        function validateForm() {
+            var selectedSlot = document.querySelector('input[name="time_slot"]:checked');
+            if (!selectedSlot) {
+                alert('Please choose a time slot before proceeding to payment.');
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>

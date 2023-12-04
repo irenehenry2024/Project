@@ -37,6 +37,221 @@ def index(request):
 def recipe_catalog(request):
     return render(request, "recipe_catalog.html")
 
+# views.py
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import LogMeals
+import requests
+import json
+
+# Assume this function to get calories from API Ninja
+def get_calories_from_api(name):
+    api_url = 'https://api.api-ninjas.com/v1/nutrition?query='
+    api_key = 'kqQ9bfS938jO+qjX74KnWg==HFoOm2P07PDOalEP'
+    headers = {'X-Api-Key': api_key}
+
+    try:
+        api_request = requests.get(api_url + name, headers=headers)
+        api_data = json.loads(api_request.content)
+
+        # Check if the API response is successful
+        if 'message' in api_data and api_data['message'] == 'success':
+            return api_data['data'][0]['calories']
+        else:
+            return None  # Handle errors or invalid responses
+
+    except Exception as e:
+        print(e)
+        return None  # Handle exceptions, return None for simplicity
+
+@login_required
+def log_meals(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        quantity = int(request.POST.get('quantity'))
+        meal = request.POST.get('meal')
+
+        # Fetch calorie information from API Ninja using the provided name
+        calories = get_calories_from_api(name)
+
+        if calories is not None:
+            # Calculate total calories based on quantity
+            total_calories = quantity * calories
+
+            # Create a LogMeals object and save it to the database
+            LogMeals.objects.create(
+                user=request.user,
+                name=name,
+                quantity=quantity,
+                calories=total_calories,
+                meal=meal
+            )
+            return redirect('log_meals')  # Redirect to the same page after submitting the form
+
+        else:
+            # Handle the case when the API request fails or returns invalid data
+            return render(request, 'log_meals.html', {'error_message': 'Failed to fetch calorie information'})
+
+    context = {
+        'log_meals': LogMeals.objects.filter(user=request.user),
+    }
+    return render(request, 'log_meals.html', context)
+
+
+# from django.http import JsonResponse
+# from django.shortcuts import render
+# from .models import TimeSlot
+
+# def add_slot(request):
+#     if request.method == "POST":
+#         session = request.POST.get('session')
+#         time = request.POST.get('time')
+
+#         if slot_exists(session, time):
+#             return JsonResponse({'success': False, 'message': 'This time slot already exists.'})
+#         else:
+#             return handle_time_slot_creation(request, session, time)
+
+#     slots = TimeSlot.objects.all()
+#     return render(request, 'add_slot.html', {"slots": slots})
+
+# def slot_exists(session, time):
+#     return TimeSlot.objects.filter(session=session, time=time).exists()
+
+# def handle_time_slot_creation(request, session, time):
+#     if hasattr(request.user, 'dietitianprofile'):
+#         dietitian = request.user.dietitian
+#         slot = TimeSlot.objects.create(dietitian=dietitian, session=session, time=time)
+#         return JsonResponse({'success': True, 'slot': {'session': slot.session, 'time': slot.time}})
+#     else:
+#         return JsonResponse({'success': False, 'message': 'User does not have a DietitianProfile.'})
+
+from django.http import JsonResponse
+from django.shortcuts import render
+from .models import TimeSlot, DietitianProfile
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from .models import CustomUser, TimeSlot
+
+def add_slot(request):
+    # Retrieve the CustomUser object or return a 404 response if it doesn't exist
+    dietitian = get_object_or_404(CustomUser, username=request.user)
+
+    if request.method == "POST":
+        session = request.POST.get('session')
+        time = request.POST.get('time')
+
+        # Check if the time slot already exists for the given dietitian
+        if TimeSlot.objects.filter(session=session, time=time, dietitian=dietitian).exists():
+            return JsonResponse({'success': False, 'message': 'This time slot already exists.'})
+        else:
+            try:
+                # Check if the user has a DietitianProfile
+                dietitian_profile = dietitian.dietitianprofile
+            except DietitianProfile.DoesNotExist:
+                return JsonResponse({'success': False, 'message': 'User does not have a DietitianProfile.'})
+
+            # Create the time slot
+            slot = TimeSlot.objects.create(dietitian=dietitian, session=session, time=time)
+            return JsonResponse({'success': True, 'slot': {'session': slot.session, 'time': slot.time}})
+
+    # Fetch all existing slots for rendering on the page
+    slots = TimeSlot.objects.all()
+    return render(request, 'add_slot.html', {"slots": slots})
+
+
+
+from django.http import JsonResponse
+from django.shortcuts import render
+from .models import DoctorSlot, DoctorProfile
+
+def dr_addslot(request):
+
+    doctor = get_object_or_404(CustomUser, username=request.user)
+
+    if request.method == "POST":
+        session = request.POST.get('session')
+        time = request.POST.get('time')
+
+        # Check if the time slot already exists
+        if DoctorSlot.objects.filter(session=session, time=time, doctor=doctor).exists():
+            return JsonResponse({'success': False, 'message': 'This time slot already exists.'})
+        else:
+            # Check if the user has a DoctorProfile
+            if hasattr(request.user, 'doctorprofile'):
+                doctor_profile = request.user.doctorprofile
+                slot = DoctorSlot.objects.create(doctor=doctor, session=session, time=time)
+                return JsonResponse({'success': True, 'slot': {'session': slot.session, 'time': slot.time}})
+            else:
+                return JsonResponse({'success': False, 'message': 'User does not have a DoctorProfile.'})
+
+    slots = DoctorSlot.objects.all()
+    return render(request, 'dr_addslot.html', {"slots": slots})
+
+# from django.shortcuts import render, redirect
+# from django.contrib import messages
+# from django.http import JsonResponse
+# from .models import TimeSlot
+
+# def add_slot(request):
+#     if request.method == "POST":
+#         session = request.POST.get('session')
+#         time = request.POST.get('time')
+
+#         # Check if the time slot already exists
+#         if TimeSlot.objects.filter(session=session, time=time).exists():
+#             return JsonResponse({'success': False, 'message': 'This time slot already exists.'})
+#         else:
+#             # Access the DietitianProfile associated with the user
+#             dietitian_profile = request.user.dietitianprofile
+
+#             # Check if the user is a dietitian and has a profile
+#             if dietitian_profile:
+#                 dietitian_id = dietitian_profile.id
+#                 slot = TimeSlot.objects.create(dietitian_id=dietitian_id, session=session, time=time)
+#                 return JsonResponse({'success': True, 'slot': {'session': slot.session, 'time': slot.time}})
+#             else:
+#                 return JsonResponse({'success': False, 'message': 'User is not a dietitian or does not have a profile.'})
+
+#     slots = TimeSlot.objects.all()
+#     return render(request, 'add_slot.html', {"slots": slots})
+
+
+# def add_slot(request):
+#     if request.method == "POST":
+#         session = request.POST.get('session')
+#         time = request.POST.get('time')
+       
+#         # Check if the time slot already exists
+#         if TimeSlot.objects.filter(session=session, time=time).exists():
+#             messages.error(request, 'This time slot already exists.')
+#         else:
+#             TimeSlot.objects.create(session=session, time=time)
+#             messages.success(request, 'Slot added successfully.')  # Set success message
+#             return redirect('duser_profile')  # Redirect to user_profile after successful slot addition
+
+#     slots = TimeSlot.objects.all()
+#     return render(request, 'add_slot.html', {"slots": slots})
+
+# from .models import TimeSlot
+# def add_slot(request):
+#     if request.method == "POST":
+#         session = request.POST.get('session')
+#         time = request.POST.get('time')
+       
+#         # Check if the time slot already exists
+#         if TimeSlot.objects.filter(session=session, time=time).exists():
+#             messages.error(request, 'This time slot already exists.')
+#         else:
+#             TimeSlot.objects.create(session=session, time=time)
+#             messages.success(request, 'Slot added successfully.')  # Set success message
+
+#     slots = TimeSlot.objects.all()
+#     return render(request, 'add_slot.html', {"slots": slots})
+
+
+
+
 def calorie_counting(request):
     import requests
     import json
@@ -281,8 +496,16 @@ def login(request):
     return render(request, 'login.html')
 
 
-# @login_required(login_url='signin')
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth import get_user_model
 def admindashboard(request):
+    User = get_user_model()
+
+    # Fetch data for the admin dashboard here
+    total_users = User.objects.count()
+    active_users = User.objects.filter(is_active=True).count()
+    inactive_users = total_users - active_users
       
     # Fetch data for the admin dashboard here (e.g., user information, orders, statistics)
     # You can use Django's ORM to query the database for this data
@@ -292,11 +515,19 @@ def admindashboard(request):
     dietitians= CustomUser.objects.filter(is_Dietitian=True)
     doctors= CustomUser.objects.filter(is_Doctor=True)
     #  username = Order.objects.all()
-    
+
+    #  # Set a session variable to mark whether the user is authenticated
+    # request.session['is_authenticated'] = True
+
     context = {
         # Pass the fetched data to the template context
     'users': users ,
-        
+    'total_users': total_users,
+    'active_users': active_users,
+    'inactive_users': inactive_users,
+    'customers': User.objects.filter(is_Customer=True),
+    'dietitians': User.objects.filter(is_Dietitian=True),
+    'doctors': User.objects.filter(is_Doctor=True),
     }
     return render(request, "admindashboard.html",context)
 
@@ -322,6 +553,26 @@ def loggout(request):
     logout(request)
     # return HttpResponse("Logged out successfully")
     return redirect('/')  # Redirect to the home page after logout
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth import logout
+
+def logout_view(request):
+    # Clear the session variables
+    request.session.flush()
+
+    # Logout the user using Django's logout function
+    logout(request)
+
+    # Add a message for the user
+    messages.info(request, 'You have been logged out.')
+
+    # Redirect to the index page
+    return redirect('/')
+
 
 def d_index(request):
     return render(request, "d_index.html")
@@ -371,20 +622,82 @@ def confirm_email(request, uidb64, token):
 
 
 
+
+def ratings(request):
+    return render(request, "ratings.html")
+
+
+def dratings(request):
+    return render(request, "dratings.html")
+
+
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import render
+from .models import CustomUser  # Import your CustomUser model
+
 def customer_list(request):
     users = CustomUser.objects.filter(is_Customer=True)
-    return render(request, 'customer_list.html', {'users': users})
-    pass
 
+    # Set the number of users per page
+    users_per_page = 10
+
+    paginator = Paginator(users, users_per_page)
+    page = request.GET.get('page',1)
+
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        users = paginator.page(1)
+    except EmptyPage:
+        users = paginator.page(paginator.num_pages)
+
+    return render(request, 'customer_list.html', {'users': users})
+
+
+
+# def customer_list(request):
+#     users = CustomUser.objects.filter(is_Customer=True)
+#     return render(request, 'customer_list.html', {'users': users})
+#     pass
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import render
+from .models import CustomUser  # Import your CustomUser model
 def dietitian_list(request):
     users = CustomUser.objects.filter(is_Dietitian=True)
-    return render(request, 'dietitian_list.html', {'users': users})
-    pass
+     # Set the number of users per page
+    users_per_page = 10
 
+    paginator = Paginator(users, users_per_page)
+    page = request.GET.get('page',1)
+
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        users = paginator.page(1)
+    except EmptyPage:
+        users = paginator.page(paginator.num_pages)
+    return render(request, 'dietitian_list.html', {'users': users})
+    
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import render
+from .models import CustomUser  # Import your CustomUser model
 def doctor_list(request):
     users = CustomUser.objects.filter(is_Doctor=True)
+     # Set the number of users per page
+    users_per_page = 10
+
+    paginator = Paginator(users, users_per_page)
+    page = request.GET.get('page',1)
+
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        users = paginator.page(1)
+    except EmptyPage:
+        users = paginator.page(paginator.num_pages)
     return render(request, 'doctor_list.html', {'users': users})
-    pass
+    
 
 from django.shortcuts import render, redirect
 from .models import UserProfile
@@ -493,7 +806,6 @@ def duser_profile(request):
         # If the profile doesn't exist, create one for the user
         dietitian = DietitianProfile(user=request.user)
         dietitian.save()
-
     if request.method == 'POST':
         if 'verify_dietitian' in request.POST:
             # Handle the dietitian verification process here
@@ -518,11 +830,315 @@ def duser_profile(request):
         dietitian.save()
         messages.success(request, 'Profile updated successfully.')
 
+         # Inside the section where you handle dietitian booking
+        if 'book_dietitian' in request.POST:
+        # Get the dietitian ID from the request
+            dietitian_id = request.POST.get('dietitian_id')
+
+        # Create a DietitianBooking instance
+            booking = DietitianBooking.objects.create(user=request.user, dietitian_id=dietitian_id)
+
+        if booking:
+            messages.success(request, 'Booking successful.')
+        else:
+            messages.error(request, 'Booking failed. Please try again.')
+
     context = {
-        'dietitian': dietitian,  # Pass the 'dietitian' object to the template
+        'dietitian': dietitian,  
+         # Pass the 'dietitian' object to the template
     }
 
     return render(request, 'duser_profile.html', context)
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import DietitianProfile, TimeSlot, DietitianBooking
+from django.contrib import messages
+
+@login_required
+
+def dietitian_timeslots(request, dietitian_id):
+    dietitian = get_object_or_404(CustomUser, id=dietitian_id, is_Dietitian=True)
+    timeslots = TimeSlot.objects.filter(dietitian=dietitian)
+
+    if request.method == 'POST':
+        dietitian_id = request.POST.get('dietitian_id')
+        session_date = request.POST.get('session_date')
+        time_slot_id = request.POST.get('time_slot')
+
+        try:
+            # Retrieve the DietitianProfile instance
+            dietitian = CustomUser.objects.get(id=dietitian_id, is_Dietitian=True)
+
+            # Retrieve the TimeSlot instance
+            time_slot = TimeSlot.objects.get(id=time_slot_id, dietitian=dietitian)
+
+            # Calculate the amount (replace this with your own logic)
+            amount = 500.00  # Replace with your own logic to calculate the amount
+
+            # Create a new DietitianBooking instance
+            booking = DietitianBooking.objects.create(
+                user=request.user,
+                dietitian=dietitian,
+                booking_date=session_date,
+                session=time_slot.session,
+                time=time_slot.time,
+                amount=amount
+            )
+
+            # Redirect to a success page or do something else
+            messages.success(request, 'Booking successful!')
+            return redirect('dietitian_payment',booking_id=booking.id)
+
+        except CustomUser.DoesNotExist:
+            messages.error(request, 'Dietitian not found.')
+        except TimeSlot.DoesNotExist:
+            messages.error(request, 'Time slot not found.')
+
+    return render(request, 'book_dietitian.html', {'dietitian': dietitian, 'timeslots': timeslots})
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import DoctorProfile, DoctorSlot, Booking
+from django.contrib import messages
+
+@login_required
+
+def doctor_timeslots(request, doctor_id):
+    doctor = get_object_or_404(CustomUser, id=doctor_id, is_Doctor=True)
+    timeslots = DoctorSlot.objects.filter(doctor=doctor)
+
+    if request.method == 'POST':
+        doctor_id = request.POST.get('doctor_id')
+        session_date = request.POST.get('session_date')
+        time_slot_id = request.POST.get('time_slot')
+
+        try:
+            # Retrieve the DietitianProfile instance
+            doctor = CustomUser.objects.get(id=doctor_id, is_Doctor=True)
+
+            # Retrieve the TimeSlot instance
+            time_slot = DoctorSlot.objects.get(id=time_slot_id,doctor=doctor)
+
+            # Calculate the amount (replace this with your own logic)
+            amount = 500.00  # Replace with your own logic to calculate the amount
+
+            # Create a new DietitianBooking instance
+            booking = Booking.objects.create(
+                user=request.user,
+                doctor=doctor,
+                booking_date=session_date,
+                session=time_slot.session,
+                time=time_slot.time,
+                amount=amount
+            )
+
+            # Redirect to a success page or do something else
+            messages.success(request, 'Booking successful!')
+            return redirect('doctor_payment',booking_id=booking.id)
+
+        except CustomUser.DoesNotExist:
+            messages.error(request, 'Doctor not found.')
+        except DoctorSlot.DoesNotExist:
+            messages.error(request, 'Time slot not found.')
+
+    return render(request, 'book_doctor.html', {'doctor': doctor, 'timeslots': timeslots})
+
+
+
+from django.shortcuts import render
+import razorpay
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponseBadRequest
+from .models import DietitianBooking
+# Authorize Razorpay client with API Keys.
+razorpay_client = razorpay.Client(
+    auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+
+
+def dietitian_payment(request, booking_id):
+    try:
+        dietitian_booking = DietitianBooking.objects.get(pk=booking_id)
+    except DietitianBooking.DoesNotExist:
+        # Handle case where booking is not found
+        return HttpResponseBadRequest()
+
+    currency = 'INR'
+    amount = int(dietitian_booking.amount * 100)  # Convert to paise
+
+    # Create a Razorpay Order
+    razorpay_order = razorpay_client.order.create(dict(
+        amount=amount,
+        currency=currency,
+        payment_capture='0'
+    ))
+
+    # Order ID of the newly created order.
+    razorpay_order_id = razorpay_order['id']
+    callback_url = f'http://127.0.0.1:8000/paymenthandler/{booking_id}/'
+
+    # Pass these details to the frontend.
+    context = {
+        'dietitian_booking': dietitian_booking,
+        'razorpay_order_id': razorpay_order_id,
+        'razorpay_merchant_key': settings.RAZOR_KEY_ID,
+        'razorpay_amount': amount,
+        'currency': currency,
+        'callback_url': callback_url,
+    }
+
+    return render(request, 'dietitian_payment.html', context=context)
+
+
+@csrf_exempt
+
+def paymenthandler(request, booking_id):
+    try:
+        dietitian_booking = DietitianBooking.objects.get(pk=booking_id)
+        dietitian_booking.is_paid = True
+        dietitian_booking.save()
+
+        # If you want to create a new DietitianBooking with is_paid=True, uncomment the following lines
+        # booking = DietitianBooking.objects.create(is_paid=True)
+        
+        return redirect('dietitians_list')  # Assuming the correct URL name is 'dietitians_list'
+    except DietitianBooking.DoesNotExist:
+        # Handle case where booking is not found
+        return HttpResponseBadRequest()
+
+
+from django.shortcuts import render
+import razorpay
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponseBadRequest
+from .models import Booking
+# Authorize Razorpay client with API Keys.
+razorpay_client = razorpay.Client(
+    auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+
+
+def doctor_payment(request, booking_id):
+    try:
+        dioctor_booking = Booking.objects.get(pk=booking_id)
+    except Booking.DoesNotExist:
+        # Handle case where booking is not found
+        return HttpResponseBadRequest()
+
+    currency = 'INR'
+    amount = int(doctor_booking.amount * 100)  # Convert to paise
+
+    # Create a Razorpay Order
+    razorpay_order = razorpay_client.order.create(dict(
+        amount=amount,
+        currency=currency,
+        payment_capture='0'
+    ))
+
+    # Order ID of the newly created order.
+    razorpay_order_id = razorpay_order['id']
+    callback_url = f'http://127.0.0.1:8000/payment/{booking_id}/'
+
+    # Pass these details to the frontend.
+    context = {
+        'doctor_booking': doctor_booking,
+        'razorpay_order_id': razorpay_order_id,
+        'razorpay_merchant_key': settings.RAZOR_KEY_ID,
+        'razorpay_amount': amount,
+        'currency': currency,
+        'callback_url': callback_url,
+    }
+
+    return render(request, 'doctor_payment.html', context=context)
+
+
+@csrf_exempt
+def payment(request, booking_id):
+    try:
+        doctor_booking = Booking.objects.get(pk=booking_id)
+        doctor_booking.is_paid = True
+        doctor_booking.save()
+
+        return redirect('doctors_list')  # Assuming the correct URL name is 'doctors_list'
+    except Booking.DoesNotExist:
+        # Handle case where booking is not found
+        return HttpResponseBadRequest()
+
+
+     
+
+
+
+
+
+
+from django.shortcuts import render
+from .models import DoctorSlot
+
+def booking_doctor(request):
+    # Assuming the user is logged in, you can access the current user
+    current_user = request.user
+
+    # Assuming TimeSlot model has a ForeignKey to User model
+    # Adjust the model and field names accordingly
+    timeslots = DoctorSlot.objects.filter(doctor=current_user.doctorprofile)
+
+    # Pass the available time slots to the template
+    return render(request, ' booking_doctor.html', {'timeslots': timeslots})
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import DietitianProfile, DietitianRating
+from django.contrib import messages
+from django.db.models import Avg
+
+@login_required
+def dietitian_ratings(request, dietitian_id):
+    rating = request.POST.get('rating')
+    review = request.POST.get('review')
+
+    # Check if the user has already rated the dietitian
+    existing_rating = DietitianRating.objects.filter(dietitian_id=dietitian_id, user=request.user).first()
+    if existing_rating:
+        messages.error(request, 'You have already rated this dietitian.')
+    else:
+        # Create a new rating
+        DietitianRating.objects.create(dietitian_id=dietitian_id, user=request.user, rating=rating, review=review)
+        messages.success(request, 'Rating submitted successfully.')
+
+    # Redirect to the dietitian ratings page
+    return redirect('dietitian_ratings_page', dietitian_id=dietitian_id)
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import DietitianProfile, DietitianRating
+from django.db.models import Avg
+
+@login_required
+def dietitian_ratings_page(request, dietitian_id):
+    # Fetch dietitian details
+    dietitian = get_object_or_404(DietitianProfile, pk=dietitian_id)
+
+    # Fetch all ratings for the dietitian
+    ratings = DietitianRating.objects.filter(dietitian=dietitian)
+
+    # Calculate average rating
+    average_rating = ratings.aggregate(Avg('rating'))['rating__avg']
+
+    context = {
+        'dietitian': dietitian,
+        'ratings': ratings,
+        'average_rating': average_rating,
+    }
+
+    return render(request, 'ratings.html', context)
+
+
+
 
 
 
@@ -570,31 +1186,108 @@ def druser_profile(request):
 
     return render(request, 'druser_profile.html', context)
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import DoctorProfile, DoctorRating
+from django.contrib import messages
+from django.db.models import Avg
 
+@login_required
+def doctor_ratings(request, doctor_id):
+    rating = request.POST.get('rating')
+    review = request.POST.get('review')
 
-from django.shortcuts import render
-from .models import DoctorProfile, Booking  # Import the Booking model
+    # Check if the user has already rated the dietitian
+    existing_rating = DoctorRating.objects.filter(doctor_id=doctor_id, user=request.user).first()
+    if existing_rating:
+        messages.error(request, 'You have already rated this dietitian.')
+    else:
+        # Create a new rating
+        DoctorRating.objects.create(doctor_id=doctor_id, user=request.user, rating=rating, review=review)
+        messages.success(request, 'Rating submitted successfully.')
+
+    # Redirect to the dietitian ratings page
+    return redirect('doctor_ratings_page', doctor_id=doctor_id)
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import DoctorProfile, DoctorRating
+from django.db.models import Avg
+
+@login_required
+def doctor_ratings_page(request, doctor_id):
+    # Fetch dietitian details
+    doctor = get_object_or_404(DoctorProfile, pk=doctor_id)
+
+    # Fetch all ratings for the dietitian
+    ratings = DoctorRating.objects.filter(doctor=doctor)
+
+    # Calculate average rating
+    average_rating = ratings.aggregate(Avg('rating'))['rating__avg']
+
+    context = {
+        'doctor': doctor,
+        'ratings': ratings,
+        'average_rating': average_rating,
+    }
+
+    return render(request, 'dratings.html', context)
+
+from django.db.models import Q
+from django.shortcuts import render, redirect
+from .models import DoctorProfile, Booking, DoctorRating
 
 def doctors_list(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        doctor_id = request.POST.get('doctor_id')
+
+        # Check if doctor_id and user_id are not None and are valid
+        if doctor_id is not None and user_id is not None:
+            try:
+                doctor_id = int(doctor_id)  # Convert to an integer if it's a string
+                user_id = int(user_id)  # Convert to an integer if it's a string
+            except (TypeError, ValueError):
+                # Handle invalid values
+                return redirect('doctors_list')  # Redirect to the same page or show an error message
+
+            # Create a Booking instance
+            booking = Booking.objects.create(user_id=user_id, doctor_id=doctor_id)
+
+            if booking:
+                return redirect('doctors_list')  # Redirect to the page after successful booking
+            else:
+                # Handle booking failure
+                return redirect('doctors_list')  # Redirect to the same page or show an error message
+
+    # Fetch a list of DoctorProfile objects
     doctors = DoctorProfile.objects.all()
 
-    if request.user.is_authenticated:
-        # If the user is logged in, fetch their bookings
-        bookings = Booking.objects.filter(user=request.user)
+    for doctor in doctors:
+        doctor.avg_rating = doctor.average_rating()
+        doctor.total_ratings = doctor.total_ratings()
 
-    else:
-        bookings = None  # If the user is not logged in, set bookings to None
+    # Handling GET (search) request
+    search_query = request.GET.get('search', '')
+
+    # Filter doctors based on the search query
+    if search_query:
+        doctors = doctors.filter(
+            Q(user__username__icontains=search_query) |
+            Q(phone_number__icontains=search_query) |
+            Q(specialization__icontains=search_query)
+        )
 
     context = {
         'doctors': doctors,
-        'bookings': bookings,  # Now, 'bookings' has a value
     }
 
     return render(request, 'doctors_list.html', context)
 
 
+from django.db.models import Q
 from django.shortcuts import render, redirect
-from .models import DietitianProfile, DietitianBooking
+from .models import DietitianProfile, DietitianBooking, DietitianRating
 
 def dietitians_list(request):
     if request.method == 'POST':
@@ -620,9 +1313,25 @@ def dietitians_list(request):
         else:
             # Handle missing dietitian_id or user_id
             return redirect('dietitians_list')  # Redirect to the same page or show an error message
+    else:  # Handling GET (search) request
+        search_query = request.GET.get('search', '')
+
 
     # Fetch a list of DietitianProfile objects
     dietitians = DietitianProfile.objects.all()
+
+    for dietitian in dietitians:
+        dietitian.avg_rating = dietitian.average_rating()
+        dietitian.total_ratings = dietitian.total_ratings()
+
+
+    # Filter dietitians based on the search query
+    if search_query:
+        dietitians = dietitians.filter(
+            Q(user__username__icontains=search_query) |
+            Q(phone_number__icontains=search_query) |
+            Q(specialization__icontains=search_query)
+            )  
 
     context = {
         'dietitians': dietitians,
@@ -946,9 +1655,34 @@ def bmi_estimation(request):
         bmi = user_profile.weight / (height_in_meters ** 2)
         user_profile.bmi = bmi  # Save BMI in the user profile
         user_profile.save()
+     # Calculate BMR (Basal Metabolic Rate)
+        if user_profile.gender == 'M':
+            bmr = 88.362 + (13.397 * user_profile.weight) + (4.799 * user_profile.height) - (5.677 * user_profile.age)
+        elif user_profile.gender == 'F':
+            bmr = 447.593 + (9.247 * user_profile.weight) + (3.098 * user_profile.height) - (4.330 * user_profile.age)
+        else:
+            bmr = 0
+
+        if request.method == 'POST':
+        # Assuming 'activity_level' is in the POST data
+           activity_level = request.POST.get('activity_level')
+           user_profile.activity_level = activity_level
+
+        # Calculate total calorie intake based on activity level
+        activity_level_multiplier = {
+            'Sedentary': 1.2,
+            'Lightly Active': 1.375,
+            'Moderately Active': 1.55,
+            'Active': 1.725,
+            'Very Active': 1.9,
+        }
+
+        activity_level = user_profile.activity_level
+        total_calorie_intake = bmr * activity_level_multiplier.get(activity_level, 1.2)
 
     context = {
         'user_profile': user_profile,
+        'total_calorie_intake': total_calorie_intake,
     }
 
     return render(request, 'bmi_estimation.html', context)
@@ -958,8 +1692,9 @@ from django.shortcuts import get_object_or_404  # Import get_object_or_404
 from .models import DoctorProfile, Booking
 
 def dr_bookings(request, doctor_id):
-    doctor = get_object_or_404(DoctorProfile, id=doctor_id)  # Use get_object_or_404 for graceful handling
-    bookings = Booking.objects.filter(doctor=doctor)
+    doctor = get_object_or_404(CustomUser, id=doctor_id)  # Use get_object_or_404 for graceful handling
+    
+    bookings = Booking.objects.filter(doctor_id=doctor_id)
     users_who_booked = [booking.user for booking in bookings]
     
 
@@ -975,16 +1710,22 @@ def dr_bookings(request, doctor_id):
 from .models import DietitianProfile, DietitianBooking
 
 def d_bookings(request, dietitian_id):
-    dietitian = DietitianProfile.objects.get(id=dietitian_id)  # Use DietitianProfile here
-    bookings = DietitianBooking.objects.filter(dietitian=dietitian)
+    # Use get_object_or_404 to retrieve the DietitianProfile or return a 404 response if it doesn't exist
+    dietitian = get_object_or_404(CustomUser, id=dietitian_id)
+    
+    # Retrieve all bookings for the specified dietitian
+    bookings = DietitianBooking.objects.filter(dietitian_id=dietitian_id)
+
     users_who_booked = [booking.user for booking in bookings]
 
     context = {
-        'dietitian': dietitian,  # Change 'doctor' to 'dietitian' here
+        'dietitian':  dietitian,
+        'bookings': bookings,
         'users_who_booked': users_who_booked,
     }
 
-    return render(request, 'd_bookings.html', context)  # Change the template name to 'd_bookings.html'
+    return render(request, 'd_bookings.html', context)
+
 
 
 from django.shortcuts import render, redirect
@@ -1007,44 +1748,136 @@ def log_exercise(request):
     return render(request, 'log_exercise.html')
 
 # views.py
-from .models import DietitianProfile, DoctorProfile, Feedback
-from .forms import FeedbackForm
+from django.shortcuts import render, redirect
+from .models import Feedback, DoctorProfile, DietitianProfile
 
-def submit_feedback(request, professional_type, professional_id):
-    if professional_type == 'dietitian':
-        professional = DietitianProfile.objects.get(id=professional_id)
-        feedback_template = 'd_feedback.html'  # Template for dietitians
-    elif professional_type == 'doctor':
-        professional = DoctorProfile.objects.get(id=professional_id)
-        feedback_template = 'dr_feedback.html'  # Template for doctors
-
+def submit_feedback(request):
     if request.method == 'POST':
-        form = FeedbackForm(request.POST)
-        if form.is_valid():
-            feedback = form.save(commit=False)
-            feedback.user = request.user
-            feedback.professional = professional
-            feedback.save()
-            messages.success(request, 'Feedback submitted successfully.')
-            return render(request, feedback_template, {'professional': professional, 'feedback': feedback})
-            # Redirecting to the feedback page with the feedback message
+        professional_type = request.POST.get('professional_type')
+        feedback_message = request.POST.get('feedback_message')
 
-    else:
-        form = FeedbackForm()
+        # Get the current user and their profile
+        user = request.user
+        user_profile = None
 
-    return render(request, 'submit_feedback.html', {'form': form, 'professional': professional, 'professional_type': professional_type, 'professional_id': professional_id})
+        # Determine the professional type and set the appropriate profile
+        if professional_type == 'Doctor':
+            user_profile = user.doctorprofile
+        elif professional_type == 'Dietitian':
+            user_profile = user.dietitianprofile
 
-def d_feedback(request, professional_id):
-    dietitian = DietitianProfile.objects.get(id=professional_id)
-    feedback_messages = Feedback.objects.filter(professional=dietitian)
+        # Create the feedback object
+        feedback = Feedback.objects.create(
+            professional_type=professional_type,
+            feedback_message=feedback_message,
+            user=user,
+        )
 
-    return render(request, 'd_feedback.html', {'dietitian': dietitian, 'feedback_messages': feedback_messages})
+        # Set the appropriate doctor or dietitian based on professional_type
+        if professional_type == 'Doctor':
+            feedback.doctor = user_profile
+        elif professional_type == 'Dietitian':
+            feedback.dietitian = user_profile
 
-def dr_feedback(request, professional_id):
-    doctor = DoctorProfile.objects.get(id=professional_id)
-    feedback_messages = Feedback.objects.filter(professional=doctor)
+        feedback.save()
 
-    return render(request, 'dr_feedback.html', {'doctor': doctor, 'feedback_messages': feedback_messages})
+        return redirect('submit_feedback.html')  # Redirect to a success page
+
+    return render(request, 'submit_feedback.html', {})
+
+# views.py
+
+from django.shortcuts import render
+from .models import Feedback, DoctorProfile, DietitianProfile
+
+def dr_feedback(request):
+    # Assuming you have a DoctorProfile linked to the current user
+    doctor_profile = request.user.doctorprofile
+
+    # Get feedback specific to the doctor
+    professional_feedback = Feedback.objects.filter(doctor=doctor_profile)
+
+    return render(request, 'dr_feedback.html', {'professional_feedback': professional_feedback})
+
+def d_feedback(request):
+    # Assuming you have a DietitianProfile linked to the current user
+    dietitian_profile = request.user.dietitianprofile
+
+    # Get feedback specific to the dietitian
+    professional_feedback = Feedback.objects.filter(dietitian=dietitian_profile)
+
+    return render(request, 'd_feedback.html', {'professional_feedback': professional_feedback})
+
+
+# from django.shortcuts import render, redirect
+# from .models import Feedback, DoctorProfile, DietitianProfile
+
+# def submit_feedback(request):
+#     if request.method == 'POST':
+#         professional_type = request.POST.get('professional_type')
+#         feedback_message = request.POST.get('feedback_message')
+
+#         # Get the current user and their profile
+#         user = request.user
+#         user_profile = None
+
+#         if professional_type == 'Doctor':
+#             user_profile = user.DoctorProfile
+#         elif professional_type == 'Dietitian':
+#             user_profile = user.DietitianProfile
+
+
+#         # Create the feedback object
+#         feedback = Feedback.objects.create(
+#             professional_type=professional_type,
+#             feedback_message=feedback_message,
+#             user=user,
+#             doctor=user_profile if professional_type == 'Doctor' else None,
+#             dietitian=user_profile if professional_type == 'Dietitian' else None,
+#         )
+
+#         return redirect('submit_feedback.html')  # Redirect to a success page
+
+#     return render(request, 'submit_feedback.html', {})
+
+# from .models import DietitianProfile, DoctorProfile, Feedback
+# from .forms import FeedbackForm
+
+# def submit_feedback(request, professional_type, professional_id):
+#     if professional_type == 'dietitian':
+#         professional = DietitianProfile.objects.get(id=professional_id)
+#         feedback_template = 'd_feedback.html'  # Template for dietitians
+#     elif professional_type == 'doctor':
+#         professional = DoctorProfile.objects.get(id=professional_id)
+#         feedback_template = 'dr_feedback.html'  # Template for doctors
+
+#     if request.method == 'POST':
+#         form = FeedbackForm(request.POST)
+#         if form.is_valid():
+#             feedback = form.save(commit=False)
+#             feedback.user = request.user
+#             feedback.professional = professional
+#             feedback.save()
+#             messages.success(request, 'Feedback submitted successfully.')
+#             return render(request, feedback_template, {'professional': professional, 'feedback': feedback})
+#             # Redirecting to the feedback page with the feedback message
+
+#     else:
+#         form = FeedbackForm()
+
+#     return render(request, 'submit_feedback.html', {'form': form, 'professional': professional, 'professional_type': professional_type, 'professional_id': professional_id})
+
+# def d_feedback(request, professional_id):
+#     dietitian = DietitianProfile.objects.get(id=professional_id)
+#     feedback_messages = Feedback.objects.filter(professional=dietitian)
+
+#     return render(request, 'd_feedback.html', {'dietitian': dietitian, 'feedback_messages': feedback_messages})
+
+# def dr_feedback(request, professional_id):
+#     doctor = DoctorProfile.objects.get(id=professional_id)
+#     feedback_messages = Feedback.objects.filter(professional=doctor)
+
+#     return render(request, 'dr_feedback.html', {'doctor': doctor, 'feedback_messages': feedback_messages})
 
 # from .models import DietitianProfile, DoctorProfile, Feedback
 # from .forms import FeedbackForm

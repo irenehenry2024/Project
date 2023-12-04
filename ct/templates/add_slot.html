@@ -1,0 +1,434 @@
+{% csrf_token %}
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add Time Slots</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 20px;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed; /* Fixed position to stay at the top */
+            top: 0;
+            z-index: 1000; /* Higher z-index to stay above other elements */
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #d92cf9;
+        }
+
+        .back-button {
+            background-color: #d92cf9;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        .container {
+            max-width: 800px;
+            padding: 100px;
+            background-color: #fff;
+            border-radius: 25px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 60px; /* Adjusted to make space for the fixed header */
+        }
+
+        .session {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .slots-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .slots-container h2 {
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .table th {
+            background-color: #f9f9f9;
+        }
+
+        /* Additional Styles */
+        h1 {
+            text-align: center;
+            color: #007BFF;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        #showSlotsFormButton {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .btn-submit {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+
+    {% if messages %}
+    <div class="messages">
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+</head>
+
+<body>
+    <section style="background-color: #eee;">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col">
+                    <nav aria-label="breadcrumb"
+                        class="bg-light rounded-3 p-3 mb-4">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item">
+                                {% if user.is_Customer %}
+                                <a href="{% url "index" %}">Home</a></li>
+                                {% elif user.is_Dietitian %}
+                                <a href="{% url "d_index" %}">Home</a></li>
+                                {% elif user.is_Doctor %}
+                                <a href="{% url "dr_index" %}">Home</a></li>
+                                {% endif %}
+                            <li class="breadcrumb-item">
+                              {% if user.is_Dietitian %}
+                              <a href="{% url 'duser_profile' %}">Dietitian Profile</a></li>
+                              {% endif %}
+                            <li class="breadcrumb-item active"
+                                aria-current="page">Add Slot</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+    {% comment %} <div class="header">
+        <h1>Calorie Tracker</h1>
+        <button id="backButton" class="back-button">Back</button>
+    </div> {% endcomment %}
+
+    <div id="successMessage" class="messages" style="display: none; color: blue;">
+        Slot added successfully.
+    </div>
+   
+    <div class="container">
+        <h1>Add Slots</h1>
+       
+        <button id="showSlotsFormButton" class="btn-submit">Add Slots</button>
+
+
+        <div class="slots-container">
+            <h2>Add Slots</h2>
+           
+            <form id="slotForm" method="post" action="{% url 'add_slot' %}">
+                {% csrf_token %}
+                <!-- Inside your form in addslot.html -->
+               
+                <input type="hidden" name="dietitian_id" value="{{ request.user.dietitianprofile.id }}">
+               
+                <div class="form-group">
+                    <label for="session">Session:</label>
+                    <select id="session" name="session">
+                        <option value="select">Select</option>
+                        <option value="morning">Morning</option>
+                        <option value="afternoon">Afternoon</option>
+                        <option value="evening">Evening</option>
+                    </select>
+                </div>
+                <div class="form-group" id="timeGroup">
+                    <label for="time">Time:</label>
+                    <div id="timeOptions"></div>
+                </div>
+                <input type="hidden" name="time" id="selectedTime" value=""> <!-- Add this hidden input to store the selected time -->
+                <div class="form-group">
+                    <button type="submit" class="btn-submit">Submit</button>
+                </div>
+            </form>
+
+            <h2>My Availability</h2>
+            <!-- Display existing data -->
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Session</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for slot in slots %}
+                    <tr>
+                        <td>{{ slot.session }}</td>
+                        <td>{{ slot.time }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("slotForm");
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+                addSlot();
+            });
+   
+            document.getElementById("showSlotsFormButton").addEventListener("click", function () {
+                console.log("Add Slots button clicked");
+                const formContainer = document.querySelector(".slots-container");
+                formContainer.style.display = "block";
+            });
+        });
+   
+        function disableSelectedOption(selectedSession, selectedTime) {
+            const timeOptions = document.querySelectorAll(`#timeOptions input`);
+   
+            for (const timeOption of timeOptions) {
+                if (timeOption.value === selectedTime) {
+                    timeOption.disabled = true; // Disable the selected time
+                }
+            }
+        }
+   
+        function enableTimeOption(selectedTime) {
+            const timeOptions = document.querySelectorAll(`#timeOptions input`);
+   
+            for (const timeOption of timeOptions) {
+                if (timeOption.value === selectedTime) {
+                    timeOption.disabled = false;
+                }
+            }
+        }
+   
+        function clearSelection() {
+            const timeInputs = document.querySelectorAll('input[name="time"]');
+            for (const input of timeInputs) {
+                input.checked = false;
+            }
+        }
+   
+        function addSlot() {
+            console.log("addSlot function called");
+            const form = document.getElementById("slotForm");
+            const session = document.getElementById("session").value;
+            const timeInputs = document.querySelectorAll('input[name="time"]');
+            let selectedTime = '';
+   
+            for (const input of timeInputs) {
+                if (input.checked) {
+                    selectedTime = input.value;
+                    break;
+                }
+            }
+
+            // Set the value of the hidden input
+            document.getElementById("selectedTime").value = selectedTime;
+   
+            // Check if the selected time already exists in the table
+            const table = document.querySelector(".table");
+            const existingTimes = Array.from(table.querySelectorAll("tbody td:nth-child(2)")).map(cell => cell.textContent.trim());
+   
+            if (session && selectedTime && !existingTimes.includes(selectedTime)) {
+                // Add the slot to the table
+                const tbody = table.querySelector("tbody");
+                const row = document.createElement("tr");
+                const sessionCell = document.createElement("td");
+                const timeCell = document.createElement("td");
+   
+                sessionCell.textContent = session;
+                timeCell.textContent = selectedTime;
+   
+                row.appendChild(sessionCell);
+                row.appendChild(timeCell);
+                tbody.appendChild(row);
+   
+                // Disable the selected option
+                disableSelectedOption(session, selectedTime);
+   
+                // Display success message
+                const successMessage = document.getElementById("successMessage");
+                successMessage.style.display = "block";
+   
+                // Hide the message after a few seconds (you can adjust the timeout)
+                setTimeout(function () {
+                    successMessage.style.display = "none";
+                }, 3000);
+   
+                // Send data to the server (Django) for database entry
+                fetch(form.action, {
+                    method: form.method,
+                    body: new URLSearchParams(new FormData(form)),
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        // Add any additional headers if needed
+                    },
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json(); // assuming server returns JSON
+                    })
+                    .then(data => {
+                        // Handle the response from the server if needed
+                        console.log(data);
+                    })
+                    .catch(error => {
+                        console.error("Error during fetch operation:", error);
+                    });
+            } else {
+                // Display error message for duplicate time
+                alert("Error: This time slot already exists. Please choose a different time.");
+            }
+   
+            // Clear the selection after adding the slot
+            clearSelection();
+        }
+   
+        const showSlotsFormButton = document.getElementById("showSlotsFormButton");
+        const sessionDropdown = document.getElementById("session");
+        const timeGroup = document.getElementById("timeGroup");
+        const timeOptions = document.getElementById("timeOptions");
+        const slotsContainer = document.querySelector(".slots-container");
+   
+        showSlotsFormButton.addEventListener("click", function () {
+            timeGroup.style.display = "none"; // Hide the time options initially
+            slotsContainer.style.display = slotsContainer.style.display === "none" ? "block" : "none";
+        });
+   
+        sessionDropdown.addEventListener("change", function () {
+            const selectedSession = sessionDropdown.value;
+            timeOptions.innerHTML = ""; // Clear previous options
+   
+            if (selectedSession === "morning") {
+                addTimeOption("6:00 am");
+                addTimeOption("8:00 am");
+                addTimeOption("10:00 am (Morning Session)");
+            } else if (selectedSession === "afternoon") {
+                addTimeOption("1:00 pm");
+                addTimeOption("3:00 pm (Afternoon Session)");
+            } else if (selectedSession === "evening") {
+                addTimeOption("4:00 pm");
+                addTimeOption("5:00 pm");
+                addTimeOption("6:00 pm (Evening Session)");
+            }
+   
+            timeGroup.style.display = "block"; // Display the time options
+   
+            // Enable all time options for the selected session
+            const timeInputs = document.querySelectorAll('input[name="time"]');
+            for (const input of timeInputs) {
+                input.disabled = false;
+            }
+        });
+   
+        function addTimeOption(value) {
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = "time";
+            input.value = value;
+   
+            const label = document.createElement("label");
+            label.appendChild(input);
+            label.appendChild(document.createTextNode(" " + value));
+   
+            timeOptions.appendChild(label);
+        }
+   
+        {% comment %} const backButton = document.getElementById("backButton");
+   
+        backButton.addEventListener("click", function () {
+            // Assuming duser_profile.html is the URL for the dietitian home page
+            window.location.href = "{% url 'duser_profile' %}";
+        }); {% endcomment %}
+    </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>        <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+</body>
+</html>

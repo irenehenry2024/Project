@@ -44,6 +44,16 @@ class UserProfile(models.Model):
     weight = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
      # Add a field to store BMI
     bmi = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    # bmr = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)  # Add BMR field
+    activity_level = models.CharField(max_length=20, blank=True, null=True)
+    # activity_level = models.CharField(max_length=20, choices=[
+    #     ('Sedentary', 'Sedentary'),
+    #     ('Lightly Active', 'Lightly Active'),
+    #     ('Moderately Active', 'Moderately Active'),
+    #     ('Active', 'Active'),
+    #     ('Very Active', 'Very Active'),
+    # ], blank=True, null=True)  # Add activity level field
+    
    
     
     def __str__(self):
@@ -77,7 +87,7 @@ class DietitianProfile(models.Model):
 from django.contrib.auth.models import User
 
 class DoctorProfile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     state = models.CharField(max_length=255, null=True, blank=True)
     district = models.CharField(max_length=100, blank=True, null=True)
@@ -94,7 +104,24 @@ class DoctorProfile(models.Model):
     def __str__(self):
         return self.user.username
 
+    def average_rating(self):
+        # Calculate the average rating using the related DietitianRating instances
+        ratings = DoctorRating.objects.filter(doctor=self)
+        if ratings.exists():
+            average = ratings.aggregate(Avg('rating'))['rating__avg']
+            return round(average, 1)
+        return 0.0
 
+    def total_ratings(self):
+        # Get the total number of ratings for the dietitian
+        return DoctorRating.objects.filter(doctor=self).count()
+
+
+
+
+from django.db import models
+from django.conf import settings
+from django.db.models import Avg
 from django.contrib.auth.models import User
 
 class DietitianProfile(models.Model):
@@ -113,28 +140,74 @@ class DietitianProfile(models.Model):
     def __str__(self):
         return self.user.username
 
+    def average_rating(self):
+        # Calculate the average rating using the related DietitianRating instances
+        ratings = DietitianRating.objects.filter(dietitian=self)
+        if ratings.exists():
+            average = ratings.aggregate(Avg('rating'))['rating__avg']
+            return round(average, 1)
+        return 0.0
+
+    def total_ratings(self):
+        # Get the total number of ratings for the dietitian
+        return DietitianRating.objects.filter(dietitian=self).count()
+
 
 
 from django.db import models
 from django.contrib.auth import get_user_model
-from .models import DoctorProfile  # Import the DoctorProfile model
-from datetime import date
+from django.conf import settings
 
 class Booking(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)  # The user who made the booking
-    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE)  # The doctor being booked
-    booking_date = models.DateField(default=date(2023, 1, 1))  # Replace with your desired default date
-    #booking_date =  models.DateField()  # Define a default value or use default=timezone.now if you want to set the current time
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name ='dr_bookings')  # The user who made the booking
+    doctor = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name ='doctor_bookings')  # The doctor being booked
+    booking_date = models.DateField()  # Replace with your desired default date
+    session = models.CharField(max_length=255, default='afternoon')
+    time = models.CharField(max_length=5, default='09:00')
+    amount = models.DecimalField(default=0.0, decimal_places=2, max_digits=10)
+    is_paid = models.BooleanField(default=False)  # New field for payment status
 
+    @property
+    def doctor_id(self):
+        return self.doctor.user.id if self.doctor and self.doctor.user else None
+
+    def __str__(self):
+        return f"{self.user} booked with {self.doctor} on {self.booking_date} for {self.session} at {self.time} with amount {self.amount}. Paid: {self.is_paid}"
+
+
+
+
+
+# from django.db import models
+# from django.contrib.auth import get_user_model
+# from .models import DietitianProfile  # Import the DoctorProfile model
+# from datetime import date
+
+# class DietitianBooking(models.Model):
+#     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='user_bookings')
+#     dietitian = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='dietitian_bookings')
+#     booking_date = models.DateField(default=date(2023, 1, 1))  # Replace with your desired default date
 from django.db import models
 from django.contrib.auth import get_user_model
-from .models import DietitianProfile  # Import the DoctorProfile model
-from datetime import date
+from django.conf import settings
 
 class DietitianBooking(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)  # The user who made the booking
-    dietitian = models.ForeignKey(DietitianProfile, on_delete=models.CASCADE)  # The doctor being booked
-    booking_date = models.DateField(default=date(2023, 1, 1))  # Replace with your desired default date
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='user_bookings')
+    dietitian = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='dietitian_bookings')
+    booking_date = models.DateField()  # No default date, the user will provide the date
+    session = models.CharField(max_length=255, default='afternoon')
+    time = models.CharField(max_length=5, default='09:00')
+    amount = models.DecimalField(default=0.0, decimal_places=2, max_digits=10)
+    is_paid = models.BooleanField(default=False)  # New field for payment status
+
+
+    # Add any additional fields you need for the DietitianBooking model
+    @property
+    def dietitian_id(self):
+        return self.dietitian.user.id if self.dietitian and self.dietitian.user else None
+
+    def __str__(self):
+        return f"{self.user} booked with {self.dietitian} on {self.booking_date} for {self.session} at {self.time} with amount {self.amount}. Paid: {self.is_paid}"
 
 
 
@@ -180,19 +253,46 @@ class ExerciseLog(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.exercise_name} on {self.date}"
 
+# models.py
+
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
+
 
 class Feedback(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    professional_type = models.CharField(max_length=10)  # 'dietitian' or 'doctor'
+    professional_type_choices = [
+        ('Doctor', 'Doctor'),
+        ('Dietitian', 'Dietitian'),
+    ]
+
+    professional_type = models.CharField(max_length=20, choices=professional_type_choices)
     feedback_message = models.TextField()
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
-    dietitian = models.ForeignKey(DietitianProfile, on_delete=models.SET_NULL, null=True, blank=True)
-    doctor = models.ForeignKey(DoctorProfile, on_delete=models.SET_NULL, null=True, blank=True)
+
+    # Reference to the respective professional model
+    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, null=True, blank=True)
+    dietitian = models.ForeignKey(DietitianProfile, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.user.username} Feedback'
+        return f"Feedback from {self.user.username}"
+
+    class Meta:
+        ordering = ['-timestamp']
+
+
+
+# class Feedback(models.Model):
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+#     professional_type = models.CharField(max_length=10)  # 'dietitian' or 'doctor'
+#     feedback_message = models.TextField()
+#     timestamp = models.DateTimeField(auto_now_add=True)
+#     dietitian = models.ForeignKey(DietitianProfile, on_delete=models.SET_NULL, null=True, blank=True)
+#     doctor = models.ForeignKey(DoctorProfile, on_delete=models.SET_NULL, null=True, blank=True)
+
+#     def __str__(self):
+#         return f'{self.user.username} Feedback'
 
 from django import forms
 from .models import Feedback
@@ -203,6 +303,85 @@ class FeedbackForm(forms.ModelForm):
         fields = ['feedback_message', 'dietitian', 'doctor']
 
 
+# models.py
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class LogMeals(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    quantity = models.PositiveIntegerField()
+    calories = models.PositiveIntegerField()
+    meal_choices = [
+        ('breakfast', 'Breakfast'),
+        ('lunch', 'Lunch'),
+        ('dinner', 'Dinner'),
+    ]
+    meal = models.CharField(max_length=10, choices=meal_choices)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+
+
+class TimeSlot(models.Model):
+    session_choices = [
+        ('morning', 'Morning'),
+        ('afternoon', 'Afternoon'),
+        ('evening', 'Evening'),
+    ]
+    
+    dietitian = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    session = models.CharField(max_length=20, choices=session_choices)
+    time = models.CharField(max_length=50)
+
+    def get_user(self):
+        # Accessing the CustomUser instance associated with the DietitianProfile
+        return self.dietitian.user if self.dietitian else None
+    
+    def __str__(self):
+        return f"{self.session} - {self.time} - Dietitian: {self.get_user()}"
+
+
+
+class DoctorSlot(models.Model):
+    session_choices = [
+        ('morning', 'Morning'),
+        ('afternoon', 'Afternoon'),
+        ('evening', 'Evening'),
+    ]
+    doctor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    session = models.CharField(max_length=20, choices=session_choices)
+    time = models.CharField(max_length=50)
+
+    def get_user(self):
+        # Accessing the CustomUser instance associated with the DoctorProfile
+        return self.doctor.user if self.doctor else None
+    
+    
+    def __str__(self):
+        return f"{self.session} - {self.time} - Doctor: {self.get_user()}"
+
+
+class DietitianRating(models.Model):
+    dietitian = models.ForeignKey(DietitianProfile, on_delete=models.CASCADE, related_name='ratings')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    rating = models.IntegerField(default=1, choices=[(1, '1 Star'), (2, '2 Stars'), (3, '3 Stars'), (4, '4 Stars'), (5, '5 Stars')])
+    # rating = models.IntegerField(default=1)
+    review = models.TextField()
+
+    def __str__(self):
+        return f"{self.user.username} - {self.rating} stars"
+
+
+class DoctorRating(models.Model):
+    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name='ratings')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    rating = models.IntegerField(default=1, choices=[(1, '1 Star'), (2, '2 Stars'), (3, '3 Stars'), (4, '4 Stars'), (5, '5 Stars')])
+    # rating = models.IntegerField(default=1)
+    review = models.TextField()
+
+    def __str__(self):
+        return f"{self.user.username} - {self.rating} stars"
 
 # from django.conf import settings
 # from django.contrib.auth import get_user_model

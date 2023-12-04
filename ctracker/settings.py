@@ -54,13 +54,14 @@ MIDDLEWARE = [
  
 ]
 
-
+RAZOR_KEY_ID ='rzp_test_Nkd11FHIIm1AHn'
+RAZOR_KEY_SECRET='Ug7rwDTrL7KOmFDNT1WdDvZI'
 ROOT_URLCONF = 'ctracker.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        'DIRS': [os.path.join(BASE_DIR,'ct','templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

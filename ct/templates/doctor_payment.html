@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>payment</title>
+	<style>
+	
+	* {
+		box-sizing: border-box;
+		padding: 0px;
+		margin: 0px;
+	}
+	html,
+	body {
+		height: 100%;
+	}
+	body {
+		background-color: #f1f5f8;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.card {
+		background-color: white;
+		padding: 25px;
+		border: 1px solid #bbbbbb;
+		border-radius: 5px;
+		box-shadow: 1px 1px 10px 0px rgb(0 0 0 / 25%);
+	}
+	.title {
+		text-align: center;
+		letter-spacing: 1px;
+	}
+	.muted {
+		color: #8e7f7f;
+		display: block;
+		margin-bottom: 10px;
+		text-align: center;
+	}
+	.btn_container {
+		padding: 20px;
+		text-align: center;
+	}
+	.btn {
+		border-radius: 4px;
+		cursor: pointer;
+		padding: 4px 8px;
+		background-color: #007bff;
+		color: white;
+		font-size: 1.2em;
+		font-weight: 600;
+		letter-spacing: 1px;
+	}
+	</style>
+</head>
+
+<body>
+	<div class="card">
+	<h1 class="title">Complete Your Payment </h1>
+    <br>
+
+	<small class="muted">Thank you for choosing Calorie Tracker!</small>
+	<div class="btn_container">
+        <h4>Payment Details</h4>
+                {% comment %} <p>User: {{ dietitian_booking.user }}</p> {% endcomment %}
+                <p>Dietitian: {{ doctor_booking.doctor }}</p>
+                <p>Date: {{ doctor_booking.booking_date }}</p>
+                <p>Session: {{ doctor_booking.session }} at {{ dietitian_booking.time }}</p>
+                <p>Amount: Rs.{{ doctor_booking.amount }}</p>
+		<!-- Payment Button -->
+		<button class="btn" id="pay-btn">Make Payment</button>
+	</div>
+	</div>
+</body>
+
+<!-- Razorpay's Javascript code. -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var options = {
+            key: "rzp_test_Nkd11FHIIm1AHn",  // Replace with your Razorpay Key
+            amount: "{{ razorpay_amount }}",  // Convert amount to paise
+            currency: "INR",
+            name: "Calorie Tracker",
+            description: "Payment for Doctor Booking",
+            
+            order_id: "{{ razorpay_order_id }}",  // Replace with your Razorpay Order ID
+            handler: function (response) {
+                // Handle the success callback
+                alert('Payment successful!');
+                window.location.href ='{% url "pay" booking_id=doctor_booking.id %}';
+            },
+            prefill: {
+                name: "{{ doctor_booking.user.username }}",
+                email: "{{ doctor_booking.user.email }}",
+                contact: "{{ doctor_booking.user.phone_number }}"  // Add your user's phone number
+            },
+            theme: {
+                color: "#007bff"
+            }
+        };
+
+        var rzp1 = new Razorpay(options);
+
+        document.getElementById("pay-btn").onclick = function (e) {
+            rzp1.open();
+            e.preventDefault();
+        };
+    </script>
+</html>
