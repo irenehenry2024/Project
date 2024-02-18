@@ -16,6 +16,17 @@ urlpatterns = [
    path('drsignup/', views.drsignup, name="drsignup"),
    path('drsignup/', views.drsignup, name="drsignup"),
    path('login/', views.login, name="login"),
+   path('messages_page/', views.messages_page, name="messages_page"),
+   
+   path('recipe/home', views.RecipeListView.as_view(), name="recipes-home"),
+   path('recipe/<int:pk>', views.RecipeDetailView.as_view(), name="recipes-detail"),
+   path('recipe/create', views.RecipeCreateView.as_view(), name="recipes-create"),
+   path('recipe/<int:pk>/update', views.RecipeUpdateView.as_view(), name="recipes-update"),
+   path('recipe/<int:pk>/delete', views.RecipeDeleteView.as_view(), name="recipes-delete"),
+   path('about/', views.about, name="recipes-about"),
+
+
+
    # path('delete_user/<int:user_id>/', views.delete_user, name='delete_user'),
    path('loggout/', views.loggout, name="loggout"),
    # path('register/', views.register, name='register'),

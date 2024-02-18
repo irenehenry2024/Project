@@ -88,12 +88,12 @@
 
                 <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
                   <!-- Inside the loop where you display dietitians -->
-                  <a href="{% url 'dietitian_timeslots' dietitian_id=dietitian.user.id %}" class="btn btn-warning btn-lg ms-2">Book</a>
+                  <a href="{% url 'dietitian_timeslots' dietitian_id=dietitian.user.id %}" id="book" class="btn btn-warning btn-lg ms-2">Book</a>
 
             
                 </div>
                 <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                  <a href="{% url 'dietitian_ratings_page' dietitian.id %}" class="btn btn-warning btn-lg ms-2">Rate</a>
+                  <a href="{% url 'dietitian_ratings_page' dietitian.id %}" id="rate" class="btn btn-warning btn-lg ms-2">Rate</a>
                   {% comment %} <button type="button" id="ratebtn" class="btn btn-warning btn-lg ms-2" onclick="window.location.href='{% url 'ratings' %}'">Rate</button> {% endcomment %}
 
                 </div>

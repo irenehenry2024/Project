@@ -122,7 +122,10 @@
                     <a class="nav-link" style="color: blue;"> Welcome, {{ user.username }}</a>
                   </li>
                   <li class="nav-item active">
-                    <a href="{% url 'loggout' %}" class="nav-link">Logout</a>
+                    <a href="{% url 'messages_page' %}" id="chat" class="nav-link">chat</a>
+                  </li>
+                  <li class="nav-item active">
+                    <a href="{% url 'loggout' %}" id="logout" class="nav-link">Logout</a>
                   </li>
                   <li class="nav-item active">
                     <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>

@@ -80,8 +80,9 @@
                         </a>
                     <ul class="dropdown-menu" aria-labelledby="accountSettingsDropdown">
                      <li><a href="{% static 'special-dishes.html' %}">Meal Plan</a></li>
-                     <li><a href="{% static 'special-dishes.html' %}">Recipe Catalog</a></li>
-                     <li><a href="{% url 'add_slot' %}">Add Slots</a></li>
+                     <li><a href="{% url 'recipes-home' %}">Recipe Catalog</a></li>
+                     {% comment %} <li><a href="{% url 'home.html' %}">Recipe Catalog</a></li> {% endcomment %}
+                     <li><a href="{% url 'add_slot' %}" id="addslot">Add Slots</a></li>
                      <li><a href="{% url 'd_bookings' dietitian_id=dietitian.user.id %}">Bookings</a></li>
 
                      {% comment %} <li><a href="{% url 'd_feedback' %}">Feedbacks</a></li> {% endcomment %}

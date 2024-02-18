@@ -154,7 +154,7 @@
                             <ol class="breadcrumb mb-0">
                                 <li class="breadcrumb-item">
                                     {% if user.is_Customer %}
-                                    <a href="{% url "index" %}">Home</a></li>
+                                    <a href="{% url "index" %}" id="home">Home</a></li>
                                     {% elif user.is_Dietitian %}
                                     <a href="{% url "d_index" %}">Home</a></li>
                                     {% elif user.is_Doctor %}

@@ -119,6 +119,9 @@
                     <a class="nav-link" style="color: blue;"> Welcome, {{ user.username }}</a>
                   </li>
                   <li class="nav-item active">
+                    <a href="{% url 'messages_page' %}"  id="chat"class="nav-link">Chat</a>
+                  </li>
+                  <li class="nav-item active">
                     <a href="{% url 'loggout' %}"  id="logout-link"class="nav-link">Logout</a>
                   </li>
                   <li class="nav-item active">

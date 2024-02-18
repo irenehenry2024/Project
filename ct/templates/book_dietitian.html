@@ -162,7 +162,7 @@
                     <input type="hidden" name="dietitian_id" value="{{ dietitian.id }}">   
                     <h4>Choose Date:</h4>
             <div class="form-group">
-                <input type="date" name="session_date" class="form-control" style="width: 200px;" required>
+                <input type="date" id="date" name="session_date" class="form-control" style="width: 200px;" required>
             </div>          
                     <h4>Choose Time Slot:</h4>
                     {% for time_slot in timeslots %}

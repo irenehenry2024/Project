@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'ct',
     'mathfilters',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -74,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ctracker.wsgi.application'
+ASGI_APPLICATION = 'ctracker.asgi.application'
 
 
 # Database
@@ -145,6 +146,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 AUTH_USER_MODEL = 'ct.CustomUser'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+       
+    }
+}
+
 
 LOGIN_URL = 'signin'
 LOGIN_REDIRECT_URL = 'index'
