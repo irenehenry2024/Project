@@ -10,16 +10,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Video</title>
     <!-- Include any additional CSS stylesheets or scripts you need -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            padding-top: 70px; /* Adjust according to navbar height */
+        }
+
+        .navbar {
+            background-color: #0C2D57;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .card {
+            margin-top: 20px;
+        }
+    </style>
 </head>
-
 <body>
-    <h2>Upload Video</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Upload Video</button>
-    </form>
-    <!-- Include any additional HTML content or scripts as needed -->
-</body>
 
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Calorie Tracker</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'duser_profile' %}">Home</a>
+                    </li>
+                    {% comment %} <li class="nav-item">
+                        <a class="nav-link" href="#">Upload</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li> {% endcomment %}
+                    <!-- Add more navbar items as needed -->
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Upload Video</h2>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">Upload Video</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include any additional HTML content or scripts as needed -->
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 </html>
