@@ -5,6 +5,9 @@ from django.contrib.auth import views as auth_views
 from . import views
 from django.conf import settings
 
+from django.urls import path
+from .views import display_videos
+
 'app/model_viewtype'
 'recipes/recipe_detail.html'
 
@@ -31,6 +34,11 @@ urlpatterns = [
 
 
 
+  path('upload_video/', views.upload_video, name='upload_video'),
+  path('display_videos/', views.display_videos, name='display_videos'),
+
+
+
    # path('delete_user/<int:user_id>/', views.delete_user, name='delete_user'),
    path('loggout/', views.loggout, name="loggout"),
    # path('register/', views.register, name='register'),
@@ -53,7 +61,8 @@ urlpatterns = [
    path('change_password/', views.change_password, name='change_password'),
    path('change_password/', views.change_password, name='change_password'),
    path('bmi_estimation/', views.bmi_estimation, name='bmi_estimation'),
-   path('recipe_catalog/', views.recipe_catalog, name='recipe_catalog'),
+   path('view_recipes/', views.view_recipes, name='view_recipes'),
+
    path('log-exercise/', views.log_exercise, name='log_exercise'),
    path('calorie_counting/', views.calorie_counting, name='calorie_counting'),
    path('food_intake/', views.food_intake, name='food_intake'),

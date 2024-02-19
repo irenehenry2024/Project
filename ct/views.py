@@ -98,15 +98,56 @@ class RecipeUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     form.instance.author = self.request.user
     return super().form_valid(form)
 
+from django.shortcuts import render
+from .models import Recipe
+from django.contrib.auth import get_user_model
 
-# Create your views here.
+User = get_user_model()
+
+def view_recipes(request):
+    # Check if the user is a dietitian
+    if request.user.is_authenticated :
+        # If the user is a dietitian, fetch recipes authored by them
+        recipes = Recipe.objects.filter(author=request.user)
+        return render(request, 'view_recipes.html', {'recipes': recipes})
+    else:
+        # If the user is not a dietitian, return an empty list of recipes
+        recipes = []
+        return render(request, 'view_recipes.html', {'recipes': recipes})
+
+
+from .forms import VideoForm
+
+def upload_video(request):
+    if request.method == 'POST':
+        form = VideoForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('duser_profile')  # Update with your template name
+    else:
+        form = VideoForm()
+    
+    return render(request, 'upload_video.html', {'form': form})
+
+
+from django.shortcuts import render
+from .models import Video
+
+def display_videos(request):
+    videos = Video.objects.all()
+    return render(request, 'display_videos.html', {'videos': videos})
+
+
+
+
+
+
 
 
 def index(request):
     return render(request, "index.html")
 
-def recipe_catalog(request):
-    return render(request, "recipe_catalog.html")
+
 
 # views.py
 from django.shortcuts import render, redirect

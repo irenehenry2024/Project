@@ -446,3 +446,13 @@ class Recipe(models.Model):
 
   def __str__(self):
     return self.title
+
+
+class Video(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()  # Add a description field
+    video_file = models.FileField(upload_to='videos/')
+    # Add any other fields you need, such as tags, etc.
+
+    def _str_(self):
+        return self.title
