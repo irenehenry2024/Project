@@ -5,6 +5,10 @@ from django.contrib.auth import views as auth_views
 from . import views
 from django.conf import settings
 
+'app/model_viewtype'
+'recipes/recipe_detail.html'
+
+
 urlpatterns = [
    
    path('',views.index, name="index"),
@@ -18,12 +22,12 @@ urlpatterns = [
    path('login/', views.login, name="login"),
    path('messages_page/', views.messages_page, name="messages_page"),
    
-   path('recipe/home', views.RecipeListView.as_view(), name="recipes-home"),
+   path('recipes/home', views.RecipeListView.as_view(), name="recipes-home"),
    path('recipe/<int:pk>', views.RecipeDetailView.as_view(), name="recipes-detail"),
-   path('recipe/create', views.RecipeCreateView.as_view(), name="recipes-create"),
-   path('recipe/<int:pk>/update', views.RecipeUpdateView.as_view(), name="recipes-update"),
-   path('recipe/<int:pk>/delete', views.RecipeDeleteView.as_view(), name="recipes-delete"),
-   path('about/', views.about, name="recipes-about"),
+   path('recipes/create', views.RecipeCreateView.as_view(), name="recipes-create"),
+   path('recipes/<int:pk>/update', views.RecipeUpdateView.as_view(), name="recipes-update"),
+   path('recipes/<int:pk>/delete', views.RecipeDeleteView.as_view(), name="recipes-delete"),
+  #  path('about/', views.about, name="recipes-about"),
 
 
 

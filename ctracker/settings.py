@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'ct',
     'mathfilters',
     'channels',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -171,3 +172,6 @@ EMAIL_HOST_USER = 'irenehenry2024a@mca.ajce.in'
 EMAIL_HOST_PASSWORD = '$Irene3698'
 
 EMAIL_DEBUG = True
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+

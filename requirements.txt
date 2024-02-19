@@ -15,3 +15,4 @@ sqlparse==0.4.4
 tzdata==2023.3
 urllib3==2.2.0
 virtualenv==20.24.5
+django-crispy-forms==2.1

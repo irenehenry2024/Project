@@ -441,8 +441,8 @@ class Recipe(models.Model):
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
 
-#   def get_absolute_url(self):
-#       return reverse("recipes-detail", kwargs={"pk": self.pk})
+  def get_absolute_url(self):
+      return reverse("recipes-detail", kwargs={"pk": self.pk})
 
-#   def __str__(self):
-#     return self.title
+  def __str__(self):
+    return self.title

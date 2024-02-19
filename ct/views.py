@@ -49,12 +49,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 #         'date posted ':'May 20, 2022' ,
 #     },
 # ]
+
 class RecipeListView(ListView):
   model = models.Recipe
   template_name = 'home.html'
   context_object_name = 'recipes'
 
-# Create your views here.
+
 def home(request):
   recipes = models.Recipe.objects.all()
   context = {
@@ -62,8 +63,8 @@ def home(request):
   }
   return render(request, 'home.html', context)
 
-def about(request):
-  return render(request, 'about.html', {'title': 'about page'})
+# def about(request):
+#   return render(request, 'about.html', {'title': 'about page'})
 
 
 class RecipeDetailView(DetailView):
