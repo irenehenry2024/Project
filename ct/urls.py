@@ -36,8 +36,7 @@ urlpatterns = [
 
   path('upload_video/', views.upload_video, name='upload_video'),
   path('display_videos/', views.display_videos, name='display_videos'),
-
-
+  path('strategy_index/', views.strategy_index, name='strategy_index'),
 
    # path('delete_user/<int:user_id>/', views.delete_user, name='delete_user'),
    path('loggout/', views.loggout, name="loggout"),

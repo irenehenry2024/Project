@@ -78,7 +78,7 @@
         <div class="navbar-nav">
           {% if user.is_authenticated %}
           <a class="nav-item nav-link" href="{% url 'duser_profile' %}">Dietitian Profile</a >
-          <a class="nav-item nav-link" href="{% url 'loggout' %}">Logout</a>
+          {% comment %} <a class="nav-item nav-link" href="{% url 'loggout' %}">Logout</a> {% endcomment %}
           {% else %}
           <a class="nav-item nav-link" href="{% url 'signin' %}">Login</a>
           <a class="nav-item nav-link" href="{% url 'dsignup' %}">Register</a>

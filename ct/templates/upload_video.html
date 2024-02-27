@@ -69,7 +69,40 @@
             </div>
         </div>
     </div>
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Select the form element
+            const form = document.querySelector('form');
+    
+            // Add event listener for form submission
+            form.addEventListener('submit', function (event) {
+                // Select the input element for file upload
+                const fileInput = document.querySelector('input[type="file"]');
+    
+                // Get the uploaded file
+                const file = fileInput.files[0];
+    
+                // Check if a file is selected
+                if (!file) {
+                    alert('Please select a file.');
+                    event.preventDefault(); // Prevent form submission
+                    return;
+                }
+    
+                // Get the file extension
+                const fileNameParts = file.name.split('.');
+                const fileExtension = fileNameParts[fileNameParts.length - 1];
+    
+                // Check if the file extension is not mp4
+                if (fileExtension.toLowerCase() !== 'mp4') {
+                    alert('Please select an MP4 video file.');
+                    event.preventDefault(); // Prevent form submission
+                    return;
+                }
+            });
+        });
+    </script>
+    
     <!-- Include any additional HTML content or scripts as needed -->
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

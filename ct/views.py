@@ -139,6 +139,8 @@ def display_videos(request):
 
 
 
+def strategy_index(request):
+    return render(request, "strategy_index.html")
 
 
 
