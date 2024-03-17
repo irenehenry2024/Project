@@ -11,7 +11,6 @@ class VideoForm(forms.ModelForm):
 
 from .models import Food, Image
 
-
 class FoodForm(forms.ModelForm):
     '''
     A ModelForm class for adding a new food item

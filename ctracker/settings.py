@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'mathfilters',
     'channels',
     'crispy_forms',
+
 ]
 
 

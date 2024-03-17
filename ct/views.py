@@ -31,6 +31,7 @@ from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from .models import User, Food, FoodCategory, FoodLog, Image, Weight
 from .forms import FoodForm, ImageForm
+from django import forms
 
 class RecipeListView(ListView):
   model = models.Recipe
@@ -233,6 +234,12 @@ def get_calories_from_api(name):
         print(e)
         return None  # Handle exceptions, return None for simplicity
 
+
+def indexfood(request):
+    '''
+    The default route which lists all food items
+    '''
+    return food_list_view(request)
 
 def food_list_view(request):
     '''

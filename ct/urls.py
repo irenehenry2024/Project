@@ -97,7 +97,9 @@ urlpatterns = [
    path('d_bookings/', views.d_bookings, name='d_bookings'),
    path('add_slot/', views.add_slot, name='add_slot'),
    path('dr_addslot/', views.dr_addslot, name='dr_addslot'),
-  
+
+
+    path('indexfood/', views.indexfood, name='indexfood'),
     path('profile/weight', views.weight_log_view, name='weight_log'),
     path('profile/weight/delete/<int:weight_id>', views.weight_log_delete, name='weight_log_delete'),
     path('food/list', views.food_list_view, name='food_list'),
@@ -107,6 +109,8 @@ urlpatterns = [
     path('food/<str:food_id>', views.food_details_view, name='food_details'),
     path('categories', views.categories_view, name='categories_view'),
     path('categories/<str:category_name>', views.category_details_view, name='category_details_view'),
+
+
   
 
 path('toggle_user_status/<int:user_id>/', views.toggle_user_status, name='toggle_user_status'),
