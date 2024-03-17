@@ -3,68 +3,82 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Bookings</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-<style>
-    header {
-        text-align: left;
-        background-color: #0B2339;
-        color: #fff;
-        padding: 0.25rem 0;
-    }
+    <meta name="viewport" content="width=device-width, initial-scale=1 ,shrink-to-fit=no">
+    <meta name="author" content="Untree.co">
+  <link rel="shortcut icon" href="favicon.png">
 
-    footer {
-        background-color: #0B2339;
-        color: #fff;
-        padding: 1rem 0;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-    }
+  <meta name="description" content="" />
+  <meta name="keywords" content="" />
 
-    header {
-        background: linear-gradient(90deg, #0B2339, #4E5C68); /* Multicolor gradient background */
-        color: #fff;
-        padding: 0.01rem 0; /* Increased padding for a more prominent header */
-        
-    }
+  <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" rel="stylesheet">
+  <link rel="stylesheet" href="fonts/icomoon/style.css">
 
-    .custom-heading {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+  <link rel="stylesheet" href="{% static 'catalog/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'catalog/css/jquery-ui.css' %}">
+  <link rel="stylesheet" href="{% static 'catalog/css/owl.carousel.min.css' %}">
+  <link rel="stylesheet" href="{% static 'catalog/css/owl.theme.default.min.css' %}">
+  <link rel="stylesheet" href="{% static 'catalog/css/owl.theme.default.min.css' %}">
 
-    .custom-heading h6 {
-        font-family: 'Times New Roman', serif;
-        font-size: 1.60em;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        margin-left: 40px; /* Adjust the value as needed */
-        margin-right: 10px; /* Adjust the value as needed */
-    }
-    footer {
-        background: linear-gradient(90deg, #0B2339, #4E5C68); /* Multicolor gradient background */
-        color: #fff;
-        padding: 0.5rem 0; /* Increased padding for a more prominent footer */
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        text-align: center; /* Center align text */
-    }
+  <link rel="stylesheet" href="{% static 'catalog/css/jquery.fancybox.min.css' %}">
 
-    footer p {
-        margin: 0; /* Remove default margin for a cleaner look */
-        font-size: 1.0em; /* Increase font size for better visibility */
-    }
-   /* Add the following style for vertical centering */
-    .custom-heading div {
-        display: flex;
-        align-items: center;
-    } 
-</style>
+  <link rel="stylesheet" href="{% static 'catalog/css/bootstrap-datepicker.css' %}">
+
+  <link rel="stylesheet" href="{% static 'catalog/fonts/flaticon/font/flaticon.css' %}">
+
+  <link rel="stylesheet" href="{% static 'catalog/css/aos.css' %}">
+
+  <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}">
+  <title>Doctor Bookings</title>
 </head>
-<body>
+<body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+
+    <div class="site-wrap">
+
+        <div class="site-mobile-menu site-navbar-target">
+          <div class="site-mobile-menu-header">
+            <div class="site-mobile-menu-close mt-3">
+              <span class="icon-close2 js-menu-toggle"></span>
+            </div>
+          </div>
+          <div class="site-mobile-menu-body"></div>
+        </div>
+    
+        <div class="top-bar py-2" id="home-section">
+          <div class="container">
+            <div class="row">
+             
+               <div class="col-md-6 text-center text-lg-left order-lg-1">
+               
+              </div> 
+    
+            </div>
+          </div> 
+        </div>
+        <header class="site-navbar py-4 js-sticky-header site-navbar-target" role="banner">
+    
+          <div class="container">
+            <div class="row align-items-center">
+    
+              <div class="col-11 col-xl-2">
+                <h1 class="mb-0 site-logo"><a href="{% url 'd_dashboard' %}" class="mb-0">Calorie Tracker<span class="text-primary"></span> </a></h1>
+              </div>
+              <div class="col-12 col-md-10 d-none d-xl-block">
+                <nav class="site-navigation position-relative text-right" role="navigation">
+    
+                  <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
+                    <li><a href="#team-section" class="nav-link">Home</a></li>
+                    <li><a href="#work-section" class="nav-link">Work</a></li>
+                     
+                  </ul>
+                </nav>
+              </div>
+    
+    <div class="d-inline-block d-xl-none ml-md-0 mr-auto py-3" style="position: relative; top: 3px;"><a href="#" class="site-menu-toggle js-menu-toggle text-black"><span class="icon-menu h3"></span></a></div>
+    
+            </div>
+        </div>  
+        </header>
+
     <header class="custom-heading">
         <div class="container py-3">
             <div class="row">
@@ -82,9 +96,9 @@
                             </li>
                             <li class="breadcrumb-item">
                                 {% if user.is_Customer %}
-                                    <a href="{% url 'user_profile' %}">User Profile</a>
+                                    <a href="{% url 'dashboard' %}">User Dashboard</a>
                                 {% elif user.is_Dietitian %}
-                                    <a href="{% url 'duser_profile' %}">Dietitian Profile</a>
+                                    <a href="{% url 'd_dashboard' %}">Dietitian Dashboard</a>
                                 {% elif user.is_Doctor %}
                                     <a href="{% url 'druser_profile' %}">Doctor Profile</a>
                                 {% endif %}
@@ -95,22 +109,18 @@
                 </div>
             </div>
         </div>
-        <h6>Calorie Tracker</h6>
-    </header>
+    </header> 
 
-   
     <section class="h-100" style="background-color: #eee;">
         <div class="container h-100 py-5">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-10">
-                    <h3 class="fw-normal mb-4 text-black">Bookings for {{ dietitian.user.username }}</h3>
+                    {% comment %} <h3 class="fw-normal mb-4 text-black">Bookings for {{ dietitian.user.username }}</h3> {% endcomment %}
                     {% for user in users_who_booked %}
                     <div class="card mb-3">
                         <div class="card-body">
-                            <h4 class="card-title">{{ user.username }}</h4>
+                            <h5 class="card-title">{{ user.username }}</h5>
                             <p class="card-text">Email: {{ user.email }}</p>
-                            <!-- Add more user details here as needed -->
-                            <!-- Example: <p class="card-text">User Email: {{ user.email }}</p> -->
                         </div>
                     </div>
                     {% endfor %}
@@ -118,17 +128,47 @@
             </div>
         </div>
     </section>
-    <footer class="text-center">
-        <p>&copy; 2023 Calorie Tracker</p>
-    </footer>
+</div>
+    <script src="{% static 'catalog/js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery-migrate-3.0.1.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery-ui.js' %}"></script>
+    <script src="{% static 'catalog/js/popper.min.js' %}"></script>
+    <script src="{% static 'catalog/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'catalog/js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery.stellar.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery.countdown.min.js' %}"></script>
+    <script src="{% static 'catalog/js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery.easing.1.3.js' %}"></script>
+    <script src="{% static 'catalog/js/aos.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery.fancybox.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jarallax.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jarallax-element.min.js' %}"></script>
+    <script src="{% static 'catalog/js/lozad.min.js' %}"></script>
+    <script src="{% static 'catalog/js/modernizr.min.js' %}"></script>
+    <script src="{% static 'catalog/js/three.min.js' %}"></script>
+    <script src="{% static 'catalog/js/TweenMax.min.js' %}"></script>
+    <script src="{% static 'catalog/js/OBJLoader.js' %}"></script>
+    <script src="{% static 'catalog/js/ParticleHead.js' %}"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="{% static 'catalog/js/jquery.sticky.js' %}"></script>
 
+    <script src="{% static 'catalog/js/typed.js' %}"></script>
+    <script>
+      var typed = new Typed('.typed-words', {
+        strings: ["Web Apps"," WordPress"," Mobile Apps"],
+        typeSpeed: 80,
+        backSpeed: 80,
+        backDelay: 4000,
+        startDelay: 1000,
+        loop: true,
+        showCursor: true
+      });
+    </script>
 
+<script src="{% static 'catalog/js/main.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
-
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
-  </script>
 </body>
 </html>

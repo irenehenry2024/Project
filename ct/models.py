@@ -435,11 +435,13 @@ class ChatMessage(models.Model):
 class Recipe(models.Model):
   title = models.CharField(max_length=100)
   description = models.TextField()
-
+  image = models.ImageField(upload_to='recipe_images/', blank=True, null=True)  # Add this line for adding an image field
   author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
+  
+
 
   def get_absolute_url(self):
       return reverse("recipes-detail", kwargs={"pk": self.pk})
@@ -452,7 +454,83 @@ class Video(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()  # Add a description field
     video_file = models.FileField(upload_to='videos/')
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    created_at = models.DateTimeField()
+   
     # Add any other fields you need, such as tags, etc.
 
     def _str_(self):
         return self.title
+
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class Notification(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.message
+
+class FoodCategory(models.Model):
+    category_name = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = 'Food Category'
+        verbose_name_plural = 'Food Categories'
+
+    def __str__(self):
+        return f'{self.category_name}'
+
+    @property
+    def count_food_by_category(self):
+        return Food.objects.filter(category=self).count()
+
+
+class Food(models.Model):
+    food_name = models.CharField(max_length=200)
+    quantity = models.DecimalField(max_digits=7, decimal_places=2, default=100.00)
+    calories = models.IntegerField(default=0)
+    fat = models.DecimalField(max_digits=7, decimal_places=2)
+    carbohydrates = models.DecimalField(max_digits=7, decimal_places=2)
+    protein = models.DecimalField(max_digits=7, decimal_places=2)
+    category = models.ForeignKey(FoodCategory, on_delete=models.CASCADE, related_name='food_category')
+
+    def __str__(self):
+        return f'{self.food_name} - category: {self.category}'
+
+
+class Image(models.Model):
+    food = models.ForeignKey(Food, on_delete=models.CASCADE, related_name='get_images')
+    image = models.ImageField(upload_to='images/')
+
+    def __str__(self):
+        return f'{self.image}'
+
+
+class FoodLog(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    food_consumed = models.ForeignKey(Food, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'Food Log'
+        verbose_name_plural = 'Food Log'
+
+    def __str__(self):
+        return f'{self.user.username} - {self.food_consumed.food_name}'
+
+
+class Weight(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    weight = models.DecimalField(max_digits=7, decimal_places=2)
+    entry_date = models.DateField()
+
+    class Meta:
+        verbose_name = 'Weight'
+        verbose_name_plural = 'Weight'
+
+    def __str__(self):
+        return f'{self.user.username} - {self.weight} kg on {self.entry_date}'

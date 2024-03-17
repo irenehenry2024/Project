@@ -67,7 +67,7 @@
             </button>
     
             <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
-                <ul class="navbar-nav d-flex justify-content-between">
+                {% comment %} <ul class="navbar-nav d-flex justify-content-between">
                     <li class="nav-item only-desktop">
                         <a class="nav-link" id="side-nav-open" href="#">
                             <span class="lnr lnr-menu"></span>
@@ -87,7 +87,7 @@
                             <li><a href="{% static 'log_exercise' %}">Excercise</a></li>
                            
                            </ul>
-                          </li>
+                          </li> {% endcomment %}
 
 
                         {% comment %} <li class="nav-item active">
@@ -99,7 +99,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% static 'about.html' %}">Recipe Catalog</a>
                         </li> {% endcomment %}
-                        <li class="nav-item dropdown">
+                        {% comment %} <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="bookAppointmentsDropdown" role="button" aria-haspopup="true" aria-expanded="false">
                               Book Appointments
                             </a>
@@ -107,11 +107,11 @@
                          <li><a href=" {% url 'doctors_list' %} ">Book Doctors</a></li>
                          <li><a href="{% url 'dietitians_list' %}">Book Dietitian</a></li>
                         </ul>
-                       </li>
+                       </li> {% endcomment %}
                         {% comment %} <li class="nav-item active">
                             <a class="nav-link" href="{% url 'doctors_list' %}">Book Appointments</a>
                         </li> {% endcomment %}
-                        <li class="nav-item dropdown">
+                        {% comment %} <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="accountSettingsDropdown" role="button" aria-haspopup="true" aria-expanded="false">
                               Profile Settings
                             </a>
@@ -123,7 +123,7 @@
                        </li>
 
                     </div>
-                </ul>
+                </ul> {% endcomment %}
                 
                 <a class="navbar-brand navbar-brand-center d-flex align-items-center only-desktop" href="#">
                     <img src="img/logo.png" alt="">
@@ -154,7 +154,7 @@
                             <ol class="breadcrumb mb-0">
                                 <li class="breadcrumb-item">
                                     {% if user.is_Customer %}
-                                    <a href="{% url "index" %}" id="home">Home</a></li>
+                                    <a href="{% url "dashboard" %}" id="home">Home</a></li>
                                     {% elif user.is_Dietitian %}
                                     <a href="{% url "d_index" %}">Home</a></li>
                                     {% elif user.is_Doctor %}
@@ -172,10 +172,6 @@
                     <div class="col-lg-4">
                         <div class="card mb-4">
                             <div class="card-body text-center">
-                                {% comment %} <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
-                                     alt="avatar" 
-                                     class="rounded-circle img-fluid"
-                                     style="width: 150px;"> {% endcomment %}
                                      <h5 class="my-3">{{ user.username }}</h5>
                                      {% if user.is_Customer %}
                                         <p class="text-muted mb-1">Customer</p>
@@ -383,18 +379,12 @@
                                      <br><br><br>
 
                                 </form>
-                                
-                                
-                        
                             </section>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        
-        
-        
         
         <script>
             function populateDistricts() {

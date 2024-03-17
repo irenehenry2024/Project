@@ -1,12 +1,4 @@
 # forms.py
-from django import forms
-from .models import Feedback  # Import the Feedback model
-
-class FeedbackForm(forms.ModelForm):
-    class Meta:
-        model = Feedback
-        fields = ['professional_type', 'feedback_message']
-
 
 from django import forms
 from .models import Video
@@ -14,39 +6,37 @@ from .models import Video
 class VideoForm(forms.ModelForm):
     class Meta:
         model = Video
-        fields = ['title', 'video_file']
-
-# class FeedbackForm(forms.ModelForm):
-#     class Meta:
-#         model = Feedback
-#         fields = ['professional_type', 'professional_id', 'feedback_message']
+        fields = ['title','video_file']
 
 
-# from django import forms
-# from .models import Feedback, DietitianProfile, DoctorProfile
+from .models import Food, Image
 
-# class FeedbackForm(forms.ModelForm):
-#     class Meta:
-#         model = Feedback
-#         fields = ['professional_type', 'professional_id', 'feedback_message']
 
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         self.fields['professional_type'].widget = forms.HiddenInput()
-#         self.fields['professional_id'].widget = forms.HiddenInput()
+class FoodForm(forms.ModelForm):
+    '''
+    A ModelForm class for adding a new food item
+    '''
+    class Meta:
+        model = Food
+        fields = ['food_name', 'quantity', 'calories', 'fat', 'carbohydrates', 'protein', 'category']
 
-#     def clean(self):
-#         cleaned_data = super().clean()
-#         professional_type = cleaned_data.get('professional_type')
-#         professional_id = cleaned_data.get('professional_id')
+    def __init__(self, *args, **kwargs):
+        super(FoodForm, self).__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
 
-#         if professional_type and professional_id:
-#             if professional_type == 'doctor' and not DoctorProfile.objects.filter(id=professional_id).exists():
-#                 self.add_error('professional_id', 'Invalid doctor selected.')
-#             elif professional_type == 'dietitian' and not DietitianProfile.objects.filter(id=professional_id).exists():
-#                 self.add_error('professional_id', 'Invalid dietitian selected.')
 
-#         return cleaned_data
+class ImageForm(forms.ModelForm):
+    '''
+    A ModelForm class for adding an image to the food item
+    '''
+    class Meta:
+        model = Image
+        fields = ['image']
+
+    def __init__(self, *args, **kwargs):
+        super(ImageForm, self).__init__(*args, **kwargs)
+        self.visible_fields()[0].field.widget.attrs['class'] = 'form-control'
 
 
 

@@ -21,34 +21,16 @@ from django.urls import reverse
 from django.contrib.auth import login, authenticate
 from .models import UserProfile 
 
-from .models import Feedback
-from .forms import FeedbackForm
-
 from . import models
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
-# recipes = [
-#     {
-#         'author':'Dom',
-#         'title':'meatball sub',
-#         'description':'combine all ingredients',
-#         'date posted ':'May 19, 2022', 
-#     },
-#     {
-#         'author':'Dom',
-#         'title':'Turkey sub',
-#         'description':'combine all ingredients',
-#         'date posted ':'May 16, 2022', 
-#     },
-#     {
-#         'author':'Dom',
-#         'title':'Chicken sub',
-#         'description':'combine all ingredients',
-#         'date posted ':'May 20, 2022' ,
-#     },
-# ]
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db import IntegrityError
+from django.http import HttpResponseRedirect
+from .models import User, Food, FoodCategory, FoodLog, Image, Weight
+from .forms import FoodForm, ImageForm
 
 class RecipeListView(ListView):
   model = models.Recipe
@@ -80,11 +62,21 @@ class RecipeDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 class RecipeCreateView(LoginRequiredMixin, CreateView):
   model = models.Recipe
-  fields = ['title', 'description']
+  fields = ['title', 'description', 'image']
 
   def form_valid(self, form):
     form.instance.author = self.request.user
     return super().form_valid(form)
+
+  def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        if form.is_valid():
+            form.instance.author = self.request.user
+            form.instance.image = request.FILES.get('image')  # Access the uploaded image
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
 class RecipeUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
   model = models.Recipe
@@ -115,14 +107,17 @@ def view_recipes(request):
         recipes = []
         return render(request, 'view_recipes.html', {'recipes': recipes})
 
-
+from django.utils import timezone
 from .forms import VideoForm
 
 def upload_video(request):
     if request.method == 'POST':
         form = VideoForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            video = form.save(commit=False)
+            video.author = request.user  # Associate the current user with the video
+            video.created_at = timezone.now() 
+            video.save()
             return redirect('duser_profile')  # Update with your template name
     else:
         form = VideoForm()
@@ -130,24 +125,84 @@ def upload_video(request):
     return render(request, 'upload_video.html', {'form': form})
 
 
+
 from django.shortcuts import render
 from .models import Video
 
 def display_videos(request):
+    # Get all videos
     videos = Video.objects.all()
-    return render(request, 'display_videos.html', {'videos': videos})
+
+    # Categorize videos based on title keywords
+    categorized_videos = {
+        'Salads': videos.filter(title__icontains='salad'),
+        'Curry': videos.filter(title__icontains='curry'),
+        'Drink': videos.filter(title__icontains='drink'),
+        'Diet': videos.filter(title__icontains='diet'),
+        # Add more categories as needed
+    }
+
+    return render(request, 'display_videos.html', {'categorized_videos': categorized_videos})
 
 
+
+
+
+    
 
 def strategy_index(request):
     return render(request, "strategy_index.html")
 
-
-
-
-
 def index(request):
     return render(request, "index.html")
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required  # Import login_required decorator
+from .models import Notification
+
+@login_required  # Apply login_required decorator
+def dashboard(request):
+    # Check if the user is authenticated
+    if request.user.is_authenticated:
+        # Fetch notifications for the current user
+        notifications = Notification.objects.filter(user=request.user)
+        return render(request, 'dashboard.html', {'notifications': notifications})
+    else:
+        # Handle the case where the user is not authenticated
+        # For example, redirect to the login page
+        return redirect('login')
+
+
+from django.http import JsonResponse
+from .models import Notification
+
+def fetch_notifications(request):
+    # Fetch notifications for the current user
+    notifications = Notification.objects.filter(user=request.user)
+    # Convert notifications to JSON format
+    notifications_data = [{'message': notification.message} for notification in notifications]
+    # Return notifications as JSON response
+    return JsonResponse(notifications_data, safe=False)
+
+
+    
+
+from django.shortcuts import render, get_object_or_404
+from .models import DietitianProfile
+
+def d_dashboard(request):
+    # Assuming you have a way to determine the current logged-in dietitian
+    dietitian = request.user  # Assuming the logged-in user is a dietitian
+    
+    # If you need to retrieve additional information about the dietitian from a profile model
+    # dietitian_profile = get_object_or_404(DietitianProfile, user=dietitian)
+    
+    context = {
+        'dietitian': dietitian,
+        # You can pass additional context variables here if needed
+    }
+
+    return render(request, 'd_dashboard.html', context)
 
 
 
@@ -178,38 +233,239 @@ def get_calories_from_api(name):
         print(e)
         return None  # Handle exceptions, return None for simplicity
 
+
+def food_list_view(request):
+    '''
+    It renders a page that displays all food items
+    Food items are paginated: 4 per page
+    '''
+    foods = Food.objects.all()
+
+    for food in foods:
+        food.image = food.get_images.first()
+
+    # Show 4 food items per page
+    page = request.GET.get('page', 1)
+    paginator = Paginator(foods, 4)
+    try:
+        pages = paginator.page(page)
+    except PageNotAnInteger:
+        pages = paginator.page(1)
+    except EmptyPage:
+        pages = paginator.page(paginator.num_pages)
+
+    return render(request, 'index.html', {
+        'categories': FoodCategory.objects.all(),
+        'foods': foods,
+        'pages': pages,
+        'title': 'Food List'
+    })
+
+
+def food_details_view(request, food_id):
+    '''
+    It renders a page that displays the details of a selected food item
+    '''
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('login'))
+
+    food = Food.objects.get(id=food_id)
+
+    return render(request, 'food.html', {
+        'categories': FoodCategory.objects.all(),
+        'food': food,
+        'images': food.get_images.all(),
+    })
+
+
 @login_required
-def log_meals(request):
+def food_add_view(request):
+    '''
+    It allows the user to add a new food item
+    '''
+    ImageFormSet = forms.modelformset_factory(Image, form=ImageForm, extra=2)
+
     if request.method == 'POST':
-        name = request.POST.get('name')
-        quantity = int(request.POST.get('quantity'))
-        meal = request.POST.get('meal')
+        food_form = FoodForm(request.POST, request.FILES)
+        image_form = ImageFormSet(request.POST, request.FILES, queryset=Image.objects.none())
 
-        # Fetch calorie information from API Ninja using the provided name
-        calories = get_calories_from_api(name)
+        if food_form.is_valid() and image_form.is_valid():
+            new_food = food_form.save(commit=False)
+            new_food.save()
 
-        if calories is not None:
-            # Calculate total calories based on quantity
-            total_calories = quantity * calories
+            for food_form in image_form.cleaned_data:
+                if food_form:
+                    image = food_form['image']
 
-            # Create a LogMeals object and save it to the database
-            LogMeals.objects.create(
-                user=request.user,
-                name=name,
-                quantity=quantity,
-                calories=total_calories,
-                meal=meal
-            )
-            return redirect('log_meals')  # Redirect to the same page after submitting the form
+                    new_image = Image(food=new_food, image=image)
+                    new_image.save()
+
+            return render(request, 'food_add.html', {
+                'categories': FoodCategory.objects.all(),
+                'food_form': FoodForm(),
+                'image_form': ImageFormSet(queryset=Image.objects.none()),
+                'success': True
+            })
 
         else:
-            # Handle the case when the API request fails or returns invalid data
-            return render(request, 'log_meals.html', {'error_message': 'Failed to fetch calorie information'})
+            return render(request, 'food_add.html', {
+                'categories': FoodCategory.objects.all(),
+                'food_form': FoodForm(),
+                'image_form': ImageFormSet(queryset=Image.objects.none()),
+            })
 
-    context = {
-        'log_meals': LogMeals.objects.filter(user=request.user),
-    }
-    return render(request, 'log_meals.html', context)
+    else:
+        return render(request, 'food_add.html', {
+            'categories': FoodCategory.objects.all(),
+            'food_form': FoodForm(),
+            'image_form': ImageFormSet(queryset=Image.objects.none()),
+        })
+
+
+@login_required
+def food_log_view(request):
+    '''
+    It allows the user to select food items and
+    add them to their food log
+    '''
+    if request.method == 'POST':
+        foods = Food.objects.all()
+
+        # get the food item selected by the user
+        food = request.POST['food_consumed']
+        food_consumed = Food.objects.get(food_name=food)
+
+        # get the currently logged in user
+        user = request.user
+
+        # add selected food to the food log
+        food_log = FoodLog(user=user, food_consumed=food_consumed)
+        food_log.save()
+
+    else:  # GET method
+        foods = Food.objects.all()
+
+    # get the food log of the logged in user
+    user_food_log = FoodLog.objects.filter(user=request.user)
+
+    return render(request, 'food_log.html', {
+        'categories': FoodCategory.objects.all(),
+        'foods': foods,
+        'user_food_log': user_food_log
+    })
+
+
+@login_required
+def food_log_delete(request, food_id):
+    '''
+    It allows the user to delete food items from their food log
+    '''
+    # get the food log of the logged in user
+    food_consumed = FoodLog.objects.filter(id=food_id)
+
+    if request.method == 'POST':
+        food_consumed.delete()
+        return redirect('food_log')
+
+    return render(request, 'food_log_delete.html', {
+        'categories': FoodCategory.objects.all()
+    })
+
+
+@login_required
+def weight_log_view(request):
+    '''
+    It allows the user to record their weight
+    '''
+    if request.method == 'POST':
+
+        # get the values from the form
+        weight = request.POST['weight']
+        entry_date = request.POST['date']
+
+        # get the currently logged in user
+        user = request.user
+
+        # add the data to the weight log
+        weight_log = Weight(user=user, weight=weight, entry_date=entry_date)
+        weight_log.save()
+
+    # get the weight log of the logged in user
+    user_weight_log = Weight.objects.filter(user=request.user)
+
+    return render(request, 'user_profile.html', {
+        'categories': FoodCategory.objects.all(),
+        'user_weight_log': user_weight_log
+    })
+
+
+@login_required
+def weight_log_delete(request, weight_id):
+    '''
+    It allows the user to delete a weight record from their weight log
+    '''
+    # get the weight log of the logged in user
+    weight_recorded = Weight.objects.filter(id=weight_id)
+
+    if request.method == 'POST':
+        weight_recorded.delete()
+        return redirect('weight_log')
+
+    return render(request, 'weight_log_delete.html', {
+        'categories': FoodCategory.objects.all()
+    })
+
+
+def categories_view(request):
+    '''
+    It renders a list of all food categories
+    '''
+    return render(request, 'categories.html', {
+        'categories': FoodCategory.objects.all()
+    })
+
+
+def category_details_view(request, category_name):
+    '''
+    Clicking on the name of any category takes the user to a page that
+    displays all of the foods in that category
+    Food items are paginated: 4 per page
+    '''
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('login'))
+
+    category = FoodCategory.objects.get(category_name=category_name)
+    foods = Food.objects.filter(category=category)
+
+    for food in foods:
+        food.image = food.get_images.first()
+
+    # Show 4 food items per page
+    page = request.GET.get('page', 1)
+    paginator = Paginator(foods, 4)
+    try:
+        pages = paginator.page(page)
+    except PageNotAnInteger:
+        pages = paginator.page(1)
+    except EmptyPage:
+        pages = paginator.page(paginator.num_pages)
+
+    return render(request, 'food_category.html', {
+        'categories': FoodCategory.objects.all(),
+        'foods': foods,
+        'foods_count': foods.count(),
+        'pages': pages,
+        'title': category.category_name
+    })
+
+
+
+
+
+
+
+
+
 
 
 from ct.models import Thread
@@ -1831,10 +2087,16 @@ def dr_bookings(request, doctor_id):
 
     return render(request, 'dr_bookings.html', context)
 
-
+from django.shortcuts import render, get_object_or_404
 from .models import DietitianProfile, DietitianBooking
 
-def d_bookings(request, dietitian_id):
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required  # Import login_required decorator
+
+@login_required  # Decorate the view with login_required
+def d_bookings(request):
+    dietitian_id = request.user.id  # Get the current logged-in user's ID
+    
     # Use get_object_or_404 to retrieve the DietitianProfile or return a 404 response if it doesn't exist
     dietitian = get_object_or_404(CustomUser, id=dietitian_id)
     
@@ -1850,214 +2112,6 @@ def d_bookings(request, dietitian_id):
     }
 
     return render(request, 'd_bookings.html', context)
-
-
-
-from django.shortcuts import render, redirect
-from .models import UserProfile
-from django.contrib import messages
-
-def log_exercise(request):
-    if request.method == 'POST':
-        # Handle form submission here
-        exercise_name = request.POST.get('exercise_name')
-        duration = request.POST.get('duration')
-        date = request.POST.get('date')
-
-        # Perform any necessary processing or database operations here
-        # For example, you can save the exercise log to your database
-
-        messages.success(request, 'Exercise logged successfully.')
-        return redirect('log_exercise')  # Redirect to the same page after successful submission
-
-    return render(request, 'log_exercise.html')
-
-# views.py
-from django.shortcuts import render, redirect
-from .models import Feedback, DoctorProfile, DietitianProfile
-
-def submit_feedback(request):
-    if request.method == 'POST':
-        professional_type = request.POST.get('professional_type')
-        feedback_message = request.POST.get('feedback_message')
-
-        # Get the current user and their profile
-        user = request.user
-        user_profile = None
-
-        # Determine the professional type and set the appropriate profile
-        if professional_type == 'Doctor':
-            user_profile = user.doctorprofile
-        elif professional_type == 'Dietitian':
-            user_profile = user.dietitianprofile
-
-        # Create the feedback object
-        feedback = Feedback.objects.create(
-            professional_type=professional_type,
-            feedback_message=feedback_message,
-            user=user,
-        )
-
-        # Set the appropriate doctor or dietitian based on professional_type
-        if professional_type == 'Doctor':
-            feedback.doctor = user_profile
-        elif professional_type == 'Dietitian':
-            feedback.dietitian = user_profile
-
-        feedback.save()
-
-        return redirect('submit_feedback.html')  # Redirect to a success page
-
-    return render(request, 'submit_feedback.html', {})
-
-# views.py
-
-from django.shortcuts import render
-from .models import Feedback, DoctorProfile, DietitianProfile
-
-def dr_feedback(request):
-    # Assuming you have a DoctorProfile linked to the current user
-    doctor_profile = request.user.doctorprofile
-
-    # Get feedback specific to the doctor
-    professional_feedback = Feedback.objects.filter(doctor=doctor_profile)
-
-    return render(request, 'dr_feedback.html', {'professional_feedback': professional_feedback})
-
-def d_feedback(request):
-    # Assuming you have a DietitianProfile linked to the current user
-    dietitian_profile = request.user.dietitianprofile
-
-    # Get feedback specific to the dietitian
-    professional_feedback = Feedback.objects.filter(dietitian=dietitian_profile)
-
-    return render(request, 'd_feedback.html', {'professional_feedback': professional_feedback})
-
-
-# from django.shortcuts import render, redirect
-# from .models import Feedback, DoctorProfile, DietitianProfile
-
-# def submit_feedback(request):
-#     if request.method == 'POST':
-#         professional_type = request.POST.get('professional_type')
-#         feedback_message = request.POST.get('feedback_message')
-
-#         # Get the current user and their profile
-#         user = request.user
-#         user_profile = None
-
-#         if professional_type == 'Doctor':
-#             user_profile = user.DoctorProfile
-#         elif professional_type == 'Dietitian':
-#             user_profile = user.DietitianProfile
-
-
-#         # Create the feedback object
-#         feedback = Feedback.objects.create(
-#             professional_type=professional_type,
-#             feedback_message=feedback_message,
-#             user=user,
-#             doctor=user_profile if professional_type == 'Doctor' else None,
-#             dietitian=user_profile if professional_type == 'Dietitian' else None,
-#         )
-
-#         return redirect('submit_feedback.html')  # Redirect to a success page
-
-#     return render(request, 'submit_feedback.html', {})
-
-# from .models import DietitianProfile, DoctorProfile, Feedback
-# from .forms import FeedbackForm
-
-# def submit_feedback(request, professional_type, professional_id):
-#     if professional_type == 'dietitian':
-#         professional = DietitianProfile.objects.get(id=professional_id)
-#         feedback_template = 'd_feedback.html'  # Template for dietitians
-#     elif professional_type == 'doctor':
-#         professional = DoctorProfile.objects.get(id=professional_id)
-#         feedback_template = 'dr_feedback.html'  # Template for doctors
-
-#     if request.method == 'POST':
-#         form = FeedbackForm(request.POST)
-#         if form.is_valid():
-#             feedback = form.save(commit=False)
-#             feedback.user = request.user
-#             feedback.professional = professional
-#             feedback.save()
-#             messages.success(request, 'Feedback submitted successfully.')
-#             return render(request, feedback_template, {'professional': professional, 'feedback': feedback})
-#             # Redirecting to the feedback page with the feedback message
-
-#     else:
-#         form = FeedbackForm()
-
-#     return render(request, 'submit_feedback.html', {'form': form, 'professional': professional, 'professional_type': professional_type, 'professional_id': professional_id})
-
-# def d_feedback(request, professional_id):
-#     dietitian = DietitianProfile.objects.get(id=professional_id)
-#     feedback_messages = Feedback.objects.filter(professional=dietitian)
-
-#     return render(request, 'd_feedback.html', {'dietitian': dietitian, 'feedback_messages': feedback_messages})
-
-# def dr_feedback(request, professional_id):
-#     doctor = DoctorProfile.objects.get(id=professional_id)
-#     feedback_messages = Feedback.objects.filter(professional=doctor)
-
-#     return render(request, 'dr_feedback.html', {'doctor': doctor, 'feedback_messages': feedback_messages})
-
-# from .models import DietitianProfile, DoctorProfile, Feedback
-# from .forms import FeedbackForm
-
-# def submit_feedback(request, professional_type, professional_id):
-#     if professional_type == 'dietitian':
-#         professional = DietitianProfile.objects.get(id=professional_id)
-
-#     elif professional_type == 'doctor':
-#         professional = DoctorProfile.objects.get(id=professional_id)
-
-#     if request.method == 'POST':
-#         form = FeedbackForm(request.POST)
-
-#         if form.is_valid():
-#             feedback = form.save(commit=False)
-#             feedback.user = request.user
-#             feedback.professional = professional
-#             feedback.save()
-#             messages.success(request, 'Feedback submitted successfully.')
-#             return redirect('professional_profile', professional_type, professional_id)
-
-#     else:
-#         form = FeedbackForm()
-
-#     return render(request, 'submit_feedback.html', {'form': form, 'professional': professional, 'professional_type': professional_type, 'professional_id': professional_id})
-# views.py
-
-# views.py
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .forms import FeedbackForm
-from .models import Feedback
-
-@login_required
-def feedback_form(request):
-    if request.method == 'POST':
-        form = FeedbackForm(request.POST)
-        if form.is_valid():
-            feedback = form.save(commit=False)
-            feedback.user = request.user  # Assign the logged-in user to the feedback
-            feedback.save()
-            messages.success(request, 'Feedback submitted successfully.')
-            return redirect('user_profile')  # Redirect to a success page after submission
-
-    else:
-        form = FeedbackForm()
-
-    return render(request, 'feedback_form.html', {'form': form})
-
-
-
-
 
 
 # from django.shortcuts import render, redirect

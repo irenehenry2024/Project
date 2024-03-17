@@ -2,10 +2,10 @@
 <!-- -->
 {% block content %}
 <div class="container">
-  <form method="POST">
+  <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <fieldset class="form-group">
-      <legend class="border-bottom mb-4">Add Recipe</legend>
+      <center><h4>Add Recipe </h4></center>
       <!-- Render each field manually -->
       {% for field in form %}
         <div class="mb-3">
@@ -22,49 +22,13 @@
     </fieldset>
     <div class="form-group py-3">
       <input class="btn btn-outline-primary" type="submit" value="Save" />
+      <button class="btn btn-outline-primary" onclick="window.location.href='{% url 'recipes-home' %}'">Cancel</button>
+
     </div>
   </form>
-  <div class="border-top pt-3">
+  {% comment %} <div class="border-top pt-3">
     <a class="text-muted" href="{% url 'recipes-home' %}">Cancel</a>
-  </div>
+  </div> {% endcomment %}
 </div>
 <!-- -->
 {% endblock content %}
-
-
-
-
-
-
-{% comment %} {% extends "base.html" %}
-<!-- -->
-{% block content %}
-<div class="container">
-  <form method="POST">
-    {% csrf_token %}
-    <fieldset class="form-group">
-      <legend class="border-bottom mb-4">Add Recipe</legend>
-      <!-- Render each field manually -->
-      {% for field in form %}
-        <div class="form-group">
-          {{ field.label_tag }}
-          {{ field }}
-          {% if field.help_text %}
-            <small class="form-text text-muted">{{ field.help_text }}</small>
-          {% endif %}
-          {% for error in field.errors %}
-            <div class="alert alert-danger">{{ error }}</div>
-          {% endfor %}
-        </div>
-      {% endfor %}
-    </fieldset>
-    <div class="form-group py-3">
-      <input class="btn btn-outline-primary" type="submit" value="Save" />
-    </div>
-  </form>
-  <div class="border-top pt-3">
-    <a class="text-muted" href="{% url 'recipes-home' %}">Cancel</a>
-  </div>
-</div>
-<!-- -->
-{% endblock content %} {% endcomment %}

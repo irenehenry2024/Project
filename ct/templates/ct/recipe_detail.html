@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 <!-- -->
 {% block content %}
-<h1>Recipe # {{ object.id }}</h1>
+<center><h4>Recipe </h4></center>
 <div class="card my-4">
+  <img src="{{ object.image.url }}" class="card-img-top" alt="{{ object.title }}" style="max-width: 20%; height: auto;">
   <div class="card-body">
     <h5 class="card-title">{{ object.title }}</h5>
-    <h6 class="card-subtitle mb-2 text-muted">{{ object.author }}</h6>
+    <h6 class="card-subtitle mb-2 text-muted"> Posted by: {{ object.author }}</h6>
     <p class="card-text">{{ object.description }}</p>
     <h6 class="card-subtitle mb-2 text-muted">
       {{ object.updated_at|date:"F d, Y" }}
@@ -19,4 +20,36 @@
 </div>
 {% endif %}
 <!-- -->
+<script>
+  document.querySelector('form').addEventListener('submit', function(event) {
+    const titleField = document.querySelector('#id_title');
+    const descriptionField = document.querySelector('#id_description');
+    const imageField = document.querySelector('#id_image');
+
+    let errors = [];
+
+    if (!titleField.value.trim()) {
+      errors.push('Title cannot be empty.');
+    }
+
+    if (!descriptionField.value.trim()) {
+      errors.push('Description cannot be empty.');
+    }
+
+    const allowedFileSize = 5 * 1024 * 1024; // 5 MB
+    if (imageField.files.length > 0) {
+      const fileSize = imageField.files[0].size;
+      if (fileSize > allowedFileSize) {
+        errors.push('Image size must be less than 5MB.');
+      }
+    } else {
+      errors.push('Please select an image.');
+    }
+
+    if (errors.length > 0) {
+      event.preventDefault();
+      alert(errors.join('\n'));
+    }
+  });
+</script>
 {% endblock content %}

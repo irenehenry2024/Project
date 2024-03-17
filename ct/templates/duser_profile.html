@@ -67,7 +67,7 @@
         </button>
 
         <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
-            <ul class="navbar-nav d-flex justify-content-between">
+            {% comment %} <ul class="navbar-nav d-flex justify-content-between">
                 <li class="nav-item only-desktop">
                     <a class="nav-link" id="side-nav-open" href="#">
                         <span class="lnr lnr-menu"></span>
@@ -81,11 +81,8 @@
                     <ul class="dropdown-menu" aria-labelledby="accountSettingsDropdown">
                      <li><a href="{% url 'upload_video' %}">Tutorials</a></li>
                      <li><a href="{% url 'recipes-home' %}">Recipe Catalog</a></li>
-                     {% comment %} <li><a href="{% url 'home.html' %}">Recipe Catalog</a></li> {% endcomment %}
                      <li><a href="{% url 'add_slot' %}" id="addslot">Add Slots</a></li>
                      <li><a href="{% url 'd_bookings' dietitian_id=dietitian.user.id %}">Bookings</a></li>
-
-                     {% comment %} <li><a href="{% url 'd_feedback' %}">Feedbacks</a></li> {% endcomment %}
                    
                     </ul>
                 </li>
@@ -100,7 +97,7 @@
                </li>
 
             </div>
-        </ul>
+        </ul> {% endcomment %}
                 
                 
                 <a class="navbar-brand navbar-brand-center d-flex align-items-center only-desktop" href="#">

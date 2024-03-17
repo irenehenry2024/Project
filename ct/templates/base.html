@@ -1,20 +1,47 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Untree.co">
+  <link rel="shortcut icon" href="favicon.png">
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="" />
     {% if title %}
     <title>Django Recipes - {{title}}</title>
     {% else %}
     <title>Django Recipes</title>
     {% endif %}
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
-      crossorigin="anonymous"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous"/>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" rel="stylesheet">
+  <link rel="stylesheet" href="fonts/icomoon/style.css">
+
+  <link rel="stylesheet" href="{% static 'catalog/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'catalog/css/jquery-ui.css' %}">
+  <link rel="stylesheet" href="{% static 'catalog/css/owl.carousel.min.css' %}">
+  <link rel="stylesheet" href="{% static 'catalog/css/owl.theme.default.min.css' %}">
+  <link rel="stylesheet" href="{% static 'catalog/css/owl.theme.default.min.css' %}">
+
+  <link rel="stylesheet" href="{% static 'catalog/css/jquery.fancybox.min.css' %}">
+
+  <link rel="stylesheet" href="{% static 'catalog/css/bootstrap-datepicker.css' %}">
+
+  <link rel="stylesheet" href="{% static 'catalog/fonts/flaticon/font/flaticon.css' %}">
+
+  <link rel="stylesheet" href="{% static 'catalog/css/aos.css' %}">
+
+  <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}">
       <style>
-        /* Custom CSS for navbar */
+        .card-subtitle {
+          color: black;
+          font-weight: bold;
+        }
+        
+        {% comment %} /* Custom CSS for navbar */
         .navbar {
             background-color: #0C2D57; /* Dark gray background */
         }
@@ -39,46 +66,88 @@
         /* Additional styling for container */
         .container {
             padding-top: 10px; /* Add padding to the top */
-        }
-    </style>
+        } {% endcomment %}
+    </style> 
   </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
+  <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+    <div class="site-wrap">
+
+      <div class="site-mobile-menu site-navbar-target">
+        <div class="site-mobile-menu-header">
+          <div class="site-mobile-menu-close mt-3">
+            <span class="icon-close2 js-menu-toggle"></span>
+          </div>
+        </div>
+        <div class="site-mobile-menu-body"></div>
+      </div>
+
+      <div class="top-bar py-2" id="home-section">
+          <div class="container">
+            <div class="row">
+              <div class="col-md-6 text-center text-lg-right order-lg-2">
+                {% comment %} <ul class="social-media m-0 p-0">
+                  <li><a href="#" class="p-2"><span class="icon-facebook"></span></a></li>
+                  <li><a href="#" class="p-2"><span class="icon-twitter"></span></a></li>
+                  <li><a href="#" class="p-2"><span class="icon-instagram"></span></a></li>
+                  <li><a href="#" class="p-2"><span class="icon-linkedin"></span></a></li>
+                </ul> {% endcomment %}
+              </div>
+               <div class="col-md-6 text-center text-lg-left order-lg-1">
+                 {% comment %} <p class="mb-0 d-inline-flex">
+                  <span class="mr-3"><a href="tel://#" class="d-flex align-items-center"><span class="icon-phone mr-2"></span><span>+1 234 5678 9101</span></a></span>
+                  <span><a href="tel://#" class="d-flex align-items-center"><span class="icon-envelope mr-2"></span><span>info@domain.com</span></a></span>
+                </p>  {% endcomment %}
+              </div> 
+    
+            </div>
+          </div> 
+        </div>
+      <header class="site-navbar py-4 js-sticky-header site-navbar-target" role="banner">
+
+          <div class="container">
+            <div class="row align-items-center">
+    
+               <div class="col-11 col-xl-2">
+                <h5 class="mb-0 site-logo">Calorie Tracker<span class="text-primary"></span></h5>
+              </div> 
+              <div class="col-12 col-md-10 d-none d-xl-block">
+                <nav class="site-navigation position-relative text-right" role="navigation">
+    
+                  <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
+                    <li><a class="nav-link" href="{% url 'd_dashboard' %}">Home</a></li>
+                    {% comment %} <li><a href="#contact-section" class="nav-link">Recipes</a></li> {% endcomment %}
+                    <li><a class="nav-link" aria-current="page" href="{% url 'recipes-home' %}" >Recipes</a></li>
+                    <li><a class="nav-link" href="{% url 'recipes-create' %}">Add Recipe</a></li>
+                  </ul>
+                </nav>
+              </div>
+              <div class="d-inline-block d-xl-none ml-md-0 mr-auto py-3" style="position: relative; top: 3px;"><a href="#" class="site-menu-toggle js-menu-toggle text-black"><span class="icon-menu h3"></span></a></div>
+            </div>
+          </div>
+      </header>
+      
+    {% comment %} <nav class="navbar navbar-expand-lg navbar-dark bg-dark"> {% endcomment %}
+      {% comment %} <div class="container">
         <a class="navbar-brand" href="{% url 'recipes-home' %}">Recipes App</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
+        <button class="navbar-toggler"  type="button"  data-bs-toggle="collapse"  data-bs-target="#navbarNav"  aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" >
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a
-                class="nav-link"
-                aria-current="page"
-                href="{% url 'recipes-home' %}"
-                >Recipes</a
-              >
+              <a class="nav-link" aria-current="page" href="{% url 'recipes-home' %}" >Recipes</a>
             </li>
-            {% comment %} <li class="nav-item">
-              <a class="nav-link" href="{% url 'recipes-about' %}">About</a>
-            </li> {% endcomment %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'recipes-create' %}">Add Recipe</a>
+              <a class="nav-link" href="{% url 'recipes-about' %}">About</a>
             </li>
+             <li class="nav-item">
+              <a class="nav-link" href="{% url 'recipes-create' %}">Add Recipe</a>
+            </li> 
           </ul>
-        </div>
+        </div> {% endcomment %}
         <div class="navbar-nav">
           {% if user.is_authenticated %}
-          <a class="nav-item nav-link" href="{% url 'duser_profile' %}">Dietitian Profile</a >
-          {% comment %} <a class="nav-item nav-link" href="{% url 'loggout' %}">Logout</a> {% endcomment %}
+          <a class="nav-item nav-link" href="{% url 'duser_profile' %}"></a >
           {% else %}
           <a class="nav-item nav-link" href="{% url 'signin' %}">Login</a>
           <a class="nav-item nav-link" href="{% url 'dsignup' %}">Register</a>
@@ -91,20 +160,49 @@
       <div class="alert alert-{{ message.tags }}">{{ message }}</div>
       {% endfor %} {% endif %} {% block content %} {% endblock %}
     </div>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"
-      integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js"
-      integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy" crossorigin="anonymous"></script>
+
+    <script src="{% static 'catalog/js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery-migrate-3.0.1.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery-ui.js' %}"></script>
+    <script src="{% static 'catalog/js/popper.min.js' %}"></script>
+    <script src="{% static 'catalog/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'catalog/js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery.stellar.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery.countdown.min.js' %}"></script>
+    <script src="{% static 'catalog/js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery.easing.1.3.js' %}"></script>
+    <script src="{% static 'catalog/js/aos.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery.fancybox.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jarallax.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jarallax-element.min.js' %}"></script>
+    <script src="{% static 'catalog/js/lozad.min.js' %}"></script>
+    <script src="{% static 'catalog/js/modernizr.min.js' %}"></script>
+    <script src="{% static 'catalog/js/three.min.js' %}"></script>
+    <script src="{% static 'catalog/js/TweenMax.min.js' %}"></script>
+    <script src="{% static 'catalog/js/OBJLoader.js' %}"></script>
+    <script src="{% static 'catalog/js/ParticleHead.js' %}"></script>
+
+    <script src="{% static 'catalog/js/jquery.sticky.js' %}"></script>
+
+    <script src="{% static 'catalog/js/typed.js' %}"></script>
+    <script>
+      var typed = new Typed('.typed-words', {
+        strings: ["Web Apps"," WordPress"," Mobile Apps"],
+        typeSpeed: 80,
+        backSpeed: 80,
+        backDelay: 4000,
+        startDelay: 1000,
+        loop: true,
+        showCursor: true
+      });
+    </script>
+
+    <script src="{% static 'catalog/js/main.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   </body>
 </html>

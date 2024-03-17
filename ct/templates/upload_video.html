@@ -1,6 +1,4 @@
-{% load static %}
-
-<!-- upload_video.html -->
+ {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,67 +6,133 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Untree.co">
+  <link rel="shortcut icon" href="favicon.png">
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="" />
     <title>Upload Video</title>
     <!-- Include any additional CSS stylesheets or scripts you need -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <style>
-        body {
-            padding-top: 70px; /* Adjust according to navbar height */
-        }
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" rel="stylesheet">
+  <link rel="stylesheet" href="fonts/icomoon/style.css">
 
-        .navbar {
-            background-color: #0C2D57;
-            color: white;
-        }
+  <link rel="stylesheet" href="{% static 'catalog/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'catalog/css/jquery-ui.css' %}">
+  <link rel="stylesheet" href="{% static 'catalog/css/owl.carousel.min.css' %}">
+  <link rel="stylesheet" href="{% static 'catalog/css/owl.theme.default.min.css' %}">
+  <link rel="stylesheet" href="{% static 'catalog/css/owl.theme.default.min.css' %}">
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .card {
-            margin-top: 20px;
-        }
-    </style>
+  <link rel="stylesheet" href="{% static 'catalog/css/jquery.fancybox.min.css' %}">
+
+  <link rel="stylesheet" href="{% static 'catalog/css/bootstrap-datepicker.css' %}">
+
+  <link rel="stylesheet" href="{% static 'catalog/fonts/flaticon/font/flaticon.css' %}">
+
+  <link rel="stylesheet" href="{% static 'catalog/css/aos.css' %}">
+
+  <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}">
 </head>
-<body>
+<body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+    <div class="site-wrap">
 
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="#">Calorie Tracker</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'duser_profile' %}">Home</a>
-                    </li>
-                    {% comment %} <li class="nav-item">
-                        <a class="nav-link" href="#">Upload</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
-                    </li> {% endcomment %}
-                    <!-- Add more navbar items as needed -->
-                </ul>
+        <div class="site-mobile-menu site-navbar-target">
+          <div class="site-mobile-menu-header">
+            <div class="site-mobile-menu-close mt-3">
+              <span class="icon-close2 js-menu-toggle"></span>
             </div>
+          </div>
+          <div class="site-mobile-menu-body"></div>
         </div>
-    </nav>
-    <div class="container">
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title">Upload Video</h2>
+
+        <div class="top-bar py-2" id="home-section">
+            <div class="container">
+              <div class="row">
+                <div class="col-md-6 text-center text-lg-right order-lg-2">
+                  <ul class="social-media m-0 p-0">
+                    <li><a href="#" class="p-2"><span class="icon-facebook"></span></a></li>
+                    <li><a href="#" class="p-2"><span class="icon-twitter"></span></a></li>
+                    <li><a href="#" class="p-2"><span class="icon-instagram"></span></a></li>
+                    <li><a href="#" class="p-2"><span class="icon-linkedin"></span></a></li>
+                  </ul>
+                </div>
+                 <div class="col-md-6 text-center text-lg-left order-lg-1">
+                   {% comment %} <p class="mb-0 d-inline-flex">
+                    <span class="mr-3"><a href="tel://#" class="d-flex align-items-center"><span class="icon-phone mr-2"></span><span>+1 234 5678 9101</span></a></span>
+                    <span><a href="tel://#" class="d-flex align-items-center"><span class="icon-envelope mr-2"></span><span>info@domain.com</span></a></span>
+                  </p>  {% endcomment %}
+                </div> 
+      
+              </div>
+            </div> 
+          </div>
+        <header class="site-navbar py-4 js-sticky-header site-navbar-target" role="banner">
+
+            <div class="container">
+              <div class="row align-items-center">
+      
+                 <div class="col-11 col-xl-2">
+                  <h5 class="mb-0 site-logo">Calorie Tracker<span class="text-primary"></span></h5>
+                </div> 
+                <div class="col-12 col-md-10 d-none d-xl-block">
+                  <nav class="site-navigation position-relative text-right" role="navigation">
+      
+                    <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
+                      <li><a class="nav-link" href="{% url 'duser_profile' %}">Home</a></li>
+                      <li><a href="#contact-section" class="nav-link">Tutorial</a></li>
+                    </ul>
+                  </nav>
+                </div>
+                <div class="d-inline-block d-xl-none ml-md-0 mr-auto py-3" style="position: relative; top: 3px;"><a href="#" class="site-menu-toggle js-menu-toggle text-black"><span class="icon-menu h3"></span></a></div>
+              </div>
             </div>
-            <div class="card-body">
+        </header>
+        
+        <section class="site-section" id="contact-section">
+          <div class="container">
+            <div class="row mb-5">
+              <div class="col-12 text-center">
+                <h2 class="site-section-heading">Tutorial</h2>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12 mb-5">
                 <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit" class="btn btn-primary">Upload Video</button>
+                    
+                  <h2 class="h4 mb-5">Upload Video</h2> 
+  
+                  <div class="row form-group">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                    </div>
+                    <div class="col-md-6">
+                      {% comment %} <label class="text-black" for="lname">Last Name</label>
+                      <input type="text" id="lname" class="form-control"> {% endcomment %}
+                    </div>
+                  </div>
+  
+                  <div class="row form-group">
+  
+                    <div class="col-md-12">
+                      <label class="text-black" for="id_description">Description:</label>
+                      <textarea class="form-control" id="id_description" name="description" cols="30" rows="7" placeholder="Write your notes or questions here..." required></textarea>
+                      <span id="descriptionSpan" style="font-size: 12px;"></span>
+                    </div>
+                  </div>
+                
+                  <div class="row form-group">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary btn-md text-white">Upload Video</button>
+                    </div>
+                  </div>
                 </form>
+              </div>
+  
             </div>
-        </div>
-    </div>
+          </div>
+        </section>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Select the form element
@@ -102,11 +166,57 @@
             });
         });
     </script>
-    
-    <!-- Include any additional HTML content or scripts as needed -->
+    <script>
+        function validateForm() {
+            var description = document.getElementById("id_description").value;
+            if (description.trim() === "") {
+                document.getElementById("descriptionError").style.display = "block";
+                return false;
+            } else {
+                document.getElementById("descriptionError").style.display = "none";
+                return true;
+            }
+        }
+    </script>
+    <script src="{% static 'catalog/js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery-migrate-3.0.1.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery-ui.js' %}"></script>
+    <script src="{% static 'catalog/js/popper.min.js' %}"></script>
+    <script src="{% static 'catalog/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'catalog/js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery.stellar.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery.countdown.min.js' %}"></script>
+    <script src="{% static 'catalog/js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery.easing.1.3.js' %}"></script>
+    <script src="{% static 'catalog/js/aos.js' %}"></script>
+    <script src="{% static 'catalog/js/jquery.fancybox.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jarallax.min.js' %}"></script>
+    <script src="{% static 'catalog/js/jarallax-element.min.js' %}"></script>
+    <script src="{% static 'catalog/js/lozad.min.js' %}"></script>
+    <script src="{% static 'catalog/js/modernizr.min.js' %}"></script>
+    <script src="{% static 'catalog/js/three.min.js' %}"></script>
+    <script src="{% static 'catalog/js/TweenMax.min.js' %}"></script>
+    <script src="{% static 'catalog/js/OBJLoader.js' %}"></script>
+    <script src="{% static 'catalog/js/ParticleHead.js' %}"></script>
 
+    <script src="{% static 'catalog/js/jquery.sticky.js' %}"></script>
+
+    <script src="{% static 'catalog/js/typed.js' %}"></script>
+    <script>
+      var typed = new Typed('.typed-words', {
+        strings: ["Web Apps"," WordPress"," Mobile Apps"],
+        typeSpeed: 80,
+        backSpeed: 80,
+        backDelay: 4000,
+        startDelay: 1000,
+        loop: true,
+        showCursor: true
+      });
+    </script>
+
+    <script src="{% static 'catalog/js/main.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-</html>
+</html> 

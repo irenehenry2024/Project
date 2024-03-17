@@ -128,7 +128,7 @@
                     <a href="{% url 'loggout' %}" id="logout" class="nav-link">Logout</a>
                   </li>
                   <li class="nav-item active">
-                    <a href="{% url 'user_profile' %}" class="nav-link">Profile</a>
+                    <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
                   </li>
                   {% else %}
                   <li class="nav-item dropdown">
@@ -214,7 +214,7 @@
     <div class="container">
         <div class="section-content">
             <div class="row">
-                <div class="col-sm-5 img-bg d-flex shadow align-items-center justify-content-center justify-content-md-end img-2" style="background-image:src="{% static 'img/yoga.jpeg' %}">
+                <div class="col-sm-5 img-bg d-flex shadow align-items-center justify-content-center justify-content-md-end img-2">
                     {% comment %} <img class=" col-sm-5 img-bg d-flex shadow align-items-center justify-content-center justify-content-md-end img-2" src="{% static 'img/img4.jpg' %}" /> {% endcomment %}
                 </div>
                 <div class="col-sm-7 py-5 pl-md-0 pl-4">

@@ -33,7 +33,8 @@ urlpatterns = [
   #  path('about/', views.about, name="recipes-about"),
 
 
-
+  path('dashboard/', views.dashboard, name="dashboard"),
+  path('d_dashboard/', views.d_dashboard, name="d_dashboard"),
   path('upload_video/', views.upload_video, name='upload_video'),
   path('display_videos/', views.display_videos, name='display_videos'),
   path('strategy_index/', views.strategy_index, name='strategy_index'),
@@ -62,7 +63,7 @@ urlpatterns = [
    path('bmi_estimation/', views.bmi_estimation, name='bmi_estimation'),
    path('view_recipes/', views.view_recipes, name='view_recipes'),
 
-   path('log-exercise/', views.log_exercise, name='log_exercise'),
+   
    path('calorie_counting/', views.calorie_counting, name='calorie_counting'),
    path('food_intake/', views.food_intake, name='food_intake'),
    path('book-dietitian/', views.book_dietitian, name='book_dietitian'),
@@ -89,21 +90,23 @@ urlpatterns = [
    path('dratings/', views.dratings, name='dratings'),
    path('doctor_ratings/<int:doctor_id>/', views.doctor_ratings, name='doctor_ratings'),
    path('doctor_ratings_page/<int:doctor_id>/', views.doctor_ratings_page, name='doctor_ratings_page'),
-
+   path('fetch-notifications/', views.fetch_notifications, name='fetch_notifications'),
 
    
    path('dr_bookings/<int:doctor_id>/', views.dr_bookings, name='dr_bookings'),
-   path('d_bookings/<int:dietitian_id>/', views.d_bookings, name='d_bookings'),
-
-   path('log_meals/', views.log_meals, name='log_meals'),
-  
-   
-   path('feedback_form/', views.feedback_form, name='feedback_form'),
+   path('d_bookings/', views.d_bookings, name='d_bookings'),
    path('add_slot/', views.add_slot, name='add_slot'),
    path('dr_addslot/', views.dr_addslot, name='dr_addslot'),
-   path('submit_feedback/dietitian/', views.submit_feedback, {'professional_type': 'dietitian'}, name='submit_dietitian_feedback'),
-   path('submit_feedback/doctor/', views.submit_feedback, {'professional_type': 'doctor'}, name='submit_doctor_feedback'),
-
+  
+    path('profile/weight', views.weight_log_view, name='weight_log'),
+    path('profile/weight/delete/<int:weight_id>', views.weight_log_delete, name='weight_log_delete'),
+    path('food/list', views.food_list_view, name='food_list'),
+    path('food/add', views.food_add_view, name='food_add'),
+    path('food/foodlog', views.food_log_view, name='food_log'),
+    path('food/foodlog/delete/<int:food_id>', views.food_log_delete, name='food_log_delete'),
+    path('food/<str:food_id>', views.food_details_view, name='food_details'),
+    path('categories', views.categories_view, name='categories_view'),
+    path('categories/<str:category_name>', views.category_details_view, name='category_details_view'),
   
 
 path('toggle_user_status/<int:user_id>/', views.toggle_user_status, name='toggle_user_status'),
