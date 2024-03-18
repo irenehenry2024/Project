@@ -60,7 +60,6 @@ urlpatterns = [
    # path('doctor_profile/<int:doctor_id>/', views.doctor_profile, name='doctor_profile'),
    path('change_password/', views.change_password, name='change_password'),
    path('change_password/', views.change_password, name='change_password'),
-   path('bmi_estimation/', views.bmi_estimation, name='bmi_estimation'),
    path('view_recipes/', views.view_recipes, name='view_recipes'),
 
    

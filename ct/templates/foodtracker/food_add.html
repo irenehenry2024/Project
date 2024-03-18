@@ -1,95 +1,154 @@
-
-{% extends 'foodtracker/base.html' %}
-
 {% load static %}
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
+    <title>Add Food Item</title>
+    <link rel='icon' type='image/x-icon' href='{% static "images/favicon.ico" %}'>
+    
+    <!-- Icons -->
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css' rel='stylesheet'>
 
-{% block title %}Food Tracker | {{ food.food_name }}{% endblock %}
+    <!-- Fonts -->
+    <link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
+
+    <!-- Bootstrap CSS -->
+    <link href='{% static "css/bootstrap.min.css" %}' rel='stylesheet'>
+
+    <!-- Custom styles -->
+    <link href='{% static "css/styles.css" %}' rel='stylesheet'>
+</head>
 
 {% block body %}
-<div class='py-4 mt-auto'>
-    <div class='container-fluid px-4'>
-        <a href="{% url 'index' %}" class='btn btn-outline-primary my-3'>Go Back</a>
-
-        <h3>{{ food.food_name }}</h3>
-        <h5>Category: {{ food.category }}</h5>
-
-        <div class='row justify-content-center'>
-            <div class='col-6'>
-
-                {% for image in images %}
-                    <!-- Food image -->
-                    <a href='#'>
-                        <img 
-                            src="{{ image.image.url|default:'../../static/images/no_image.png' }}" 
-                            class='img-fluid'
-                            alt='food image'
-                        >
+<nav class='navbar navbar-expand-lg navbar-dark bg-primary'>
+    <div class='container-fluid'>
+        <a class='navbar-brand' href="{% url 'indexfood' %}">
+            Calorie Tracker
+        </a>
+        <button class='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarColor' aria-controls='navbarColor' aria-expanded='false' aria-label='Toggle navigation'>
+            <span class='navbar-toggler-icon'></span>
+        </button>
+        
+        <div class='collapse navbar-collapse' id='navbarColor'>
+            <ul class='navbar-nav me-auto'>
+                <li class='nav-item'>
+                    <a class='nav-link' href="{% url 'food_add' %}">
+                        <i class='far fa-plus-square'></i> Add Food Item
                     </a>
-                {% endfor %}
-            </div>
-            <div class='col-6'>
-                <div class='card text-white bg-info mb-3'>
-                    <div class='card-header'>
-                        <div class='d-flex w-100 justify-content-between'>
-                            <h5 class='card-title mb-1'>
-                                Calories per {{ food.quantity|floatformat:0 }} grams:
-                            </h5>
-                            <p><strong>{{ food.calories }}</strong></p>
-
-                            <input type='hidden' id='calories_details' name='calories_details' value='{{ food.calories }}'>
-                            <input type='hidden' id='fat_details' name='calories_details' value='{{ food.fat }}'>
-                            <input type='hidden' id='carbohydrates_details' name='calories_details' value='{{ food.carbohydrates }}'>
-                            <input type='hidden' id='protein_details' name='calories_details' value='{{ food.protein }}'>
-                        
-                        </div>
-                    </div>
-                    <div class='card-body'>
-
-                        <div class='d-flex w-100 justify-content-between'>
-                            <h5 class='card-title'>
-                                Macronutrients (g) per {{ food.quantity|floatformat:0 }} grams:
-                            </h5>
-                        </div>
-
-                        <div class='d-flex w-100 justify-content-between'>
-                            <p class='mb-1'>Fat:</p>
-                            <p><strong>{{ food.fat }}</strong></p>
-                        </div>
-
-                        <div class='d-flex w-100 justify-content-between'>
-                            <p class='mb-1'>Carbs:</p>
-                            <p><strong>{{ food.carbohydrates }}</strong></p>
-                        </div>
-
-                        <div class='d-flex w-100 justify-content-between'>
-                            <p class='mb-1'>Protein:</p>
-                            <p><strong>{{ food.protein }}</strong></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class='card bg-secondary mb-3'>
-                    <div class='card-header'>
-                        <h4>Macronutrients breakdown</h4>
-                    </div>
-                    <div class='card-body justify-content-center'>
-                        <div class='chart-bar'>
-                            <canvas id='myBarChart'></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+                </li>
+            </ul>
+            <ul class='navbar-nav ml-auto'>
+                <li class='nav-item'>
+                    <a class='nav-link' href="{% url 'd_dashboard' %}">
+                        <i class='fas fa-arrow-left'></i> Back
+                    </a>
+                </li>
+            </ul>
         </div>
+    </div>
+</nav>
+&nbsp;&nbsp;
 
+<div class='container'>
+    <div class='row justify-content-center'>
+        <div class='col-md-8'>
+            <div class='card'>
+                <div class='card-header'>Add Food Item</div>
+                <div class='card-body'>
+                    <form method='post' enctype='multipart/form-data'>
+                        {% csrf_token %}
+                        {{ food_form.as_p }}
+                        {{ image_form.as_p }}
+                        <button type='submit' class='btn btn-primary'>Submit</button>
+                        <a href="{% url 'indexfood' %}" class='btn btn-secondary'>Cancel</a>
+                    </form>
+                    {% if success %}
+                        <div class='alert alert-success mt-3' role='alert'>
+                            The new item has been added successfully.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('foodForm');
+        const submitButton = document.getElementById('submitButton');
+        const imageInput = document.getElementById('id_image');
+        const secondImageInput = document.getElementById('id_second_image');
+
+        // Function to enable/disable submit button based on form validation
+        function validateForm() {
+            const foodName = document.getElementById('id_food_name').value.trim();
+            const category = document.getElementById('id_category').value.trim();
+            const calories = parseFloat(document.getElementById('id_calories').value.trim());
+            const fatInput = document.getElementById('id_fat').value.trim();
+            const carbohydratesInput = document.getElementById('id_carbohydrates').value.trim();
+            const proteinInput = document.getElementById('id_protein').value.trim();
+            const image = imageInput.value.trim().toLowerCase();
+
+            // Check if fat, carbohydrates, and protein are within a range
+            const fatRange = fatInput.split('-');
+            const carbohydratesRange = carbohydratesInput.split('-');
+            const proteinRange = proteinInput.split('-');
+            const fatFrom = parseFloat(fatRange[0]);
+            const fatTo = parseFloat(fatRange[1]);
+            const carbohydratesFrom = parseFloat(carbohydratesRange[0]);
+            const carbohydratesTo = parseFloat(carbohydratesRange[1]);
+            const proteinFrom = parseFloat(proteinRange[0]);
+            const proteinTo = parseFloat(proteinRange[1]);
+
+            // Check if all fields are filled and data types are correct
+            if (foodName !== '' && category !== '' && !isNaN(calories) && validateRange(fatInput) && validateRange(carbohydratesInput) && validateRange(proteinInput) && validateImage(image)) {
+                // Check if only one image field is filled
+                if ((image !== '' && secondImageInput.value.trim() === '') || (image === '' && secondImageInput.value.trim() !== '')) {
+                    submitButton.disabled = false;
+                } else {
+                    submitButton.disabled = true;
+                }
+            } else {
+                submitButton.disabled = true;
+            }
+        }
+
+        // Function to validate range format
+        function validateRange(value) {
+            const range = value.split('-');
+            if (range.length === 2) {
+                const from = parseFloat(range[0]);
+                const to = parseFloat(range[1]);
+                return !isNaN(from) && !isNaN(to);
+            }
+            return !isNaN(parseFloat(value));
+        }
+
+        // Function to validate image file format
+        function validateImage(image) {
+            const allowedFormats = ['jpg', 'jpeg', 'png'];
+            const extension = image.substring(image.lastIndexOf('.') + 1);
+            return allowedFormats.includes(extension);
+        }
+
+        // Event listeners for input fields to trigger form validation
+        form.addEventListener('input', validateForm);
+
+        // Initial form validation
+        validateForm();
+    });
+</script>
+
     <!-- Page level plugins -->    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
 
     <!-- Page level custom scripts -->
     <script src="{% static 'js/foodDetails.js' %}"></script>
 {% endblock %}
+&nbsp;&nbsp;
+</body>
+</html>

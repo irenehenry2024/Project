@@ -261,7 +261,7 @@ def food_list_view(request):
     except EmptyPage:
         pages = paginator.page(paginator.num_pages)
 
-    return render(request, 'index.html', {
+    return render(request, 'indexfood.html', {
         'categories': FoodCategory.objects.all(),
         'foods': foods,
         'pages': pages,
@@ -285,11 +285,19 @@ def food_details_view(request, food_id):
     })
 
 
+from django.contrib.auth.decorators import login_required
+
 @login_required
 def food_add_view(request):
     '''
     It allows the user to add a new food item
     '''
+
+    # Check if the user is a superuser or dietitian
+    if not (request.user.is_superuser or request.user.is_Dietitian):
+        # If not authorized, redirect to home page or any other appropriate page
+        return HttpResponseRedirect(reverse('indexfood'))
+
     ImageFormSet = forms.modelformset_factory(Image, form=ImageForm, extra=2)
 
     if request.method == 'POST':
@@ -327,6 +335,7 @@ def food_add_view(request):
             'food_form': FoodForm(),
             'image_form': ImageFormSet(queryset=Image.objects.none()),
         })
+
 
 
 @login_required
@@ -439,7 +448,7 @@ def category_details_view(request, category_name):
     Food items are paginated: 4 per page
     '''
     if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('login'))
+        return HttpResponseRedirect(reverse('signin'))
 
     category = FoodCategory.objects.get(category_name=category_name)
     foods = Food.objects.filter(category=category)
@@ -2030,50 +2039,50 @@ def food_intake_list(request):
     users = UserProfile.objects.all()
     return render(request, 'food_intake_list.html', {'users': users})
 
-from django.shortcuts import render
-from .models import UserProfile
-from django.contrib.auth.decorators import login_required
+# from django.shortcuts import render
+# from .models import UserProfile
+# from django.contrib.auth.decorators import login_required
 
-@login_required
-def bmi_estimation(request):
-    user_profile = UserProfile.objects.get(user=request.user)
+# @login_required
+# def bmi_estimation(request):
+#     user_profile = UserProfile.objects.get(user=request.user)
 
-    if user_profile.height and user_profile.weight:
-        height_in_meters = user_profile.height / 100  # Convert height to meters
-        bmi = user_profile.weight / (height_in_meters ** 2)
-        user_profile.bmi = bmi  # Save BMI in the user profile
-        user_profile.save()
-     # Calculate BMR (Basal Metabolic Rate)
-        if user_profile.gender == 'M':
-            bmr = 88.362 + (13.397 * user_profile.weight) + (4.799 * user_profile.height) - (5.677 * user_profile.age)
-        elif user_profile.gender == 'F':
-            bmr = 447.593 + (9.247 * user_profile.weight) + (3.098 * user_profile.height) - (4.330 * user_profile.age)
-        else:
-            bmr = 0
+#     if user_profile.height and user_profile.weight:
+#         height_in_meters = user_profile.height / 100  # Convert height to meters
+#         bmi = user_profile.weight / (height_in_meters ** 2)
+#         user_profile.bmi = bmi  # Save BMI in the user profile
+#         user_profile.save()
+#      # Calculate BMR (Basal Metabolic Rate)
+#         if user_profile.gender == 'M':
+#             bmr = 88.362 + (13.397 * user_profile.weight) + (4.799 * user_profile.height) - (5.677 * user_profile.age)
+#         elif user_profile.gender == 'F':
+#             bmr = 447.593 + (9.247 * user_profile.weight) + (3.098 * user_profile.height) - (4.330 * user_profile.age)
+#         else:
+#             bmr = 0
 
-        if request.method == 'POST':
-        # Assuming 'activity_level' is in the POST data
-           activity_level = request.POST.get('activity_level')
-           user_profile.activity_level = activity_level
+#         if request.method == 'POST':
+#         # Assuming 'activity_level' is in the POST data
+#            activity_level = request.POST.get('activity_level')
+#            user_profile.activity_level = activity_level
 
-        # Calculate total calorie intake based on activity level
-        activity_level_multiplier = {
-            'Sedentary': 1.2,
-            'Lightly Active': 1.375,
-            'Moderately Active': 1.55,
-            'Active': 1.725,
-            'Very Active': 1.9,
-        }
+#         # Calculate total calorie intake based on activity level
+#         activity_level_multiplier = {
+#             'Sedentary': 1.2,
+#             'Lightly Active': 1.375,
+#             'Moderately Active': 1.55,
+#             'Active': 1.725,
+#             'Very Active': 1.9,
+#         }
 
-        activity_level = user_profile.activity_level
-        total_calorie_intake = bmr * activity_level_multiplier.get(activity_level, 1.2)
+#         activity_level = user_profile.activity_level
+#         total_calorie_intake = bmr * activity_level_multiplier.get(activity_level, 1.2)
 
-    context = {
-        'user_profile': user_profile,
-        'total_calorie_intake': total_calorie_intake,
-    }
+#     context = {
+#         'user_profile': user_profile,
+#         'total_calorie_intake': total_calorie_intake,
+#     }
 
-    return render(request, 'bmi_estimation.html', context)
+#     return render(request, 'bmi_estimation.html', context)
 
 from django.shortcuts import render, redirect
 from django.shortcuts import get_object_or_404  # Import get_object_or_404

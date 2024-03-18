@@ -54,19 +54,8 @@
     <div class="top-bar py-2" id="home-section">
       <div class="container">
         <div class="row">
-          {% comment %} <div class="col-md-6 text-center text-lg-right order-lg-2">
-            <ul class="social-media m-0 p-0">
-              <li><a href="#" class="p-2"><span class="icon-facebook"></span></a></li>
-              <li><a href="#" class="p-2"><span class="icon-twitter"></span></a></li>
-              <li><a href="#" class="p-2"><span class="icon-instagram"></span></a></li>
-              <li><a href="#" class="p-2"><span class="icon-linkedin"></span></a></li>
-            </ul>
-          </div> {% endcomment %}
            <div class="col-md-6 text-center text-lg-left order-lg-1">
-            {% comment %} <p class="mb-0 d-inline-flex">
-              <span class="mr-3"><a href="tel://#" class="d-flex align-items-center"><span class="icon-phone mr-2"></span><span>+1 234 5678 9101</span></a></span>
-              <span><a href="tel://#" class="d-flex align-items-center"><span class="icon-envelope mr-2"></span><span>info@domain.com</span></a></span>
-            </p>  {% endcomment %}
+           
           </div> 
 
         </div>
@@ -93,9 +82,9 @@
                   <ul class="dropdown">
                     <li><a href="{% url 'calorie_counting' %}">Food Intake</a></li>
                     <li><a href="{% url 'display_videos' %}">View Tutorials</a></li>
-                    <li><a href="{% url 'bmi_estimation' %}">BMI Estimation</a></li>
-                    <li><a href="{% url 'view_recipes' %}">View Recipe</a></li>
-                    <li><a href="{% static 'log_exercise' %}">Excercise</a></li>
+                    <li><a href="{% url 'indexfood' %}">Food Log</a></li>
+                    {% comment %} <li><a href="{% url 'view_recipes' %}">View Recipe</a></li> {% endcomment %}
+                    {% comment %} <li><a href="{% static 'log_exercise' %}">Excercise</a></li> {% endcomment %}
                   </ul>
                 </li> 
 
@@ -104,7 +93,7 @@
                   <ul class="dropdown">
                     <li><a href="{% url 'user_profile' %}">My Profile</a></li>
                     <li><a href="{% url "change_password" %}">Change Password</a></li>
-                    <li><a href="{% url 'feedback_form' %}">Feedback</a></li>
+                    {% comment %} <li><a href="{% url 'feedback_form' %}">Feedback</a></li> {% endcomment %}
                   </ul>
                 </li> 
                 {% comment %} <li><a href="#blog-section" class="nav-link">Blog</a></li> {% endcomment %}
@@ -124,17 +113,7 @@
 
         </div>
     </div> 
-              <!-- Add this code to display notifications -->
-<div class="notification-dropdown">
-  <a href="#" class="notification-icon"><span class="icon-bell"></span></a>
-  <div class="notification-dropdown-content">
-      {% for notification in notifications %}
-          <div class="notification">{{ notification.message }}</div>
-      {% empty %}
-          <div class="notification">No new notifications</div>
-      {% endfor %}
-  </div>
-</div> 
+
     </header>
 
     <section class="site-section border-bottom" id="services-section">
@@ -228,26 +207,6 @@
    <!-- Your HTML content -->
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-$(document).ready(function(){
-    // Handle click event on bell icon
-    $(".notification-icon").click(function(){
-        // Fetch notifications using AJAX
-        $.get("{% url 'fetch_notifications' %}", function(data){
-            $(".notification-dropdown-content").html(data);
-        });
-        // Toggle dropdown visibility
-        $(".notification-dropdown-content").toggle();
-    });
-    
-    // Close dropdown when clicking outside
-    $(document).click(function(event){
-        if (!$(event.target).closest('.notification-dropdown').length) {
-            $(".notification-dropdown-content").hide();
-        }
-    });
-});
-</script>
 </body>
 </html>
 
