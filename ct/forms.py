@@ -8,6 +8,30 @@ class VideoForm(forms.ModelForm):
         model = Video
         fields = ['title','video_file']
 
+from django import forms
+from .models import Recipe
+
+class RecipeForm(forms.ModelForm):
+    class Meta:
+        model = Recipe
+        fields = ['title', 'description', 'image']  # Fields to include in the form
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            # You may want to customize the widget for the image field if needed
+        }
+        labels = {
+            'title': 'Title',  # Custom labels for the fields
+            'description': 'Description',
+            'image': 'Image',
+        }
+
+
+
+
+
+
+
 
 from .models import Food, Image
 

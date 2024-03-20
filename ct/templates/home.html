@@ -1,11 +1,11 @@
-{% extends "base.html" %}
+{% extends "ct/base.html" %}
 <!-- -->
 {% block content %}
 <center><h4>Recipes</h4></center>
 {% for recipe in recipes %}
 <div class="card my-4">
-<img src="{{ object.image.url }}" class="card-img-top" alt="{{ object.title }}" style="max-width: 20%; height: auto;">
-  <div class="card-body">
+  <img src="{{ object.image.url }}" class="card-img-top" alt="{{ object.title }}" style="max-width: 20%; height: auto;">
+<div class="card-body">
     <h5 class="card-title">{{ recipe.title }}</h5>
     <h6 class="card-subtitle mb-2 text-muted">Posted by: {{ recipe.author }}</h6>
     <p class="card-text">{{ recipe.description }}</p>

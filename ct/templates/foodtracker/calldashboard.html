@@ -1,0 +1,79 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoChat</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        /* Import Google font - Poppins */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            width: 100%;
+            background: #D9DFE4;
+        }
+
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 430px;
+            width: 100%;
+            background: #fff;
+            border-radius: 7px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .container .form {
+            padding: 2rem;
+        } 
+
+        /* Centered text with dancing bars */
+        .dancing-bars {
+            display: inline-block;
+            background: navy;
+            color: white;
+            padding: 5px 15px;
+            margin: 10px;
+            border-radius: 5px;
+            animation: dancing 1s infinite;
+        }
+
+        @keyframes dancing {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="form">
+      <h3>Welcome, {{name}}!</h3>
+        <div class="intro">
+            <h4>Choose an action:</h4>
+            <a class="dancing-bars" href="{% url 'meeting' %}">New Meeting</a>
+            <a class="dancing-bars" href="{% url 'join_room' %}">Join Meeting</a>
+            <a class="dancing-bars" href="{% url 'loggout' %}">Logout</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

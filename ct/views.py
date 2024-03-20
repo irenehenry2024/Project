@@ -44,7 +44,7 @@ def home(request):
   context = {
     'recipes': recipes
   }
-  return render(request, 'home.html', context)
+  return render(request, 'recipes-home.html', context)
 
 # def about(request):
 #   return render(request, 'about.html', {'title': 'about page'})
@@ -146,9 +146,20 @@ def display_videos(request):
     return render(request, 'display_videos.html', {'categorized_videos': categorized_videos})
 
 
+@login_required
+def videocall(request):
+    return render(request, 'foodtracker/videocall.html', {'name': request.user.username})
 
+@login_required
+def calldashboard(request):
+    return render(request, 'foodtracker/calldashboard.html', {'name': request.user.username})
 
-
+@login_required
+def join_room(request):
+    if request.method == 'POST':
+        roomID = request.POST['roomID']
+        return redirect("/meeting?roomID=" + roomID)
+    return render(request, 'foodtracker/joinroom.html')
     
 
 def strategy_index(request):

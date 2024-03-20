@@ -109,6 +109,10 @@ urlpatterns = [
     path('categories', views.categories_view, name='categories_view'),
     path('categories/<str:category_name>', views.category_details_view, name='category_details_view'),
 
+    path('calldashboard/',views.calldashboard, name='calldashboard'),
+    path('meeting/',views.videocall, name='meeting'),
+    path('join/',views.join_room, name='join_room'),
+    
 
   
 
