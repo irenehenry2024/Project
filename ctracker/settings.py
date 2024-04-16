@@ -89,8 +89,19 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
 }
+}
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'mydatabase',
+#         'PASSWORD': 'mypassword',
+#         'HOST': 'db',
+#         'USER': 'mydatabaseuser',
+#         'PORT':5432
+#     }
+# }
 
 
 # Password validation
@@ -173,7 +184,6 @@ EMAIL_USE_TLS = True  # or False depending on your SMTP server
 EMAIL_USE_SSL = False  # or True depending on your SMTP server
 EMAIL_HOST_USER = 'irenehenry2024a@mca.ajce.in'
 EMAIL_HOST_PASSWORD = '$Irene3698'
-
 EMAIL_DEBUG = True
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
