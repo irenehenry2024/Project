@@ -145,6 +145,78 @@ def display_videos(request):
 
     return render(request, 'display_videos.html', {'categorized_videos': categorized_videos})
 
+# views.py
+
+import nltk
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
+
+from django.shortcuts import render
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import linear_kernel
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+
+# Load the dataset
+def load_data():
+    df = pd.read_csv(r'C:\Users\irene\Downloads\Recipes.csv')
+    return df
+
+# Preprocess the dataset
+def preprocess_data(df):
+    # Convert ingredients to lowercase
+    df['Cleaned_Ingredients'] = df['Ingredients'].str.lower()
+    # Tokenize ingredients
+    df['Cleaned_Ingredients'] = df['Cleaned_Ingredients'].apply(word_tokenize)
+    # Remove stopwords
+    custom_stopwords = set(stopwords.words('english')) - {'salt', 'pepper', 'oil'}  # Customize stopwords
+    df['Cleaned_Ingredients'] = df['Cleaned_Ingredients'].apply(lambda x: [word for word in x if word not in custom_stopwords])
+    # Lemmatize ingredients
+    lemmatizer = WordNetLemmatizer()
+    df['Cleaned_Ingredients'] = df['Cleaned_Ingredients'].apply(lambda x: [lemmatizer.lemmatize(word) for word in x])
+    # Combine tokens back to sentences
+    df['Cleaned_Ingredients'] = df['Cleaned_Ingredients'].apply(' '.join)
+    return df
+
+def recommend_recipes(request):
+    if request.method == 'POST':
+        user_input = request.POST.get('food_item', '')
+        # Load and preprocess data
+        df = load_data()
+        df = preprocess_data(df)
+        
+        # Initialize TF-IDF Vectorizer with adjusted parameters
+        vectorizer = TfidfVectorizer(stop_words='english', min_df=2, max_df=0.8, ngram_range=(1, 2))
+        
+        # Fit and transform the vectorizer with all ingredients
+        tfidf_matrix = vectorizer.fit_transform(df['Cleaned_Ingredients'])
+        
+        # Transform user input using fitted vectorizer
+        user_input_vector = vectorizer.transform([user_input])
+        
+        # Calculate cosine similarity between user input and recipes
+        similarity_scores = linear_kernel(user_input_vector, tfidf_matrix)
+        
+        # Get indices of all similar recipes
+        all_indices = similarity_scores.argsort()[0][::-1]
+        
+        # Initialize a list to store recommended recipes
+        recommended_recipes = []
+        
+        # Display up to 10 similar recipes
+        for idx in all_indices:
+            recipe = df.iloc[idx]
+            recommended_recipes.append(recipe)
+            if len(recommended_recipes) >= 10:
+                break
+        
+        return render(request, 'recommend_recipes.html', {'recommended_recipes': recommended_recipes})
+    else:
+        return render(request, 'recommend_recipes.html', {})
+
 
 @login_required
 def videocall(request):

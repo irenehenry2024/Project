@@ -112,8 +112,7 @@ urlpatterns = [
     path('calldashboard/',views.calldashboard, name='calldashboard'),
     path('meeting/',views.videocall, name='meeting'),
     path('join/',views.join_room, name='join_room'),
-    
-
+    path('recommend_recipes/', views.recommend_recipes, name='recommend_recipes'),
   
 
 path('toggle_user_status/<int:user_id>/', views.toggle_user_status, name='toggle_user_status'),

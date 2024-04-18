@@ -31,8 +31,6 @@ class RecipeForm(forms.ModelForm):
 
 
 
-
-
 from .models import Food, Image
 
 class FoodForm(forms.ModelForm):
